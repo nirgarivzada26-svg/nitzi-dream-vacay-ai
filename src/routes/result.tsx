@@ -1,14 +1,17 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { NitziLogo } from "@/components/NitziLogo";
-import { ArrowLeft, Calendar, Hotel, MapPin, Sparkles, Utensils, Wallet, Wand2 } from "lucide-react";
+import {
+  ArrowLeft, Bookmark, Calendar, Cloud, Hotel, MapPin, Plane,
+  Share2, Sparkles, Utensils, Wallet, Wand2,
+} from "lucide-react";
 import { defaultAnswers, pickDestination, tripTypes, styles, type QuizAnswers } from "@/lib/nitzi-data";
 
 export const Route = createFileRoute("/result")({
   head: () => ({
     meta: [
       { title: "החופשה שלך — NITZI" },
-      { name: "description", content: "הצעת חופשה בהתאמה אישית מ-NITZI." },
+      { name: "description", content: "הצעת חופשה בהתאמה אישית מ-NITZI: יעד, מסלול, מלונות, מזג אוויר ותקציב." },
       { property: "og:title", content: "החופשה המושלמת שלך מוכנה" },
       { property: "og:description", content: "יעד, מסלול יומי, מלונות ואטרקציות — הכל בפנים." },
     ],
@@ -20,63 +23,87 @@ function Result() {
   const navigate = useNavigate();
   const [answers, setAnswers] = useState<QuizAnswers>(defaultAnswers);
   const [loading, setLoading] = useState(true);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem("nitzi:answers");
       if (raw) setAnswers(JSON.parse(raw));
     } catch {}
-    const t = setTimeout(() => setLoading(false), 1800);
+    const t = setTimeout(() => setLoading(false), 2200);
     return () => clearTimeout(t);
   }, []);
 
   const dest = useMemo(() => pickDestination(answers), [answers]);
   const total = answers.budget * answers.people;
+  const enoughBudget = answers.budget >= dest.avgBudgetPerPerson * 0.85;
+  const matchScore = useMemo(() => {
+    const base = 82;
+    const typeMatch = answers.type && dest.matches.includes(answers.type) ? 12 : 4;
+    const budgetMatch = enoughBudget ? 4 : -3;
+    return Math.max(70, Math.min(99, base + typeMatch + budgetMatch));
+  }, [answers.type, dest, enoughBudget]);
+
   const typeLabel = tripTypes.find((t) => t.id === answers.type)?.label ?? "חופשה";
   const styleLabel = styles.find((s) => s.id === answers.style)?.label ?? "";
+
+  const share = async () => {
+    const text = `${dest.name}, ${dest.country} — נבנה לי על ידי NITZI ✨`;
+    if (navigator.share) {
+      try { await navigator.share({ title: "NITZI", text, url: window.location.href }); } catch {}
+    } else {
+      try { await navigator.clipboard.writeText(text); } catch {}
+    }
+  };
 
   if (loading) return <LoadingState />;
 
   return (
     <div dir="rtl" className="relative min-h-screen bg-background pb-24">
       <div aria-hidden className="pointer-events-none absolute -top-32 -right-24 h-80 w-80 rounded-full bg-gradient-sunset opacity-30 blur-3xl" />
-      <div aria-hidden className="pointer-events-none absolute top-1/2 -left-24 h-72 w-72 rounded-full bg-gradient-ocean opacity-25 blur-3xl" />
 
-      {/* Header */}
       <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur-lg">
         <div className="mx-auto flex w-full max-w-md items-center justify-between px-5 py-3">
-          <button
-            onClick={() => navigate({ to: "/quiz" })}
-            className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card"
-            aria-label="חזרה לשאלון"
-          >
+          <button onClick={() => navigate({ to: "/quiz" })} className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card" aria-label="חזרה">
             <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
           </button>
           <NitziLogo />
-          <div className="w-10" />
+          <div className="flex gap-1">
+            <button onClick={() => setSaved((s) => !s)} className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card" aria-label="שמור">
+              <Bookmark className={`h-4 w-4 ${saved ? "fill-primary text-primary" : ""}`} />
+            </button>
+            <button onClick={share} className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card" aria-label="שתף">
+              <Share2 className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-md space-y-5 px-5 pt-5">
-        {/* Hero card */}
-        <section className="relative overflow-hidden rounded-[2rem] bg-gradient-aurora p-6 text-white shadow-glow animate-fade-up">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold uppercase tracking-widest backdrop-blur">
+      <div className="mx-auto w-full max-w-md space-y-5 pt-5">
+        {/* Hero image */}
+        <section className="relative mx-5 overflow-hidden rounded-[2rem] shadow-glow animate-fade-up">
+          <img src={dest.image} alt={dest.name} width={800} height={1000} className="h-[380px] w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+          <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-[11px] font-bold text-white backdrop-blur-md">
             <Sparkles className="h-3 w-3" /> ההמלצה של NITZI
-          </span>
-          <div className="mt-4 flex items-start justify-between gap-3">
-            <div>
-              <h1 className="text-4xl font-black leading-none">{dest.name}</h1>
-              <p className="mt-1 text-sm font-semibold text-white/85">{dest.country} {dest.emoji}</p>
-            </div>
-            <div className="text-right text-xs font-bold">
-              <div className="rounded-xl bg-white/15 px-3 py-2 backdrop-blur">
-                <div className="text-[10px] text-white/70">התאמה</div>
-                <div className="text-lg">97%</div>
-              </div>
-            </div>
           </div>
-          <p className="mt-4 text-sm leading-relaxed text-white/95">{dest.tagline}</p>
+          <div className="absolute top-4 left-4 grid place-items-center rounded-2xl bg-gradient-sunset px-3 py-2 text-white shadow-glow">
+            <div className="text-[9px] font-bold uppercase tracking-widest opacity-90">התאמה</div>
+            <div className="text-xl font-black leading-none">{matchScore}%</div>
+          </div>
+          <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+            <p className="text-xs font-bold text-white/85">{dest.country} {dest.emoji}</p>
+            <h1 className="text-4xl font-black leading-tight drop-shadow-md">{dest.name}</h1>
+            <p className="mt-2 text-sm leading-relaxed text-white/90">{dest.tagline}</p>
+          </div>
         </section>
+
+        {/* Quick stats */}
+        <div className="mx-5 grid grid-cols-3 gap-2">
+          <MiniStat icon={<Cloud className="h-4 w-4" />} label="מזג אוויר" value={dest.weather} />
+          <MiniStat icon={<Plane className="h-4 w-4" />} label="טיסה מישראל" value={`${dest.flightHours} שעות`} />
+          <MiniStat icon={<Calendar className="h-4 w-4" />} label="משך" value={`${answers.days} ימים`} />
+        </div>
 
         {/* Why */}
         <Card>
@@ -85,16 +112,19 @@ function Result() {
             <Li>בחרת {typeLabel} — {dest.name} מספק/ת בדיוק את זה.</Li>
             {styleLabel && <Li>סגנון {styleLabel} מתאים לאווירה של היעד.</Li>}
             <Li>{answers.days} ימים = טיים־פריים מושלם לחוויה בלי להתעייף.</Li>
-            <Li>בניתי לך מסלול לפי תקציב של ₪{answers.budget.toLocaleString()} לאדם.</Li>
+            <Li>{answers.people} נוסעים — התאמתי מלונות ומסלול בהתאם.</Li>
           </ul>
         </Card>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-3">
-          <Stat icon={<Calendar className="h-4 w-4" />} label="ימים" value={String(answers.days)} />
-          <Stat icon={<MapPin className="h-4 w-4" />} label="נוסעים" value={String(answers.people)} />
-          <Stat icon={<Wallet className="h-4 w-4" />} label="תקציב סה״כ" value={`₪${(total / 1000).toFixed(1)}K`} />
-        </div>
+        {/* Budget check */}
+        <Card>
+          <SectionTitle icon={<Wallet className="h-4 w-4" />} title="בדיקת תקציב" />
+          <div className={`mt-3 rounded-2xl p-4 text-sm font-semibold ${enoughBudget ? "bg-emerald-50 text-emerald-900" : "bg-amber-50 text-amber-900"}`}>
+            {enoughBudget
+              ? `התקציב שלך (₪${answers.budget.toLocaleString()} לאדם) מספיק בהחלט. ממוצע ליעד: ₪${dest.avgBudgetPerPerson.toLocaleString()}.`
+              : `התקציב קצת דחוק — הממוצע ל${dest.name} הוא כ־₪${dest.avgBudgetPerPerson.toLocaleString()} לאדם. תוכל לחסוך במלונות או לשקול תאריכים גמישים.`}
+          </div>
+        </Card>
 
         {/* Itinerary */}
         <Card>
@@ -102,9 +132,7 @@ function Result() {
           <ol className="mt-4 space-y-3">
             {dest.itinerary.slice(0, answers.days).map((d, i) => (
               <li key={i} className="relative flex gap-3 rounded-2xl border border-border/70 bg-muted/40 p-3">
-                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-sunset text-sm font-black text-white shadow-glow">
-                  {i + 1}
-                </div>
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-sunset text-sm font-black text-white shadow-glow">{i + 1}</div>
                 <div>
                   <p className="text-[11px] font-bold text-primary">יום {i + 1}</p>
                   <p className="text-sm leading-relaxed text-foreground">{d}</p>
@@ -112,6 +140,24 @@ function Result() {
               </li>
             ))}
           </ol>
+        </Card>
+
+        {/* Map placeholder */}
+        <Card>
+          <SectionTitle icon={<MapPin className="h-4 w-4" />} title="על המפה" />
+          <div className="relative mt-3 h-40 overflow-hidden rounded-2xl border border-border">
+            <div className="absolute inset-0 bg-gradient-ocean opacity-80" />
+            <div className="absolute inset-0" style={{
+              backgroundImage: "radial-gradient(circle at 20% 30%, rgba(255,255,255,.35) 0 2px, transparent 3px), radial-gradient(circle at 70% 60%, rgba(255,255,255,.25) 0 2px, transparent 3px), radial-gradient(circle at 40% 80%, rgba(255,255,255,.2) 0 2px, transparent 3px)",
+            }} />
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+              <div className="grid h-12 w-12 place-items-center rounded-full bg-white text-primary shadow-glow animate-pulse-glow">
+                <MapPin className="h-5 w-5" />
+              </div>
+              <div className="mt-1 text-center text-xs font-black text-white drop-shadow">{dest.name}</div>
+            </div>
+          </div>
+          <p className="mt-2 text-[11px] text-muted-foreground">מפה אינטראקטיבית תתווסף בגרסה הבאה</p>
         </Card>
 
         {/* Hotels */}
@@ -137,9 +183,7 @@ function Result() {
           <SectionTitle icon={<Sparkles className="h-4 w-4" />} title="אטרקציות חובה" />
           <div className="mt-3 flex flex-wrap gap-2">
             {dest.attractions.map((a) => (
-              <span key={a} className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground">
-                ✦ {a}
-              </span>
+              <span key={a} className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground">✦ {a}</span>
             ))}
           </div>
         </Card>
@@ -152,7 +196,7 @@ function Result() {
           </ul>
         </Card>
 
-        {/* Budget */}
+        {/* Budget breakdown */}
         <Card>
           <SectionTitle icon={<Wallet className="h-4 w-4" />} title="פירוט תקציב משוער" />
           <div className="mt-3 space-y-2 text-sm">
@@ -167,19 +211,18 @@ function Result() {
           </div>
         </Card>
 
-        <div className="flex gap-3 pt-2">
-          <Link
-            to="/quiz"
-            className="flex-1 rounded-2xl border border-border bg-card py-3 text-center text-sm font-bold text-foreground"
-          >
-            שנה תשובות
+        <div className="mx-5 flex flex-col gap-2 pt-2">
+          <Link to="/quiz" className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-sunset py-3 text-center text-sm font-black text-white shadow-glow">
+            <Sparkles className="h-4 w-4" /> צור לי חופשה אחרת
           </Link>
-          <Link
-            to="/"
-            className="flex-1 rounded-2xl bg-gradient-sunset py-3 text-center text-sm font-bold text-white shadow-glow"
-          >
-            תכנן עוד חופשה
-          </Link>
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={() => setSaved((s) => !s)} className="flex items-center justify-center gap-2 rounded-2xl border border-border bg-card py-3 text-sm font-bold text-foreground">
+              <Bookmark className={`h-4 w-4 ${saved ? "fill-primary text-primary" : ""}`} /> {saved ? "נשמר" : "שמור חופשה"}
+            </button>
+            <button onClick={share} className="flex items-center justify-center gap-2 rounded-2xl border border-border bg-card py-3 text-sm font-bold text-foreground">
+              <Share2 className="h-4 w-4" /> שתף
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -188,10 +231,11 @@ function Result() {
 
 function LoadingState() {
   const lines = [
-    "אני מנתח את התשובות שלך…",
-    "מחפש יעדים שמתאימים לסגנון…",
-    "בונה מסלול יומי מותאם…",
-    "מוסיף המלצות שף ומלונות…",
+    "NITZI חושב…",
+    "מחפש את היעד המושלם…",
+    "משווה בין מאות אפשרויות…",
+    "מוצא מלונות מתאימים…",
+    "בונה עבורך מסלול אישי…",
   ];
   const [i, setI] = useState(0);
   useEffect(() => {
@@ -213,9 +257,7 @@ function LoadingState() {
           {lines.map((l, idx) => (
             <li
               key={l}
-              className={`flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 transition ${
-                idx <= i ? "opacity-100" : "opacity-30"
-              }`}
+              className={`flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 transition ${idx <= i ? "opacity-100" : "opacity-30"}`}
             >
               <span className={`h-2 w-2 rounded-full ${idx <= i ? "bg-primary animate-pulse" : "bg-muted-foreground/50"}`} />
               <span className="text-foreground">{l}</span>
@@ -229,7 +271,7 @@ function LoadingState() {
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
-    <section className="rounded-3xl border border-border/70 bg-card/80 p-5 shadow-soft backdrop-blur animate-fade-up">
+    <section className="mx-5 rounded-3xl border border-border/70 bg-card/80 p-5 shadow-soft backdrop-blur animate-fade-up">
       {children}
     </section>
   );
@@ -250,12 +292,12 @@ function Li({ children }: { children: React.ReactNode }) {
     </li>
   );
 }
-function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function MiniStat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-border/70 bg-card p-3 text-center shadow-soft">
       <div className="mx-auto grid h-8 w-8 place-items-center rounded-lg bg-gradient-ocean text-white">{icon}</div>
-      <div className="mt-2 text-lg font-black text-foreground">{value}</div>
-      <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{label}</div>
+      <div className="mt-1.5 text-sm font-black text-foreground">{value}</div>
+      <div className="text-[10px] font-semibold text-muted-foreground">{label}</div>
     </div>
   );
 }

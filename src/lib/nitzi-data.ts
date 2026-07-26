@@ -1,3 +1,11 @@
+import santoriniImg from "@/assets/dest-santorini.jpg";
+import baliImg from "@/assets/dest-bali.jpg";
+import maldivesImg from "@/assets/dest-maldives.jpg";
+import tokyoImg from "@/assets/dest-tokyo.jpg";
+import laplandImg from "@/assets/dest-lapland.jpg";
+import amalfiImg from "@/assets/dest-amalfi.jpg";
+import dubaiImg from "@/assets/dest-dubai.jpg";
+
 export type TripType = "beach" | "adventure" | "romantic" | "family" | "friends" | "nightlife" | "nature";
 export type TripStyle = "chill" | "luxury" | "young" | "smart";
 
@@ -36,46 +44,58 @@ export const styles: { id: TripStyle; label: string; emoji: string }[] = [
   { id: "smart", label: "זול וחכם", emoji: "🎯" },
 ];
 
-interface Destination {
+export interface Destination {
   name: string;
   country: string;
   emoji: string;
+  image: string;
   matches: TripType[];
   tagline: string;
+  weather: string;
+  flightHours: number;
+  avgBudgetPerPerson: number;
   hotels: { name: string; note: string }[];
   attractions: string[];
   restaurants: string[];
   itinerary: string[];
 }
 
-const destinations: Destination[] = [
+export const destinations: Destination[] = [
   {
-    name: "מיקונוס",
+    name: "סנטוריני",
     country: "יוון",
     emoji: "🇬🇷",
-    matches: ["beach", "nightlife", "friends", "romantic"],
-    tagline: "האי הלבן-כחול של האגאי — שילוב מושלם של חופים, מסיבות שקיעה ואווירה ים תיכונית קסומה.",
+    image: santoriniImg,
+    matches: ["beach", "romantic", "friends"],
+    tagline: "האי הלבן-כחול של האגאי — שקיעות מהאגדות, כנסיות עם כיפות כחולות ומסיבות ים תיכוניות.",
+    weather: "28° בהיר",
+    flightHours: 3.5,
+    avgBudgetPerPerson: 6500,
     hotels: [
       { name: "Cavo Tagoo", note: "בוטיק עם בריכת אינפיניטי מול הים" },
       { name: "Semeli Hotel", note: "לב העיר, יחס איכות־מחיר מעולה" },
-      { name: "Rocabella", note: "נוף מטורף לשקיעה של מיקונוס" },
+      { name: "Rocabella", note: "נוף מטורף לשקיעה" },
     ],
-    attractions: ["חוף Paradise ו-Super Paradise", "העיר העתיקה Chora וטחנות הרוח", "שייט סאנסט לדלוס", "מסיבת יום ב-Scorpios"],
-    restaurants: ["Kiki's Tavern — דגים על הגריל", "Nammos — בראנץ' על החוף", "Ling Ling — אסייתי יוקרתי"],
+    attractions: ["שקיעה באויה", "חוף אדום", "שייט לקלדרה", "כרם יין באי"],
+    restaurants: ["Ambrosia — פיין דיינינג", "Metaxi Mas — טברנה יוונית", "Lauda — כוכב מישלן"],
     itinerary: [
       "נחיתה, צ'ק־אין וסיבוב בעיר העתיקה עם שקיעה בליטל ונציה",
-      "יום חוף ב-Paradise Beach ומסיבת יום",
-      "שייט פרטי לדלוס עם עצירות שנורקלינג",
-      "יום ספא + ארוחת ערב יוקרתית ב-Nammos",
-      "בוקר רגוע, קניות בעיר וטיסה חזרה",
+      "יום חוף אדום + מסיבת יום",
+      "שייט פרטי לקלדרה עם עצירות שנורקלינג",
+      "יום ספא + ארוחת ערב באויה",
+      "בוקר רגוע, קניות בפירה וטיסה חזרה",
     ],
   },
   {
     name: "באלי",
     country: "אינדונזיה",
     emoji: "🇮🇩",
-    matches: ["nature", "adventure", "romantic", "chill" as unknown as TripType],
+    image: baliImg,
+    matches: ["nature", "adventure", "romantic"],
     tagline: "אי של אורז, מקדשים וגלים — חוויה רוחנית וטרופית שמשלבת הרפתקה, יוגה וחופים אינסופיים.",
+    weather: "31° חם ולח",
+    flightHours: 13,
+    avgBudgetPerPerson: 8000,
     hotels: [
       { name: "Hanging Gardens Ubud", note: "בריכות מדורגות בג'ונגל" },
       { name: "Potato Head Suites", note: "בסמוק לצד החוף והמועדון" },
@@ -94,18 +114,73 @@ const destinations: Destination[] = [
     ],
   },
   {
+    name: "מלדיביים",
+    country: "האוקיינוס ההודי",
+    emoji: "🏝️",
+    image: maldivesImg,
+    matches: ["beach", "romantic"],
+    tagline: "וילות מעל המים, שוניות אלמוגים ושקט מוחלט — גן עדן לזוגיות.",
+    weather: "30° טרופי",
+    flightHours: 10,
+    avgBudgetPerPerson: 18000,
+    hotels: [
+      { name: "Soneva Fushi", note: "וילות עץ עם מגלשות לים" },
+      { name: "Anantara Kihavah", note: "מסעדת אקווריום מתחת למים" },
+      { name: "Baros Maldives", note: "אינטימי ורומנטי" },
+    ],
+    attractions: ["שנורקלינג עם צבי ים", "שקיעה בקטמרן", "ספא צף", "דולפינים בשחר"],
+    restaurants: ["Sea Fire Salt Sky", "By The Sea", "Fresh in the Garden"],
+    itinerary: [
+      "נחיתה במאלה + טיסת סירה לוילה",
+      "יום שנורקלינג באי הרפתקאות",
+      "ספא זוגי + ארוחת שקיעה",
+      "טיול דולפינים ולילה תחת הכוכבים",
+      "בוקר עצל וטיסה חזרה",
+    ],
+  },
+  {
+    name: "טוקיו",
+    country: "יפן",
+    emoji: "🇯🇵",
+    image: tokyoImg,
+    matches: ["nightlife", "adventure", "friends"],
+    tagline: "עיר שלא ישנה — נאונים, סושי, מקדשים עתיקים ותרבות פופ בלי סוף.",
+    weather: "22° נעים",
+    flightHours: 14,
+    avgBudgetPerPerson: 12000,
+    hotels: [
+      { name: "Aman Tokyo", note: "יוקרה יפנית מודרנית" },
+      { name: "Hoshinoya Tokyo", note: "ריוקאן עירוני עם אונסן פרטי" },
+      { name: "Shibuya Stream Excel", note: "מרכזי, ליד המעבר המפורסם" },
+    ],
+    attractions: ["מעבר שיבויה", "מקדש סנסו-ג'י", "TeamLab Planets", "גולדן גאי בשינג'וקו"],
+    restaurants: ["Sukiyabashi Jiro — סושי אגדי", "Ichiran Ramen", "Narisawa — מטבח קייסקי"],
+    itinerary: [
+      "נחיתה, מנוחה וסיור לילי בשינג'וקו",
+      "אסאקוסה, אואנו ומוזיאון TeamLab",
+      "יום קניות בהרג'וקו + שיבויה",
+      "טיול יום להאקונה",
+      "אקיהברה וברים נסתרים",
+      "שוק צוקיג'י ובראנץ' סושי + טיסה",
+    ],
+  },
+  {
     name: "לפלנד",
     country: "פינלנד",
     emoji: "🇫🇮",
+    image: laplandImg,
     matches: ["adventure", "family", "nature", "romantic"],
     tagline: "ממלכת שלג קסומה עם זוהר צפוני, מזחלות האסקי ובקתות זכוכית מתחת לכוכבים.",
+    weather: "-8° מושלג",
+    flightHours: 6,
+    avgBudgetPerPerson: 9500,
     hotels: [
       { name: "Kakslauttanen Igloo", note: "איגלו זכוכית לצפייה בזוהר הצפוני" },
       { name: "Arctic TreeHouse", note: "בקתות עץ מודרניות ביער" },
       { name: "Santa's Hotel", note: "אווירת חג לכל המשפחה" },
     ],
-    attractions: ["ציד זוהר צפוני", "מזחלות האסקי וראיינדיר", "כפר סנטה קלאוס ברובנימי", "סנואומוביל ביערות הקפואים"],
-    restaurants: ["Nili — מטבח לאפי אותנטי", "Aanaar — סלמון מעושן על עצי אלון", "Roka Kitchen — נורדי מודרני"],
+    attractions: ["ציד זוהר צפוני", "מזחלות האסקי", "כפר סנטה קלאוס", "סנואומוביל"],
+    restaurants: ["Nili — מטבח לאפי", "Aanaar — סלמון מעושן", "Roka Kitchen — נורדי מודרני"],
     itinerary: [
       "נחיתה ברובנימי, ערב אח וסאונה",
       "מזחלות האסקי + סיור בכפר סנטה",
@@ -115,46 +190,53 @@ const destinations: Destination[] = [
     ],
   },
   {
-    name: "טוקיו",
-    country: "יפן",
-    emoji: "🇯🇵",
-    matches: ["nightlife", "adventure", "friends", "young" as unknown as TripType],
-    tagline: "עיר שלא ישנה — נאונים, סושי, מקדשים עתיקים ותרבות פופ בלי סוף.",
+    name: "אמלפי",
+    country: "איטליה",
+    emoji: "🇮🇹",
+    image: amalfiImg,
+    matches: ["romantic", "family", "beach"],
+    tagline: "כפרים פסטליים על צוקי הים, לימונדות טריות ופסטה שקוראים לה מהחלומות.",
+    weather: "27° חמים",
+    flightHours: 4,
+    avgBudgetPerPerson: 7500,
     hotels: [
-      { name: "Aman Tokyo", note: "יוקרה יפנית מודרנית עם נוף עוצר נשימה" },
-      { name: "Hoshinoya Tokyo", note: "ריוקאן עירוני עם אונסן פרטי" },
-      { name: "Shibuya Stream Excel", note: "מרכזי, ליד המעבר המפורסם" },
+      { name: "Le Sirenuse", note: "מלון בוטיק אייקוני בפוזיטאנו" },
+      { name: "Hotel Santa Caterina", note: "צוק מעל הים באמלפי" },
+      { name: "Casa Angelina", note: "מודרני-מינימלי עם נוף עוצר נשימה" },
     ],
-    attractions: ["מעבר שיבויה וטיילת הרג'וקו", "מקדש סנסו-ג'י באסאקוסה", "TeamLab Planets", "סיור אוכל בשינג'וקו גולדן גאי"],
-    restaurants: ["Sukiyabashi Jiro — סושי אגדי", "Ichiran Ramen — טונקוצו קלאסי", "Narisawa — מטבח קייסקי עכשווי"],
+    attractions: ["פוזיטאנו וסיירנטו", "האי קפרי + הגרוטו הכחול", "טרק שביל האלים", "שייט חוף אמלפי"],
+    restaurants: ["Da Vincenzo", "La Sponda", "Il Ritrovo"],
     itinerary: [
-      "נחיתה, מנוחה וסיור לילי בשינג'וקו",
-      "אסאקוסה, אואנו ומוזיאון TeamLab",
-      "יום קניות בהרג'וקו + שיבויה",
-      "טיול יום להאקונה למעיינות חמים",
-      "אקיהברה, גיימינג וברים נסתרים",
-      "שוק צוקיג'י ובראנץ' סושי + טיסה",
+      "נחיתה בנאפולי + צ'ק אין בפוזיטאנו",
+      "יום קפרי והגרוטו הכחול",
+      "טרק Sentiero degli Dei",
+      "רבלו וגני וילה צימברונה",
+      "יום חוף בנרנו + פרידה",
     ],
   },
   {
-    name: "ליסבון",
-    country: "פורטוגל",
-    emoji: "🇵🇹",
-    matches: ["romantic", "friends", "nightlife", "family"],
-    tagline: "עיר של אריחים, פאדו וגבעות עם נוף לים — טעימה של אירופה עם נשמה חמה.",
+    name: "דובאי",
+    country: "איחוד האמירויות",
+    emoji: "🇦🇪",
+    image: dubaiImg,
+    matches: ["family", "nightlife", "friends"],
+    tagline: "יוקרה בלי גבולות, גורדי שחקים, מדבר וקניות של פעם בחיים.",
+    weather: "33° בהיר",
+    flightHours: 3,
+    avgBudgetPerPerson: 8500,
     hotels: [
-      { name: "Memmo Alfama", note: "בוטיק עם בריכה ונוף לטאז'ו" },
-      { name: "The Lumiares", note: "סוויטות מעוצבות בבאירו אלטו" },
-      { name: "Santiago de Alfama", note: "מלון קסום ברובע העתיק" },
+      { name: "Burj Al Arab", note: "האייקון של דובאי" },
+      { name: "Atlantis The Palm", note: "פארק מים ואקווריום" },
+      { name: "Bulgari Resort", note: "אי פרטי אינטימי" },
     ],
-    attractions: ["טרמוויי 28", "מגדל בלם ומנזר ז'רונימוש", "סינטרה — טירת פנה", "מופע פאדו באלפמה"],
-    restaurants: ["Time Out Market", "Cervejaria Ramiro — פירות ים", "Belcanto — כוכב מישלן של ז'וזה אבילז"],
+    attractions: ["בורג' חליפה", "ספארי מדבר", "Dubai Mall + Fountain", "פאלם ג'ומיירה"],
+    restaurants: ["Nobu", "Zuma", "Pierchic — על המים"],
     itinerary: [
-      "צ'ק־אין ושקיעה במירדורו סנטה קתרינה",
-      "אלפמה, מבצר סאו ז'ורז' ופאדו בערב",
-      "יום בסינטרה וקאסקאיש",
-      "בלם, פסטל דה נאטה ואופניים לחוף",
-      "בראנץ' בטיים אאוט ופרידה",
+      "נחיתה + סאנסט בבורג' חליפה",
+      "ספארי מדבר וגמלים",
+      "יום פארק מים באטלנטיס",
+      "קניות במרינה + סירת אבּרה",
+      "בראנץ' יוקרתי ופרידה",
     ],
   },
 ];
@@ -179,4 +261,33 @@ export function pickDestination(a: QuizAnswers): Destination {
 
 export const popularDestinations = [
   "יוון", "איטליה", "תאילנד", "יפן", "ספרד", "פורטוגל", "באלי", "מלדיביים", "דובאי", "ניו יורק",
+];
+
+export type CategoryId = "popular" | "romantic" | "family" | "summer" | "winter" | "luxury" | "lastminute" | "ai";
+
+export interface Category {
+  id: CategoryId;
+  title: string;
+  subtitle: string;
+  destinations: string[]; // destination names
+}
+
+export const categories: Category[] = [
+  { id: "popular", title: "יעדים פופולריים", subtitle: "הכי מבוקשים החודש", destinations: ["סנטוריני", "באלי", "טוקיו", "אמלפי", "דובאי"] },
+  { id: "romantic", title: "חופשות זוגיות", subtitle: "רומנטיקה במיטבה", destinations: ["סנטוריני", "מלדיביים", "אמלפי", "באלי"] },
+  { id: "family", title: "חופשות משפחתיות", subtitle: "כיף לכל הגילאים", destinations: ["דובאי", "לפלנד", "אמלפי"] },
+  { id: "summer", title: "יעדי קיץ", subtitle: "שמש, ים וטורקיז", destinations: ["סנטוריני", "אמלפי", "מלדיביים", "באלי"] },
+  { id: "winter", title: "יעדי חורף", subtitle: "שלג, אח ורומנטיקה", destinations: ["לפלנד", "טוקיו"] },
+  { id: "luxury", title: "חופשות יוקרה", subtitle: "החוויה הכי פרימיום", destinations: ["מלדיביים", "דובאי", "אמלפי"] },
+  { id: "lastminute", title: "דילים של הרגע האחרון", subtitle: "טיסה השבוע", destinations: ["דובאי", "סנטוריני", "אמלפי"] },
+  { id: "ai", title: "המלצות NITZI השבוע", subtitle: "נבחר במיוחד עבורך על ידי AI", destinations: ["באלי", "לפלנד", "טוקיו"] },
+];
+
+export const tripPurposes = [
+  { id: "any", label: "כל סוג" },
+  { id: "beach", label: "🏖️ ים ושמש" },
+  { id: "romantic", label: "💞 זוגי" },
+  { id: "family", label: "👨‍👩‍👧 משפחה" },
+  { id: "adventure", label: "🏔️ הרפתקה" },
+  { id: "nightlife", label: "🌃 חיי לילה" },
 ];
