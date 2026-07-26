@@ -6,6 +6,8 @@ import { SearchEngine } from "@/components/SearchEngine";
 import { DestinationCarousel } from "@/components/DestinationCarousel";
 import { SecretDealCard } from "@/components/SecretDealCard";
 import { SignInModal } from "@/components/SignInModal";
+import { Footer } from "@/components/Footer";
+import { DemoDataNotice } from "@/components/DemoDataNotice";
 import { categories } from "@/lib/nitzi-data";
 import { displayNameOf, useAuth } from "@/lib/auth";
 import { LogIn, Sparkles, User as UserIcon } from "lucide-react";
