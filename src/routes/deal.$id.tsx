@@ -1,13 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft, BadgeCheck, Calendar, CheckCircle2, Clock, MapPin, Plane, Share2,
-  Shield, ShieldCheck, Sparkles, Star, Timer, Utensils, Wallet, XCircle, RefreshCw, Bookmark, Lock,
+  Shield, ShieldCheck, Sparkles, Star, Timer, Utensils, Wallet, XCircle, RefreshCw, Heart, Lock,
 } from "lucide-react";
 import { NitziLogo } from "@/components/NitziLogo";
 import { SignInModal } from "@/components/SignInModal";
 import { getDeal, revalidateDeal, type Deal, type RevalidationResult } from "@/lib/deals";
-import { isAuthenticated, setAuthIntent, subscribe } from "@/lib/auth-stub";
+import { setAuthIntent, useAuth } from "@/lib/auth";
+import { addFavorite, isDealFavorited, removeFavorite } from "@/lib/user-data";
 
 export const Route = createFileRoute("/deal/$id")({
   head: ({ params }) => ({
@@ -25,8 +27,7 @@ export const Route = createFileRoute("/deal/$id")({
 
 function fmtILS(n: number) { return `₪${Math.round(n).toLocaleString()}`; }
 function fmtDate(iso: string) {
-  const d = new Date(iso);
-  return d.toLocaleDateString("he-IL", { day: "2-digit", month: "short", year: "numeric" });
+  return new Date(iso).toLocaleDateString("he-IL", { day: "2-digit", month: "short", year: "numeric" });
 }
 function fmtTime(iso: string) {
   const d = new Date(iso);
@@ -41,28 +42,31 @@ function agoLabel(iso: string) {
   if (s < 60) return `לפני ${s} שנ׳`;
   const m = Math.floor(s / 60);
   if (m < 60) return `לפני ${m} דק׳`;
-  const h = Math.floor(m / 60);
-  return `לפני ${h} ש׳`;
+  return `לפני ${Math.floor(m / 60)} ש׳`;
 }
 
 function DealPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const qc = useQueryClient();
+  const { isAuthenticated } = useAuth();
   const [deal, setDeal] = useState<Deal | null>(() => getDeal(id));
   const [refreshing, setRefreshing] = useState(false);
   const [revalidation, setRevalidation] = useState<RevalidationResult | null>(null);
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
-  const [authed, setAuthed] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [pendingAction, setPendingAction] = useState<null | "save" | "book">(null);
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
-    setAuthed(isAuthenticated());
-    const unsub = subscribe((u) => setAuthed(!!u));
     const t = setInterval(() => setNow(Date.now()), 30000);
-    return () => { unsub(); clearInterval(t); };
+    return () => clearInterval(t);
   }, []);
+
+  const savedQ = useQuery({
+    queryKey: ["fav", id, isAuthenticated],
+    queryFn: () => isDealFavorited(id),
+    enabled: isAuthenticated,
+  });
 
   if (!deal) {
     return (
@@ -89,19 +93,36 @@ function DealPage() {
     setTimeout(() => setRevalidation(null), 4000);
   };
 
-  const startBooking = async () => {
-    if (!authed) {
+  const toggleSave = async () => {
+    if (!isAuthenticated) {
       setAuthIntent(`/deal/${deal.id}`);
+      setPendingAction("save");
       setSignInOpen(true);
       return;
     }
-    setCheckoutOpen(true);
-    // Re-validate price before checkout — the trust contract
+    const currently = !!savedQ.data;
+    try {
+      if (currently) await removeFavorite(deal.id);
+      else await addFavorite(deal);
+      qc.invalidateQueries({ queryKey: ["fav", id] });
+      qc.invalidateQueries({ queryKey: ["favorites"] });
+    } catch (e) { console.error(e); }
+  };
+
+  const startBooking = async () => {
+    if (!isAuthenticated) {
+      setAuthIntent(`/deal/${deal.id}`);
+      setPendingAction("book");
+      setSignInOpen(true);
+      return;
+    }
     setRefreshing(true);
     const res = await revalidateDeal(deal);
     setDeal(res.deal);
     setRevalidation(res);
     setRefreshing(false);
+    if (res.status === "sold-out") return;
+    navigate({ to: "/checkout/$id", params: { id: deal.id } });
   };
 
   const availabilityChip = useMemo(() => {
@@ -120,14 +141,11 @@ function DealPage() {
           <NitziLogo />
           <div className="flex gap-1">
             <button
-              onClick={() => {
-                if (!authed) { setAuthIntent(`/deal/${deal.id}`); setSignInOpen(true); return; }
-                setSaved((s) => !s);
-              }}
+              onClick={toggleSave}
               className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card"
               aria-label="שמור"
             >
-              <Bookmark className={`h-4 w-4 ${saved ? "fill-primary text-primary" : ""}`} />
+              <Heart className={`h-4 w-4 ${savedQ.data ? "fill-rose-500 text-rose-500" : ""}`} />
             </button>
             <button
               onClick={() => { if (navigator.share) navigator.share({ title: dest.name, url: window.location.href }).catch(() => {}); }}
@@ -141,10 +159,8 @@ function DealPage() {
       </header>
 
       <div className="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6 lg:pt-6">
-        {/* Gallery + Sticky booking */}
         <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="space-y-5">
-            {/* Hero image */}
             <section className="relative overflow-hidden rounded-[2rem] shadow-glow animate-fade-up">
               <img src={dest.image} alt={dest.name} className="h-[320px] w-full object-cover sm:h-[420px] lg:h-[480px]" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
@@ -160,7 +176,6 @@ function DealPage() {
               </div>
             </section>
 
-            {/* Trust bar */}
             <section className="rounded-3xl border border-emerald-200 bg-emerald-50/70 p-4 shadow-soft animate-fade-up">
               <div className="flex flex-wrap items-center gap-3 text-sm">
                 <div className="flex items-center gap-2 text-emerald-900">
@@ -182,12 +197,9 @@ function DealPage() {
                   <Timer className="h-3 w-3" /> ההצעה מוצגת מעל 15 דקות — לחץ "בדוק מחיר עכשיו" לאימות מחודש.
                 </p>
               )}
-              {revalidation && (
-                <RevalidationBanner res={revalidation} />
-              )}
+              {revalidation && <RevalidationBanner res={revalidation} />}
             </section>
 
-            {/* Hotel */}
             <Section title="המלון" icon={<MapPin className="h-4 w-4" />}>
               <div className="flex items-start gap-4">
                 <div className="flex-1">
@@ -207,14 +219,12 @@ function DealPage() {
               </div>
             </Section>
 
-            {/* Flights */}
             <Section title="פרטי הטיסות" icon={<Plane className="h-4 w-4" />}>
               <FlightLine label="הלוך" f={deal.outbound} />
               <div className="my-3 h-px bg-border" />
               <FlightLine label="חזור" f={deal.inbound} />
             </Section>
 
-            {/* Dates */}
             <Section title="תאריכים ומשך" icon={<Calendar className="h-4 w-4" />}>
               <div className="grid grid-cols-3 gap-2 text-center">
                 <Info label="יציאה" value={fmtDate(deal.dates.start)} />
@@ -223,7 +233,6 @@ function DealPage() {
               </div>
             </Section>
 
-            {/* Includes / excludes */}
             <div className="grid gap-4 sm:grid-cols-2">
               <Section title="מה כלול" icon={<CheckCircle2 className="h-4 w-4" />}>
                 <ul className="space-y-2 text-sm">
@@ -241,13 +250,9 @@ function DealPage() {
               </Section>
             </div>
 
-            {/* Map */}
             <Section title="על המפה" icon={<MapPin className="h-4 w-4" />}>
               <div className="relative h-52 overflow-hidden rounded-2xl border border-border">
                 <div className="absolute inset-0 bg-gradient-ocean opacity-80" />
-                <div className="absolute inset-0" style={{
-                  backgroundImage: "radial-gradient(circle at 20% 30%, rgba(255,255,255,.35) 0 2px, transparent 3px), radial-gradient(circle at 70% 60%, rgba(255,255,255,.25) 0 2px, transparent 3px), radial-gradient(circle at 40% 80%, rgba(255,255,255,.2) 0 2px, transparent 3px)",
-                }} />
                 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
                   <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-white text-primary shadow-glow animate-pulse-glow">
                     <MapPin className="h-5 w-5" />
@@ -258,7 +263,6 @@ function DealPage() {
               <p className="mt-2 text-[11px] text-muted-foreground">מפה אינטראקטיבית תתווסף בגרסה הבאה.</p>
             </Section>
 
-            {/* Attractions */}
             <Section title="אטרקציות מומלצות" icon={<Sparkles className="h-4 w-4" />}>
               <div className="flex flex-wrap gap-2">
                 {deal.attractions.map((a) => (
@@ -267,7 +271,6 @@ function DealPage() {
               </div>
             </Section>
 
-            {/* Restaurants */}
             <Section title="מסעדות נבחרות" icon={<Utensils className="h-4 w-4" />}>
               <ul className="space-y-2 text-sm">
                 {deal.restaurants.map((r) => (
@@ -276,12 +279,10 @@ function DealPage() {
               </ul>
             </Section>
 
-            {/* Cancellation */}
             <Section title="תנאי ביטול" icon={<Shield className="h-4 w-4" />}>
               <p className="text-sm text-foreground">{deal.cancellation}</p>
             </Section>
 
-            {/* Transparency */}
             <Section title="שקיפות NITZI" icon={<ShieldCheck className="h-4 w-4" />}>
               <ul className="space-y-2 text-sm text-foreground">
                 <li className="flex gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />מקור הנתונים: {deal.price.source}</li>
@@ -292,21 +293,14 @@ function DealPage() {
             </Section>
           </div>
 
-          {/* Sticky booking panel — desktop */}
           <aside className="hidden lg:block">
             <div className="sticky top-24 space-y-3">
-              <BookingCard
-                deal={deal}
-                onBook={startBooking}
-                availabilityChip={availabilityChip}
-                refreshing={refreshing}
-              />
+              <BookingCard deal={deal} onBook={startBooking} availabilityChip={availabilityChip} refreshing={refreshing} authed={isAuthenticated} />
             </div>
           </aside>
         </div>
       </div>
 
-      {/* Mobile sticky book bar */}
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 p-3 shadow-glow backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-2">
           <div className="min-w-0">
@@ -316,10 +310,10 @@ function DealPage() {
           </div>
           <button
             onClick={startBooking}
-            disabled={deal.price.availability === "sold-out"}
+            disabled={deal.price.availability === "sold-out" || refreshing}
             className="ms-auto flex items-center gap-2 rounded-2xl bg-gradient-sunset px-5 py-3 text-sm font-black text-white shadow-glow disabled:opacity-50"
           >
-            {!authed && <Lock className="h-4 w-4" />}
+            {!isAuthenticated && <Lock className="h-4 w-4" />}
             הזמן עכשיו
           </button>
         </div>
@@ -329,19 +323,13 @@ function DealPage() {
         open={signInOpen}
         onClose={(signed) => {
           setSignInOpen(false);
-          if (signed) startBooking();
+          if (!signed) { setPendingAction(null); return; }
+          if (pendingAction === "book") startBooking();
+          if (pendingAction === "save") toggleSave();
+          setPendingAction(null);
         }}
-        reason="כדי להתקדם להזמנה צריך חשבון NITZI."
+        reason={pendingAction === "save" ? "כדי לשמור לרשימה שלך צריך חשבון NITZI." : "כדי להתקדם להזמנה צריך חשבון NITZI."}
       />
-
-      {checkoutOpen && (
-        <CheckoutModal
-          deal={deal}
-          revalidation={revalidation}
-          refreshing={refreshing}
-          onClose={() => setCheckoutOpen(false)}
-        />
-      )}
     </div>
   );
 }
@@ -371,13 +359,8 @@ function RevalidationBanner({ res }: { res: RevalidationResult }) {
   );
 }
 
-function BookingCard({
-  deal, onBook, availabilityChip, refreshing,
-}: {
-  deal: Deal;
-  onBook: () => void;
-  availabilityChip: { text: string; cls: string };
-  refreshing: boolean;
+function BookingCard({ deal, onBook, availabilityChip, refreshing, authed }: {
+  deal: Deal; onBook: () => void; availabilityChip: { text: string; cls: string }; refreshing: boolean; authed: boolean;
 }) {
   return (
     <div className="rounded-3xl border border-border bg-card p-5 shadow-soft">
@@ -402,104 +385,12 @@ function BookingCard({
         disabled={deal.price.availability === "sold-out" || refreshing}
         className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-sunset py-3 text-sm font-black text-white shadow-glow disabled:opacity-50"
       >
+        {!authed && <Lock className="h-4 w-4" />}
         <Wallet className="h-4 w-4" /> הזמן עכשיו
       </button>
       <p className="mt-2 text-center text-[10px] text-muted-foreground">
         לפני החיוב נבצע בדיקת מחיר נוספת ונציג כל שינוי לאישורך.
       </p>
-    </div>
-  );
-}
-
-function CheckoutModal({
-  deal, revalidation, refreshing, onClose,
-}: {
-  deal: Deal;
-  revalidation: RevalidationResult | null;
-  refreshing: boolean;
-  onClose: () => void;
-}) {
-  const changed = revalidation?.status === "changed";
-  const soldOut = revalidation?.status === "sold-out" || deal.price.availability === "sold-out";
-  const [confirmed, setConfirmed] = useState(false);
-
-  return (
-    <div
-      dir="rtl"
-      className="fixed inset-0 z-50 grid place-items-end sm:place-items-center bg-black/50 p-0 sm:p-4 backdrop-blur-sm animate-fade-up"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-md rounded-t-[2rem] sm:rounded-[2rem] border border-border bg-card p-6 shadow-glow"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="text-center">
-          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-sunset text-white shadow-glow">
-            <ShieldCheck className="h-6 w-6" />
-          </div>
-          <h2 className="mt-3 text-xl font-black text-foreground">בדיקת מחיר לפני התשלום</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            אנחנו מוודאים שהמחיר שראית עדיין תקף מול הספק.
-          </p>
-        </div>
-
-        <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4 text-sm">
-          {refreshing ? (
-            <div className="flex items-center gap-2 text-foreground">
-              <RefreshCw className="h-4 w-4 animate-spin text-primary" /> בודק מול {deal.price.source}…
-            </div>
-          ) : soldOut ? (
-            <div className="text-rose-800">
-              <div className="flex items-center gap-2 font-black"><XCircle className="h-4 w-4" /> אזל המלאי</div>
-              <p className="mt-1 text-[12px]">הדיל נסגר בזמן שהתקדמנו. לא בוצע חיוב. נשמח למצוא לך אלטרנטיבה דומה.</p>
-            </div>
-          ) : changed ? (
-            <div className="text-amber-900">
-              <div className="flex items-center gap-2 font-black"><Timer className="h-4 w-4" /> המחיר השתנה</div>
-              <p className="mt-1 text-[12px]">
-                מחיר קודם: <span className="line-through">{fmtILS(revalidation!.status === "changed" ? revalidation.oldPrice : 0)}</span><br />
-                מחיר חדש: <span className="text-base font-black">{fmtILS(deal.price.total)}</span>
-              </p>
-              <p className="mt-1 text-[11px]">לא תחויב ללא אישור מפורש שלך.</p>
-            </div>
-          ) : (
-            <div className="text-emerald-800">
-              <div className="flex items-center gap-2 font-black"><BadgeCheck className="h-4 w-4" /> המחיר אומת</div>
-              <p className="mt-1 text-[12px]">אתה תשלם בדיוק את מה שראית: <span className="font-black">{fmtILS(deal.price.total)}</span>.</p>
-            </div>
-          )}
-        </div>
-
-        <div className="mt-4 space-y-2 rounded-2xl border border-border bg-card p-4 text-sm">
-          <Row label="חבילה" value={`${deal.destination.name} · ${deal.dates.nights} לילות`} />
-          <Row label="נוסעים" value={`${deal.people}`} />
-          <Row label="מחיר לאדם" value={fmtILS(deal.price.perPerson)} />
-          <div className="mt-2 flex items-center justify-between border-t border-border pt-2 text-base font-black">
-            <span>סה״כ לתשלום</span>
-            <span className="text-gradient-sunset">{fmtILS(deal.price.total)}</span>
-          </div>
-        </div>
-
-        {!confirmed ? (
-          <button
-            onClick={() => setConfirmed(true)}
-            disabled={soldOut || refreshing}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-sunset py-3 text-sm font-black text-white shadow-glow disabled:opacity-50"
-          >
-            {changed ? "אני מאשר את המחיר החדש" : "המשך לתשלום"}
-          </button>
-        ) : (
-          <div className="mt-4 rounded-2xl bg-emerald-50 p-4 text-center text-sm text-emerald-900">
-            <div className="text-2xl">🎉</div>
-            <div className="mt-1 font-black">תודה! ההזמנה תושלם בגרסת הפרודקשן.</div>
-            <p className="mt-1 text-[11px]">בגל הבא נחבר את NITZI לספק אמיתי ולתשלום מאובטח.</p>
-          </div>
-        )}
-
-        <button onClick={onClose} className="mt-3 w-full rounded-2xl border border-border bg-card py-2.5 text-sm font-bold text-foreground">
-          חזרה
-        </button>
-      </div>
     </div>
   );
 }
@@ -521,15 +412,6 @@ function Info({ label, value }: { label: string; value: string }) {
     <div className="rounded-2xl border border-border bg-muted/40 p-3">
       <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{label}</div>
       <div className="mt-0.5 text-sm font-black text-foreground">{value}</div>
-    </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between text-foreground">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-bold">{value}</span>
     </div>
   );
 }

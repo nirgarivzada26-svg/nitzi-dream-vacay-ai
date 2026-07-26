@@ -1,12 +1,8 @@
-// The "🔥 Secret Deal of NITZI" — visible to everyone as teaser, but the
-// price and CTA are gated behind sign-in for guests. Rotates every few hours
-// (source: getSecretDeal in lib/deals).
-
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Flame, Lock, Sparkles, Timer } from "lucide-react";
 import { getSecretDeal } from "@/lib/deals";
-import { isAuthenticated, setAuthIntent, subscribe } from "@/lib/auth-stub";
+import { setAuthIntent, useAuth } from "@/lib/auth";
 import { SignInModal } from "@/components/SignInModal";
 
 function formatCountdown(ms: number) {
@@ -20,26 +16,20 @@ function formatCountdown(ms: number) {
 export function SecretDealCard() {
   const navigate = useNavigate();
   const { deal, nextRotationAt } = useMemo(() => getSecretDeal(), []);
-  const [authed, setAuthed] = useState<boolean>(false);
+  const { isAuthenticated } = useAuth();
   const [signInOpen, setSignInOpen] = useState(false);
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
-    setAuthed(isAuthenticated());
-    const unsub = subscribe((u) => setAuthed(!!u));
     const t = setInterval(() => setNow(Date.now()), 60000);
-    return () => { unsub(); clearInterval(t); };
+    return () => clearInterval(t);
   }, []);
 
   const openDeal = () => navigate({ to: "/deal/$id", params: { id: deal.id } });
 
   const handleClick = () => {
-    if (authed) {
-      openDeal();
-    } else {
-      setAuthIntent(`/deal/${deal.id}`);
-      setSignInOpen(true);
-    }
+    if (isAuthenticated) openDeal();
+    else { setAuthIntent(`/deal/${deal.id}`); setSignInOpen(true); }
   };
 
   return (
@@ -49,7 +39,7 @@ export function SecretDealCard() {
           <img
             src={deal.destination.image}
             alt={deal.destination.name}
-            className={`h-full w-full object-cover transition ${authed ? "" : "blur-md scale-110"}`}
+            className={`h-full w-full object-cover transition ${isAuthenticated ? "" : "blur-md scale-110"}`}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/30" />
 
@@ -61,7 +51,7 @@ export function SecretDealCard() {
           </div>
 
           <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-            {authed ? (
+            {isAuthenticated ? (
               <>
                 <p className="text-[11px] font-bold text-white/85">{deal.destination.country} {deal.destination.emoji}</p>
                 <h3 className="text-2xl font-black leading-tight sm:text-3xl">{deal.destination.name}</h3>
@@ -99,14 +89,8 @@ export function SecretDealCard() {
         </div>
       </div>
 
-      <SignInModal
-        open={signInOpen}
-        onClose={(signed) => {
-          setSignInOpen(false);
-          if (signed) openDeal();
-        }}
-        reason="הדיל הסודי זמין לחברי NITZI בלבד."
-      />
+      <SignInModal open={signInOpen} onClose={(signed) => { setSignInOpen(false); if (signed) openDeal(); }}
+        reason="הדיל הסודי זמין לחברי NITZI בלבד." />
     </section>
   );
 }

@@ -1,5 +1,5 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import heroImg from "@/assets/hero-main.jpg";
 import { NitziLogo } from "@/components/NitziLogo";
 import { SearchEngine } from "@/components/SearchEngine";
@@ -7,7 +7,7 @@ import { DestinationCarousel } from "@/components/DestinationCarousel";
 import { SecretDealCard } from "@/components/SecretDealCard";
 import { SignInModal } from "@/components/SignInModal";
 import { categories } from "@/lib/nitzi-data";
-import { getUser, signOut, subscribe, type NitziUser } from "@/lib/auth-stub";
+import { displayNameOf, useAuth } from "@/lib/auth";
 import { LogIn, Sparkles, User as UserIcon } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -31,17 +31,11 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const navigate = useNavigate();
-  const [user, setUser] = useState<NitziUser | null>(null);
+  const { user } = useAuth();
   const [signInOpen, setSignInOpen] = useState(false);
-
-  useEffect(() => {
-    setUser(getUser());
-    return subscribe(setUser);
-  }, []);
 
   return (
     <div dir="rtl" className="min-h-screen bg-background pb-16">
-      {/* HERO */}
       <section className="relative">
         <div className="relative min-h-[720px] w-full overflow-hidden sm:min-h-[780px] lg:min-h-[860px]">
           <img
@@ -54,7 +48,6 @@ function Home() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-background" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 
-          {/* Top bar */}
           <div className="absolute inset-x-0 top-0 z-10">
             <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 pt-6 sm:px-8">
               <NitziLogo />
@@ -63,13 +56,13 @@ function Home() {
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> AI פעיל
                 </div>
                 {user ? (
-                  <button
-                    onClick={() => signOut()}
+                  <Link
+                    to="/account"
                     className="flex items-center gap-1.5 rounded-full border border-white/40 bg-white/20 px-3 py-1.5 text-[11px] font-black text-white backdrop-blur-md"
-                    aria-label="חשבון"
+                    aria-label="החשבון שלי"
                   >
-                    <UserIcon className="h-3.5 w-3.5" /> {user.name}
-                  </button>
+                    <UserIcon className="h-3.5 w-3.5" /> {displayNameOf(user)}
+                  </Link>
                 ) : (
                   <button
                     onClick={() => setSignInOpen(true)}
@@ -82,7 +75,6 @@ function Home() {
             </div>
           </div>
 
-          {/* Headline + centered giant search */}
           <div className="absolute inset-x-0 top-24 z-10 mx-auto flex w-full max-w-6xl flex-col items-center px-5 text-center text-white sm:top-28 sm:px-8 lg:top-32">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold uppercase tracking-widest backdrop-blur-md">
               <Sparkles className="h-3 w-3" /> NITZI · Travel AI
@@ -108,12 +100,10 @@ function Home() {
         </div>
       </section>
 
-      {/* Secret deal */}
       <div className="mx-auto mt-8 w-full max-w-6xl sm:mt-12">
         <SecretDealCard />
       </div>
 
-      {/* Categories */}
       <div className="mx-auto mt-10 flex w-full max-w-6xl flex-col gap-10 px-5 sm:px-8 sm:mt-14">
         {categories.map((c) => (
           <DestinationCarousel key={c.id} category={c} asDeals={c.id === "lastminute" || c.id === "ai"} />
@@ -124,7 +114,7 @@ function Home() {
         NITZI · העוזר האישי לחופשות · MVP
       </footer>
 
-      <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} />
+      <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} onSignedIn={() => navigate({ to: "/account" })} />
     </div>
   );
 }

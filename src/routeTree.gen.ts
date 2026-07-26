@@ -11,8 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResultRouteImport } from './routes/result'
 import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DealIdRouteImport } from './routes/deal.$id'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
+import { Route as AuthenticatedCheckoutIdRouteImport } from './routes/_authenticated/checkout.$id'
 
 const ResultRoute = ResultRouteImport.update({
   id: '/result',
@@ -22,6 +26,15 @@ const ResultRoute = ResultRouteImport.update({
 const QuizRoute = QuizRouteImport.update({
   id: '/quiz',
   path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -34,36 +47,81 @@ const DealIdRoute = DealIdRouteImport.update({
   path: '/deal/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCheckoutIdRoute = AuthenticatedCheckoutIdRouteImport.update({
+  id: '/checkout/$id',
+  path: '/checkout/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/deal/$id': typeof DealIdRoute
+  '/checkout/$id': typeof AuthenticatedCheckoutIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
+  '/account': typeof AuthenticatedAccountRoute
   '/deal/$id': typeof DealIdRoute
+  '/checkout/$id': typeof AuthenticatedCheckoutIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/deal/$id': typeof DealIdRoute
+  '/_authenticated/checkout/$id': typeof AuthenticatedCheckoutIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/quiz' | '/result' | '/deal/$id'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/quiz'
+    | '/result'
+    | '/account'
+    | '/deal/$id'
+    | '/checkout/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/quiz' | '/result' | '/deal/$id'
-  id: '__root__' | '/' | '/quiz' | '/result' | '/deal/$id'
+  to:
+    | '/'
+    | '/auth'
+    | '/quiz'
+    | '/result'
+    | '/account'
+    | '/deal/$id'
+    | '/checkout/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/quiz'
+    | '/result'
+    | '/_authenticated/account'
+    | '/deal/$id'
+    | '/_authenticated/checkout/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   QuizRoute: typeof QuizRoute
   ResultRoute: typeof ResultRoute
   DealIdRoute: typeof DealIdRoute
@@ -85,6 +143,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QuizRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -99,11 +171,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DealIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/checkout/$id': {
+      id: '/_authenticated/checkout/$id'
+      path: '/checkout/$id'
+      fullPath: '/checkout/$id'
+      preLoaderRoute: typeof AuthenticatedCheckoutIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedCheckoutIdRoute: typeof AuthenticatedCheckoutIdRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+  AuthenticatedCheckoutIdRoute: AuthenticatedCheckoutIdRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   QuizRoute: QuizRoute,
   ResultRoute: ResultRoute,
   DealIdRoute: DealIdRoute,
