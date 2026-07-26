@@ -38,11 +38,6 @@ const questions = [
   "אחרון — איזה סגנון חופשה הכי מתאים לך עכשיו?",
 ];
 
-const reactions: (a: QuizAnswers) => string = (a) => {
-  const lastType = tripTypes.find((t) => t.id === a.type)?.label;
-  return "";
-};
-
 function reactionFor(step: number, a: QuizAnswers): string | null {
   switch (step) {
     case 1: {
