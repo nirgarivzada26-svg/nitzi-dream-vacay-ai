@@ -14,7 +14,189 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bookings: {
+        Row: {
+          created_at: string
+          currency: string
+          deal_id: string
+          destination_name: string
+          end_date: string
+          id: string
+          nights: number
+          people: number
+          price_per_person: number
+          snapshot: Json
+          start_date: string
+          status: string
+          total_price: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          deal_id: string
+          destination_name: string
+          end_date: string
+          id?: string
+          nights: number
+          people: number
+          price_per_person: number
+          snapshot: Json
+          start_date: string
+          status?: string
+          total_price: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          deal_id?: string
+          destination_name?: string
+          end_date?: string
+          id?: string
+          nights?: number
+          people?: number
+          price_per_person?: number
+          snapshot?: Json
+          start_date?: string
+          status?: string
+          total_price?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      favorites: {
+        Row: {
+          created_at: string
+          deal_id: string
+          destination_name: string
+          id: string
+          snapshot: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deal_id: string
+          destination_name: string
+          id?: string
+          snapshot: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deal_id?: string
+          destination_name?: string
+          id?: string
+          snapshot?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notification_preferences: {
+        Row: {
+          deals: boolean
+          email: boolean
+          push: boolean
+          sms: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          deals?: boolean
+          email?: boolean
+          push?: boolean
+          sms?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          deals?: boolean
+          email?: boolean
+          push?: boolean
+          sms?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      saved_trips: {
+        Row: {
+          answers: Json
+          created_at: string
+          destination_name: string
+          id: string
+          snapshot: Json
+          title: string
+          user_id: string
+        }
+        Insert: {
+          answers: Json
+          created_at?: string
+          destination_name: string
+          id?: string
+          snapshot: Json
+          title: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          destination_name?: string
+          id?: string
+          snapshot?: Json
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      search_history: {
+        Row: {
+          answers: Json
+          created_at: string
+          destination_name: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          answers: Json
+          created_at?: string
+          destination_name?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          destination_name?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
