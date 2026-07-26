@@ -1,10 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import heroImg from "@/assets/hero-main.jpg";
 import { NitziLogo } from "@/components/NitziLogo";
 import { SearchEngine } from "@/components/SearchEngine";
 import { DestinationCarousel } from "@/components/DestinationCarousel";
+import { SecretDealCard } from "@/components/SecretDealCard";
+import { SignInModal } from "@/components/SignInModal";
 import { categories } from "@/lib/nitzi-data";
-import { Sparkles } from "lucide-react";
+import { getUser, signOut, subscribe, type NitziUser } from "@/lib/auth-stub";
+import { LogIn, Sparkles, User as UserIcon } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,64 +30,101 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState<NitziUser | null>(null);
+  const [signInOpen, setSignInOpen] = useState(false);
+
+  useEffect(() => {
+    setUser(getUser());
+    return subscribe(setUser);
+  }, []);
+
   return (
     <div dir="rtl" className="min-h-screen bg-background pb-16">
       {/* HERO */}
       <section className="relative">
-        <div className="relative h-[560px] w-full overflow-hidden">
+        <div className="relative min-h-[720px] w-full overflow-hidden sm:min-h-[780px] lg:min-h-[860px]">
           <img
             src={heroImg}
             alt="חוף טורקיז מלמעלה"
-            width={1600}
-            height={1200}
-            className="h-full w-full object-cover"
+            width={2400}
+            height={1400}
+            className="absolute inset-0 h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-background" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 
           {/* Top bar */}
           <div className="absolute inset-x-0 top-0 z-10">
-            <div className="mx-auto flex w-full max-w-md items-center justify-between px-5 pt-6">
+            <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 pt-6 sm:px-8">
               <NitziLogo />
-              <div className="flex items-center gap-1 rounded-full border border-white/30 bg-white/15 px-3 py-1.5 text-[11px] font-bold text-white backdrop-blur-md">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> AI פעיל
+              <div className="flex items-center gap-2">
+                <div className="hidden items-center gap-1 rounded-full border border-white/30 bg-white/15 px-3 py-1.5 text-[11px] font-bold text-white backdrop-blur-md sm:flex">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> AI פעיל
+                </div>
+                {user ? (
+                  <button
+                    onClick={() => signOut()}
+                    className="flex items-center gap-1.5 rounded-full border border-white/40 bg-white/20 px-3 py-1.5 text-[11px] font-black text-white backdrop-blur-md"
+                    aria-label="חשבון"
+                  >
+                    <UserIcon className="h-3.5 w-3.5" /> {user.name}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setSignInOpen(true)}
+                    className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[11px] font-black text-foreground shadow-glow"
+                  >
+                    <LogIn className="h-3.5 w-3.5" /> התחבר
+                  </button>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Headline */}
-          <div className="absolute inset-x-0 bottom-40 mx-auto max-w-md px-5 text-white">
+          {/* Headline + centered giant search */}
+          <div className="absolute inset-x-0 top-24 z-10 mx-auto flex w-full max-w-6xl flex-col items-center px-5 text-center text-white sm:top-28 sm:px-8 lg:top-32">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold uppercase tracking-widest backdrop-blur-md">
               <Sparkles className="h-3 w-3" /> NITZI · Travel AI
             </span>
-            <h1 className="mt-3 text-4xl font-black leading-tight drop-shadow-lg">
+            <h1 className="mt-4 text-4xl font-black leading-[1.05] drop-shadow-lg sm:text-6xl lg:text-7xl">
               לאן בא לך <span className="text-gradient-sunset">לברוח</span>
-              <br />הפעם?
+              <br className="sm:hidden" /> הפעם?
             </h1>
-            <p className="mt-2 max-w-xs text-sm leading-relaxed text-white/90">
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/90 sm:text-lg">
               חפש בעצמך או תן ל-NITZI לבנות לך את החופשה המושלמת ב־60 שניות.
             </p>
-          </div>
-        </div>
 
-        {/* Search engine floating */}
-        <div className="relative z-20 -mt-32 px-4">
-          <div className="mx-auto max-w-md animate-fade-up">
-            <SearchEngine />
+            <div className="mt-8 w-full max-w-4xl animate-fade-up">
+              <SearchEngine size="lg" />
+            </div>
+
+            <div className="mt-6 hidden items-center gap-6 text-[11px] font-bold text-white/90 sm:flex">
+              <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> מחיר נבדק ואומת</span>
+              <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-amber-400" /> מסלולים בהתאמה אישית</span>
+              <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-sky-400" /> חופשה מלאה במקום אחד</span>
+            </div>
           </div>
         </div>
       </section>
 
+      {/* Secret deal */}
+      <div className="mx-auto mt-8 w-full max-w-6xl sm:mt-12">
+        <SecretDealCard />
+      </div>
+
       {/* Categories */}
-      <div className="mx-auto mt-10 flex max-w-md flex-col gap-10 px-5">
+      <div className="mx-auto mt-10 flex w-full max-w-6xl flex-col gap-10 px-5 sm:px-8 sm:mt-14">
         {categories.map((c) => (
-          <DestinationCarousel key={c.id} category={c} />
+          <DestinationCarousel key={c.id} category={c} asDeals={c.id === "lastminute" || c.id === "ai"} />
         ))}
       </div>
 
-      <footer className="mx-auto mt-14 max-w-md px-5 text-center text-[11px] text-muted-foreground">
+      <footer className="mx-auto mt-14 max-w-6xl px-5 text-center text-[11px] text-muted-foreground">
         NITZI · העוזר האישי לחופשות · MVP
       </footer>
+
+      <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} />
     </div>
   );
 }

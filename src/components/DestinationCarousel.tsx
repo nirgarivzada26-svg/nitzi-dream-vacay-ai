@@ -1,8 +1,9 @@
 import { useNavigate } from "@tanstack/react-router";
 import { destinations, type Category } from "@/lib/nitzi-data";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { dealIdFor } from "@/lib/deals";
+import { ArrowLeft, BadgeCheck, Sparkles } from "lucide-react";
 
-export function DestinationCarousel({ category }: { category: Category }) {
+export function DestinationCarousel({ category, asDeals = false }: { category: Category; asDeals?: boolean }) {
   const navigate = useNavigate();
   const items = category.destinations
     .map((n) => destinations.find((d) => d.name === n))
@@ -11,6 +12,10 @@ export function DestinationCarousel({ category }: { category: Category }) {
   const isAi = category.id === "ai";
 
   const open = (name: string) => {
+    if (asDeals) {
+      navigate({ to: "/deal/$id", params: { id: dealIdFor(name) } });
+      return;
+    }
     try {
       sessionStorage.setItem(
         "nitzi:answers",
@@ -24,24 +29,24 @@ export function DestinationCarousel({ category }: { category: Category }) {
     <section className="animate-fade-up">
       <div className="mb-3 flex items-end justify-between px-1">
         <div>
-          <h3 className="flex items-center gap-2 text-lg font-black text-foreground">
+          <h3 className="flex items-center gap-2 text-lg font-black text-foreground sm:text-xl">
             {isAi && <Sparkles className="h-4 w-4 text-primary" />}
             {category.title}
           </h3>
-          <p className="text-xs text-muted-foreground">{category.subtitle}</p>
+          <p className="text-xs text-muted-foreground sm:text-sm">{category.subtitle}</p>
         </div>
         <button className="flex items-center gap-1 text-xs font-bold text-primary">
           הכל <ArrowLeft className="h-3 w-3 rtl:rotate-180" />
         </button>
       </div>
-      <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] sm:-mx-8 sm:gap-4 sm:px-8 [&::-webkit-scrollbar]:hidden">
         {items.map((d) => (
           <button
             key={d.name}
             onClick={() => open(d.name)}
-            className="group relative w-[220px] shrink-0 snap-start overflow-hidden rounded-3xl border border-border/60 bg-card text-right shadow-soft transition active:scale-[0.98]"
+            className="group relative w-[220px] shrink-0 snap-start overflow-hidden rounded-3xl border border-border/60 bg-card text-right shadow-soft transition active:scale-[0.98] sm:w-[260px] lg:w-[300px]"
           >
-            <div className="relative h-[280px] w-full overflow-hidden">
+            <div className="relative h-[280px] w-full overflow-hidden sm:h-[320px] lg:h-[360px]">
               <img
                 src={d.image}
                 alt={d.name}
@@ -56,13 +61,18 @@ export function DestinationCarousel({ category }: { category: Category }) {
                   <Sparkles className="h-3 w-3" /> AI Pick
                 </span>
               )}
+              {asDeals && !isAi && (
+                <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-emerald-500/90 px-2 py-1 text-[10px] font-black text-white backdrop-blur-md">
+                  <BadgeCheck className="h-3 w-3" /> מחיר מאומת
+                </span>
+              )}
               <div className="absolute inset-x-0 bottom-0 p-4 text-white">
                 <p className="text-[11px] font-semibold text-white/80">{d.country} {d.emoji}</p>
                 <h4 className="text-xl font-black leading-tight">{d.name}</h4>
                 <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-white/85">{d.tagline}</p>
                 <div className="mt-2 flex items-center justify-between text-[10px] font-bold">
                   <span className="rounded-full bg-white/20 px-2 py-0.5 backdrop-blur">{d.weather}</span>
-                  <span>מ־₪{d.avgBudgetPerPerson.toLocaleString()}</span>
+                  <span>{asDeals ? "מ־" : "מ־"}₪{d.avgBudgetPerPerson.toLocaleString()}</span>
                 </div>
               </div>
             </div>

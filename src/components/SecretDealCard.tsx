@@ -31,13 +31,13 @@ export function SecretDealCard() {
     return () => { unsub(); clearInterval(t); };
   }, []);
 
-  const openDeal = () => navigate({ to: "/deal/$id", params: { id: deal.id }, search: { secret: 1 } });
+  const openDeal = () => navigate({ to: "/deal/$id", params: { id: deal.id } });
 
   const handleClick = () => {
     if (authed) {
       openDeal();
     } else {
-      setAuthIntent(`/deal/${deal.id}?secret=1`);
+      setAuthIntent(`/deal/${deal.id}`);
       setSignInOpen(true);
     }
   };

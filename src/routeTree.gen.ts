@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResultRouteImport } from './routes/result'
 import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DealIdRouteImport } from './routes/deal.$id'
 
 const ResultRoute = ResultRouteImport.update({
   id: '/result',
@@ -28,35 +29,44 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DealIdRoute = DealIdRouteImport.update({
+  id: '/deal/$id',
+  path: '/deal/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
+  '/deal/$id': typeof DealIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
+  '/deal/$id': typeof DealIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
+  '/deal/$id': typeof DealIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/quiz' | '/result'
+  fullPaths: '/' | '/quiz' | '/result' | '/deal/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/quiz' | '/result'
-  id: '__root__' | '/' | '/quiz' | '/result'
+  to: '/' | '/quiz' | '/result' | '/deal/$id'
+  id: '__root__' | '/' | '/quiz' | '/result' | '/deal/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   QuizRoute: typeof QuizRoute
   ResultRoute: typeof ResultRoute
+  DealIdRoute: typeof DealIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/deal/$id': {
+      id: '/deal/$id'
+      path: '/deal/$id'
+      fullPath: '/deal/$id'
+      preLoaderRoute: typeof DealIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   QuizRoute: QuizRoute,
   ResultRoute: ResultRoute,
+  DealIdRoute: DealIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
