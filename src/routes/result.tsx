@@ -29,9 +29,11 @@ function Result() {
   const [answers, setAnswers] = useState<QuizAnswers>(defaultAnswers);
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   const [hotels, setHotels] = useState<(HotelT & { score: number })[]>([]);
   const [flights, setFlights] = useState<(Flight & { score: number })[]>([]);
   const [packages, setPackages] = useState<(PackageT & { score: number })[]>([]);
+
 
   useEffect(() => {
     try {
