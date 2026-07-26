@@ -29,6 +29,9 @@ function Result() {
   const [answers, setAnswers] = useState<QuizAnswers>(defaultAnswers);
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
+  const [hotels, setHotels] = useState<(HotelT & { score: number })[]>([]);
+  const [flights, setFlights] = useState<(Flight & { score: number })[]>([]);
+  const [packages, setPackages] = useState<(PackageT & { score: number })[]>([]);
 
   useEffect(() => {
     try {
@@ -38,6 +41,7 @@ function Result() {
     const t = setTimeout(() => setLoading(false), 2200);
     return () => clearTimeout(t);
   }, []);
+
 
   const dest = useMemo(() => pickDestination(answers), [answers]);
   const total = answers.budget * answers.people;
