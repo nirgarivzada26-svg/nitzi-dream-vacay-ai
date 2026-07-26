@@ -192,23 +192,46 @@ function Result() {
           <p className="mt-2 text-[11px] text-muted-foreground">מפה אינטראקטיבית תתווסף בגרסה הבאה</p>
         </Card>
 
-        {/* Hotels */}
+        {/* Flights */}
         <Card>
-          <SectionTitle icon={<Hotel className="h-4 w-4" />} title="מלונות מומלצים" />
+          <SectionTitle icon={<Plane className="h-4 w-4" />} title="טיסות אמיתיות" />
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            מדורג לפי מחיר, עצירות, משך וזמני יציאה נוחים
+          </p>
           <div className="mt-3 space-y-2">
-            {dest.hotels.map((h) => (
-              <div key={h.name} className="flex items-start gap-3 rounded-2xl border border-border/70 bg-muted/40 p-3">
-                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-ocean text-white">
-                  <Hotel className="h-4 w-4" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-foreground">{h.name}</p>
-                  <p className="text-xs text-muted-foreground">{h.note}</p>
-                </div>
-              </div>
+            {flights.length === 0 && <SkeletonRow />}
+            {flights.map((f) => (
+              <FlightRow key={f.id} flight={f} cheapest={cheapestFlight} fastest={fastestFlight} answers={answers} />
             ))}
           </div>
         </Card>
+
+        {/* Hotels */}
+        <Card>
+          <SectionTitle icon={<Hotel className="h-4 w-4" />} title="מלונות מומלצים" />
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            {hotels.length ? `${hotels.length} תוצאות מדורגות לפי התאמה, איכות וערך` : "טוען מלונות…"}
+          </p>
+          <div className="mt-3 space-y-2">
+            {hotels.length === 0 && <SkeletonRow />}
+            {hotels.map((h) => (
+              <HotelRow key={h.id} hotel={h} answers={answers} />
+            ))}
+          </div>
+        </Card>
+
+        {/* Packages */}
+        <Card>
+          <SectionTitle icon={<PackageIcon className="h-4 w-4" />} title="חבילות מומלצות" />
+          <p className="mt-1 text-[11px] text-muted-foreground">טיסה + מלון במחיר משתלם יותר</p>
+          <div className="mt-3 space-y-2">
+            {packages.length === 0 && <SkeletonRow />}
+            {packages.map((p) => (
+              <PackageRow key={p.id} pkg={p} answers={answers} />
+            ))}
+          </div>
+        </Card>
+
 
         {/* Attractions */}
         <Card>
