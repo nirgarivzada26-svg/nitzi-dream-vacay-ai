@@ -71,7 +71,7 @@ export async function addFavorite(deal: Deal): Promise<void> {
     user_id: user.id,
     deal_id: deal.id,
     destination_name: deal.destination.name,
-    snapshot: deal as unknown as Record<string, unknown>,
+    snapshot: deal as unknown as never,
   });
   if (error && error.code !== "23505") throw error; // ignore duplicate
 }
@@ -93,8 +93,8 @@ export async function saveTrip(input: { title: string; destinationName: string; 
     user_id: user.id,
     title: input.title,
     destination_name: input.destinationName,
-    answers: input.answers as unknown as Record<string, unknown>,
-    snapshot: input.snapshot as unknown as Record<string, unknown>,
+    answers: input.answers as unknown as never,
+    snapshot: input.snapshot as unknown as never,
   });
   if (error) throw error;
 }
@@ -124,7 +124,7 @@ export async function createBooking(deal: Deal): Promise<BookingRow> {
     start_date: deal.dates.start.slice(0, 10),
     end_date: deal.dates.end.slice(0, 10),
     status: "confirmed",
-    snapshot: deal as unknown as Record<string, unknown>,
+    snapshot: deal as unknown as never,
   }).select("*").single();
   if (error) throw error;
   return data as unknown as BookingRow;
@@ -136,7 +136,7 @@ export async function logSearch(answers: QuizAnswers, destinationName?: string):
   if (!user) return; // silent no-op when guest
   await supabase.from("search_history").insert({
     user_id: user.id,
-    answers: answers as unknown as Record<string, unknown>,
+    answers: answers as unknown as never,
     destination_name: destinationName ?? null,
   });
 }
