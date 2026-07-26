@@ -1,0 +1,227 @@
+// Deals layer — a curated "buyable" trip built on top of destinations.
+// The UI never fabricates prices: it calls getDeal() / listDeals() and displays
+// exactly what the provider returned, along with a verifiedAt timestamp and
+// availability status.
+//
+// Today the provider is deterministic-mock (see nitzi-data). When we swap to
+// a real supplier (Booking / Amadeus / Expedia), replace the body of these
+// functions — the return shape and Price-Revalidation contract are stable.
+
+import { destinations, type Destination } from "./nitzi-data";
+
+export type Availability = "available" | "limited" | "sold-out";
+
+export interface DealPrice {
+  perPerson: number;
+  total: number;
+  currency: "ILS";
+  verifiedAt: string; // ISO
+  availability: Availability;
+  source: string;    // provider id
+  ttlSeconds: number; // how long this quote is trusted
+}
+
+export interface DealFlight {
+  airline: string;
+  flightNumber: string;
+  departAt: string;
+  arriveAt: string;
+  stops: number;
+  durationMinutes: number;
+}
+
+export interface Deal {
+  id: string; // stable slug (destination name urlencoded)
+  destination: Destination;
+  title: string;
+  hotel: {
+    name: string;
+    note: string;
+    stars: number;
+    guestRating: number;
+    reviewsCount: number;
+  };
+  outbound: DealFlight;
+  inbound: DealFlight;
+  dates: { start: string; end: string; nights: number };
+  people: number;
+  price: DealPrice;
+  includes: string[];
+  excludes: string[];
+  cancellation: string;
+  gallery: { src: string; alt: string }[];
+  attractions: string[];
+  restaurants: string[];
+  secret?: boolean;
+}
+
+// Deterministic pseudo-random from a string seed so a given destination
+// always renders the same price/dates within its TTL window.
+function rng(seed: string) {
+  let h = 2166136261;
+  for (let i = 0; i < seed.length; i++) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return () => {
+    h ^= h << 13; h ^= h >>> 17; h ^= h << 5;
+    return ((h >>> 0) % 100000) / 100000;
+  };
+}
+const pick = <T,>(r: () => number, arr: T[]) => arr[Math.floor(r() * arr.length)];
+
+const AIRLINES = [
+  { code: "LY", name: "אל על" },
+  { code: "IZ", name: "ארקיע" },
+  { code: "LH", name: "לופטהנזה" },
+  { code: "TK", name: "טורקיש איירליינס" },
+  { code: "W6", name: "וויז אייר" },
+  { code: "AF", name: "אייר פראנס" },
+];
+
+export function dealIdFor(destinationName: string) {
+  return encodeURIComponent(destinationName);
+}
+
+function buildDeal(dest: Destination, opts?: { secret?: boolean; seed?: string }): Deal {
+  const seed = opts?.seed ?? `deal|${dest.name}`;
+  const r = rng(seed);
+  const nights = 4 + Math.floor(r() * 4); // 4..7
+  const people = 2;
+
+  const start = new Date(Date.now() + (14 + Math.floor(r() * 21)) * 86400000);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start.getTime() + nights * 86400000);
+
+  const airOut = pick(r, AIRLINES);
+  const airIn = r() > 0.7 ? pick(r, AIRLINES) : airOut;
+  const stopsOut = r() > 0.55 ? 0 : 1;
+  const stopsIn = r() > 0.55 ? 0 : 1;
+  const durOut = Math.round(dest.flightHours * 60 + stopsOut * (90 + r() * 90));
+  const durIn = Math.round(dest.flightHours * 60 + stopsIn * (90 + r() * 90));
+  const depOut = new Date(start); depOut.setHours(5 + Math.floor(r() * 12), 15 * Math.floor(r() * 4), 0, 0);
+  const arrOut = new Date(depOut.getTime() + durOut * 60000);
+  const depIn = new Date(end); depIn.setHours(8 + Math.floor(r() * 10), 15 * Math.floor(r() * 4), 0, 0);
+  const arrIn = new Date(depIn.getTime() + durIn * 60000);
+
+  const perPersonBase = dest.avgBudgetPerPerson * (0.78 + r() * 0.18);
+  const secretDiscount = opts?.secret ? 0.72 : 1;
+  const perPerson = Math.round((perPersonBase * secretDiscount) / 10) * 10;
+  const total = perPerson * people;
+
+  const hotel = dest.hotels[Math.floor(r() * dest.hotels.length)];
+  const stars = 4 + Math.floor(r() * 2);
+
+  return {
+    id: dealIdFor(dest.name),
+    destination: dest,
+    title: `${nights} לילות ב${dest.name} · ${hotel.name}`,
+    hotel: {
+      name: hotel.name,
+      note: hotel.note,
+      stars,
+      guestRating: Number((8.4 + r() * 1.4).toFixed(1)),
+      reviewsCount: 240 + Math.floor(r() * 3200),
+    },
+    outbound: {
+      airline: airOut.name,
+      flightNumber: `${airOut.code}${100 + Math.floor(r() * 900)}`,
+      departAt: depOut.toISOString(),
+      arriveAt: arrOut.toISOString(),
+      stops: stopsOut,
+      durationMinutes: durOut,
+    },
+    inbound: {
+      airline: airIn.name,
+      flightNumber: `${airIn.code}${100 + Math.floor(r() * 900)}`,
+      departAt: depIn.toISOString(),
+      arriveAt: arrIn.toISOString(),
+      stops: stopsIn,
+      durationMinutes: durIn,
+    },
+    dates: { start: start.toISOString(), end: end.toISOString(), nights },
+    people,
+    price: {
+      perPerson,
+      total,
+      currency: "ILS",
+      verifiedAt: new Date().toISOString(),
+      availability: r() > 0.85 ? "limited" : "available",
+      source: "NITZI Verified",
+      ttlSeconds: 15 * 60,
+    },
+    includes: [
+      `${nights} לילות ב-${hotel.name} (${stars}★)`,
+      "טיסה הלוך-חזור מתל אביב",
+      "כבודה 20 ק״ג לאדם",
+      "העברות משדה התעופה למלון",
+      hotel.note.includes("ברי") || r() > 0.4 ? "ארוחת בוקר כלולה" : "ביטוח מזוודות",
+    ],
+    excludes: [
+      "ביטוח נסיעות (מומלץ בנפרד)",
+      "ארוחות שאינן צוינו במפורש",
+      "אטרקציות וסיורים מודרכים",
+      "פיקדון וחיובים אישיים במלון",
+    ],
+    cancellation: "ביטול חינם עד 21 ימים לפני היציאה. לאחר מכן חיוב לפי מדיניות הספק.",
+    gallery: [
+      { src: dest.image, alt: `${dest.name} — נוף ראשי` },
+    ],
+    attractions: dest.attractions,
+    restaurants: dest.restaurants,
+    secret: opts?.secret,
+  };
+}
+
+// Simulated Price Revalidation. Real API would call the supplier here and
+// return one of: verified (unchanged), changed (new price to confirm),
+// sold-out. UI must present changed/sold-out clearly before charging.
+export type RevalidationResult =
+  | { status: "verified"; deal: Deal }
+  | { status: "changed"; deal: Deal; oldPrice: number; newPrice: number }
+  | { status: "sold-out"; deal: Deal };
+
+export async function revalidateDeal(deal: Deal): Promise<RevalidationResult> {
+  await new Promise((r) => setTimeout(r, 900));
+  // ~85% verified, ~12% price change, ~3% sold out
+  const roll = Math.random();
+  if (roll < 0.85) {
+    return { status: "verified", deal: { ...deal, price: { ...deal.price, verifiedAt: new Date().toISOString() } } };
+  }
+  if (roll < 0.97) {
+    const delta = Math.round(deal.price.perPerson * (0.03 + Math.random() * 0.08));
+    const newPer = deal.price.perPerson + delta;
+    return {
+      status: "changed",
+      oldPrice: deal.price.total,
+      newPrice: newPer * deal.people,
+      deal: {
+        ...deal,
+        price: { ...deal.price, perPerson: newPer, total: newPer * deal.people, verifiedAt: new Date().toISOString() },
+      },
+    };
+  }
+  return { status: "sold-out", deal: { ...deal, price: { ...deal.price, availability: "sold-out", verifiedAt: new Date().toISOString() } } };
+}
+
+export function listDeals(): Deal[] {
+  return destinations.map((d) => buildDeal(d));
+}
+
+export function getDeal(id: string): Deal | null {
+  const decoded = decodeURIComponent(id);
+  const dest = destinations.find((d) => d.name === decoded);
+  if (!dest) return null;
+  return buildDeal(dest);
+}
+
+// Secret deal rotates every 6 hours. Deterministic per slot so all viewers see
+// the same secret deal until the next rotation.
+const SECRET_ROTATION_HOURS = 6;
+export function getSecretDeal(): { deal: Deal; nextRotationAt: Date } {
+  const slotMs = SECRET_ROTATION_HOURS * 3600 * 1000;
+  const slot = Math.floor(Date.now() / slotMs);
+  const dest = destinations[slot % destinations.length];
+  const nextRotationAt = new Date((slot + 1) * slotMs);
+  return {
+    deal: buildDeal(dest, { secret: true, seed: `secret|${dest.name}|${slot}` }),
+    nextRotationAt,
+  };
+}
