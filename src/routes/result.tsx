@@ -2,10 +2,15 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { NitziLogo } from "@/components/NitziLogo";
 import {
-  ArrowLeft, Bookmark, Calendar, Cloud, Hotel, MapPin, Plane,
-  Share2, Sparkles, Utensils, Wallet, Wand2,
+  ArrowLeft, Bookmark, Calendar, Clock, Cloud, Hotel, MapPin, Package as PackageIcon,
+  Plane, Share2, Sparkles, Star, Utensils, Wallet, Wand2,
 } from "lucide-react";
 import { defaultAnswers, pickDestination, tripTypes, styles, type QuizAnswers } from "@/lib/nitzi-data";
+import { getProviders } from "@/lib/providers/registry";
+import type { Flight, Hotel as HotelT, Package as PackageT } from "@/lib/providers/types";
+import { budgetFit, rank, scoreFlight, scoreHotel, scorePackage } from "@/lib/ranking";
+import { amenityLabel, explainFlight, explainHotel, explainPackage } from "@/lib/explain";
+
 
 export const Route = createFileRoute("/result")({
   head: () => ({
