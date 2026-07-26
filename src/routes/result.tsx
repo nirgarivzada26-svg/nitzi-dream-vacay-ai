@@ -194,45 +194,94 @@ function Result() {
           <p className="mt-2 text-[11px] text-muted-foreground">מפה אינטראקטיבית תתווסף בגרסה הבאה</p>
         </Card>
 
-        {/* Flights */}
-        <Card>
-          <SectionTitle icon={<Plane className="h-4 w-4" />} title="טיסות אמיתיות" />
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            מדורג לפי מחיר, עצירות, משך וזמני יציאה נוחים
-          </p>
-          <div className="mt-3 space-y-2">
-            {flights.length === 0 && <SkeletonRow />}
-            {flights.map((f) => (
-              <FlightRow key={f.id} flight={f} cheapest={cheapestFlight} fastest={fastestFlight} answers={answers} />
-            ))}
+        {/* NITZI's Picks — top curated by AI */}
+        <section className="mx-5 overflow-hidden rounded-3xl border border-primary/30 bg-gradient-to-b from-primary/10 via-card/90 to-card/80 p-5 shadow-glow backdrop-blur animate-fade-up">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-sunset text-white shadow-glow">
+                <Sparkles className="h-4 w-4" />
+              </span>
+              <div>
+                <h3 className="text-base font-black text-foreground">הבחירות של NITZI</h3>
+                <p className="text-[11px] text-muted-foreground">נבחרו עבורך לפי התקציב, הסגנון וההעדפות</p>
+              </div>
+            </div>
           </div>
-        </Card>
 
-        {/* Hotels */}
-        <Card>
-          <SectionTitle icon={<Hotel className="h-4 w-4" />} title="מלונות מומלצים" />
-          <p className="mt-1 text-[11px] text-muted-foreground">
-            {hotels.length ? `${hotels.length} תוצאות מדורגות לפי התאמה, איכות וערך` : "טוען מלונות…"}
-          </p>
-          <div className="mt-3 space-y-2">
-            {hotels.length === 0 && <SkeletonRow />}
-            {hotels.map((h) => (
-              <HotelRow key={h.id} hotel={h} answers={answers} />
-            ))}
-          </div>
-        </Card>
+          {hotels.length === 0 || flights.length === 0 ? (
+            <div className="mt-4 space-y-2"><SkeletonRow /><SkeletonRow /><SkeletonRow /></div>
+          ) : (
+            <div className="mt-4 space-y-3">
+              {packages[0] && (
+                <PickWrap kind="חבילה מומלצת" reason="הכי משתלמת ומאוזנת ליעד שלך">
+                  <PackageRow pkg={packages[0]} answers={answers} />
+                </PickWrap>
+              )}
+              {hotels.slice(0, 2).map((h, i) => (
+                <PickWrap key={h.id} kind={i === 0 ? "המלון המושלם" : "אלטרנטיבה מצוינת"} reason={i === 0 ? "הציון הגבוה ביותר בהתאמה אישית" : "איזון טוב בין מחיר לאיכות"}>
+                  <HotelRow hotel={h} answers={answers} />
+                </PickWrap>
+              ))}
+              {flights[0] && (
+                <PickWrap kind="הטיסה הכי חכמה" reason="שילוב מנצח של מחיר, זמן ונוחות">
+                  <FlightRow flight={flights[0]} cheapest={cheapestFlight} fastest={fastestFlight} answers={answers} />
+                </PickWrap>
+              )}
+            </div>
+          )}
 
-        {/* Packages */}
-        <Card>
-          <SectionTitle icon={<PackageIcon className="h-4 w-4" />} title="חבילות מומלצות" />
-          <p className="mt-1 text-[11px] text-muted-foreground">טיסה + מלון במחיר משתלם יותר</p>
-          <div className="mt-3 space-y-2">
-            {packages.length === 0 && <SkeletonRow />}
-            {packages.map((p) => (
-              <PackageRow key={p.id} pkg={p} answers={answers} />
-            ))}
-          </div>
-        </Card>
+          <button
+            onClick={() => setShowAll((v) => !v)}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-card py-3 text-sm font-bold text-foreground transition hover:bg-muted"
+          >
+            {showAll ? "הסתר את כל האפשרויות" : "הצג את כל האפשרויות"}
+            <span className="text-[10px] font-semibold text-muted-foreground">
+              ({hotels.length} מלונות · {flights.length} טיסות · {packages.length} חבילות)
+            </span>
+          </button>
+        </section>
+
+        {showAll && (
+          <>
+            {/* Flights */}
+            <Card>
+              <SectionTitle icon={<Plane className="h-4 w-4" />} title="כל הטיסות" />
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                מדורג לפי מחיר, עצירות, משך וזמני יציאה נוחים
+              </p>
+              <div className="mt-3 space-y-2">
+                {flights.map((f) => (
+                  <FlightRow key={f.id} flight={f} cheapest={cheapestFlight} fastest={fastestFlight} answers={answers} />
+                ))}
+              </div>
+            </Card>
+
+            {/* Hotels */}
+            <Card>
+              <SectionTitle icon={<Hotel className="h-4 w-4" />} title="כל המלונות" />
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                {hotels.length} תוצאות מדורגות לפי התאמה, איכות וערך
+              </p>
+              <div className="mt-3 space-y-2">
+                {hotels.map((h) => (
+                  <HotelRow key={h.id} hotel={h} answers={answers} />
+                ))}
+              </div>
+            </Card>
+
+            {/* Packages */}
+            <Card>
+              <SectionTitle icon={<PackageIcon className="h-4 w-4" />} title="כל החבילות" />
+              <p className="mt-1 text-[11px] text-muted-foreground">טיסה + מלון במחיר משתלם יותר</p>
+              <div className="mt-3 space-y-2">
+                {packages.map((p) => (
+                  <PackageRow key={p.id} pkg={p} answers={answers} />
+                ))}
+              </div>
+            </Card>
+          </>
+        )}
+
 
 
         {/* Attractions */}
