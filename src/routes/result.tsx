@@ -416,7 +416,22 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
+function PickWrap({ kind, reason, children }: { kind: string; reason: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-3xl border border-primary/25 bg-card/90 p-2 shadow-soft">
+      <div className="flex items-center justify-between px-2 pb-2 pt-1">
+        <span className="inline-flex items-center gap-1 rounded-full bg-gradient-sunset px-2.5 py-1 text-[10px] font-black text-white shadow-glow">
+          <Sparkles className="h-3 w-3" /> {kind}
+        </span>
+        <span className="truncate text-[10px] font-semibold text-muted-foreground">{reason}</span>
+      </div>
+      {children}
+    </div>
+  );
+}
+
 function SkeletonRow() {
+
   return (
     <div className="h-20 animate-pulse rounded-2xl border border-border/70 bg-muted/40" />
   );
