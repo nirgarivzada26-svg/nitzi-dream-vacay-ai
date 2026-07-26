@@ -44,6 +44,29 @@ function Result() {
 
 
   const dest = useMemo(() => pickDestination(answers), [answers]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const providers = getProviders();
+    const ctx = { answers, destination: dest };
+    (async () => {
+      const [h, f, p] = await Promise.all([
+        providers.hotels.search(ctx, { limit: 10 }),
+        providers.flights.search(ctx, { limit: 6 }),
+        providers.packages.search(ctx, { limit: 4 }),
+      ]);
+      if (cancelled) return;
+      const prices = f.map((x) => x.price);
+      setHotels(rank(h, (x) => scoreHotel(x, answers)));
+      setFlights(rank(f, (x) => scoreFlight(x, answers, prices)));
+      setPackages(rank(p, (x) => scorePackage(x, answers)));
+    })();
+    return () => { cancelled = true; };
+  }, [answers, dest]);
+
+  const cheapestFlight = useMemo(() => flights.slice().sort((a, b) => a.price - b.price)[0], [flights]);
+  const fastestFlight = useMemo(() => flights.slice().sort((a, b) => a.durationMinutes - b.durationMinutes)[0], [flights]);
+
   const total = answers.budget * answers.people;
   const enoughBudget = answers.budget >= dest.avgBudgetPerPerson * 0.85;
   const matchScore = useMemo(() => {
