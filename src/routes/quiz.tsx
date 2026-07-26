@@ -15,8 +15,8 @@ import {
 export const Route = createFileRoute("/quiz")({
   head: () => ({
     meta: [
-      { title: "בנייה מותאמת אישית — NITZI" },
-      { name: "description", content: "ענה על כמה שאלות ו-NITZI יבנה לך חופשה מושלמת." },
+      { title: "שיחה עם NITZI — בונים חופשה" },
+      { name: "description", content: "שיחה קצרה עם ה-AI שבונה את החופשה המושלמת עבורך." },
       { property: "og:title", content: "שאלון החופשה של NITZI" },
       { property: "og:description", content: "שיחה קצרה עם ה-AI שבונה את החופשה שלך." },
     ],
@@ -27,26 +27,67 @@ export const Route = createFileRoute("/quiz")({
 type Step = 0 | 1 | 2 | 3 | 4 | 5;
 const totalSteps = 6;
 
+const intro = "שלום 👋 אני NITZI. בוא נמצא יחד את החופשה המושלמת עבורך.";
+
 const questions = [
-  "שלום 👋 קודם כל — איזה סוג חופשה מדגדג לך הפעם?",
-  "מעולה. יש לך יעד שאת/ה חולם/ת עליו? או שאבחר לך?",
+  "קודם כל — איזה סוג חופשה מדגדג לך הפעם?",
+  "מעולה בחירה! יש לך יעד שאתה חולם עליו? או שאבחר לך?",
   "כמה ימים תהיו בחו״ל?",
   "מה התקציב לאדם? (בשקלים)",
   "כמה אנשים נוסעים איתך?",
   "אחרון — איזה סגנון חופשה הכי מתאים לך עכשיו?",
 ];
 
-function useLocalAnswers() {
-  const [a, setA] = useState<QuizAnswers>(defaultAnswers);
-  return [a, setA] as const;
+const reactions: (a: QuizAnswers) => string = (a) => {
+  const lastType = tripTypes.find((t) => t.id === a.type)?.label;
+  return "";
+};
+
+function reactionFor(step: number, a: QuizAnswers): string | null {
+  switch (step) {
+    case 1: {
+      const t = tripTypes.find((x) => x.id === a.type);
+      return t ? `${t.emoji} ${t.label} — קלאסיקה. יש לי כמה יעדים שיתאימו לך בול.` : null;
+    }
+    case 2:
+      return a.destination === "surprise"
+        ? "אוהב אתגרים ✨ אני אבחר לך משהו מיוחד."
+        : a.destination
+          ? `${a.destination} — טעם מעולה!`
+          : null;
+    case 3:
+      return `${a.days} ימים — טיים־פריים מושלם 👌`;
+    case 4:
+      return `תקציב של ₪${a.budget.toLocaleString()} — יש איפה לשחק.`;
+    case 5:
+      return `${a.people} נוסעים — סגור. עוד שאלה אחרונה.`;
+    default:
+      return null;
+  }
 }
 
 function Quiz() {
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>(0);
-  const [answers, setAnswers] = useLocalAnswers();
+  const [answers, setAnswers] = useState<QuizAnswers>(defaultAnswers);
   const [typing, setTyping] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    try {
+      const seed = sessionStorage.getItem("nitzi:seed");
+      if (seed) {
+        const s = JSON.parse(seed);
+        setAnswers((a) => ({
+          ...a,
+          destination: s.destination || "",
+          people: s.people || a.people,
+          budget: s.budget || a.budget,
+          type: s.purpose && s.purpose !== "any" ? s.purpose : null,
+        }));
+      }
+    } catch {}
+  }, []);
 
   useEffect(() => {
     setTyping(true);
@@ -81,7 +122,6 @@ function Quiz() {
       <div aria-hidden className="pointer-events-none absolute -top-32 -left-20 h-72 w-72 rounded-full bg-gradient-sunset opacity-25 blur-3xl" />
       <div aria-hidden className="pointer-events-none absolute top-1/3 -right-24 h-72 w-72 rounded-full bg-gradient-ocean opacity-25 blur-3xl" />
 
-      {/* Header */}
       <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur-lg">
         <div className="mx-auto flex w-full max-w-md items-center justify-between px-5 py-3">
           <button
@@ -104,15 +144,20 @@ function Quiz() {
         </div>
       </header>
 
-      {/* Chat area */}
       <div ref={scrollRef} className="mx-auto w-full max-w-md flex-1 space-y-4 overflow-y-auto px-5 py-6">
-        {Array.from({ length: step + 1 }).map((_, i) => (
-          <ChatBlock key={i} index={i as Step} answers={answers} setAnswers={setAnswers} active={i === step} />
-        ))}
+        <AiBubble text={intro} />
+        {Array.from({ length: step + 1 }).map((_, i) => {
+          const react = i > 0 ? reactionFor(i, answers) : null;
+          return (
+            <div key={i} className="space-y-3">
+              {react && <AiBubble text={react} />}
+              <ChatBlock index={i as Step} answers={answers} setAnswers={setAnswers} active={i === step} />
+            </div>
+          );
+        })}
         {typing && <TypingBubble />}
       </div>
 
-      {/* Footer CTA */}
       <div className="sticky bottom-0 z-20 border-t border-border/60 bg-background/90 px-5 py-4 backdrop-blur-lg">
         <div className="mx-auto flex w-full max-w-md items-center gap-3">
           <div className="flex-1 truncate rounded-2xl border border-border bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
@@ -127,6 +172,19 @@ function Quiz() {
             {step === 5 ? <Sparkles className="h-5 w-5" /> : <Send className="h-5 w-5 rtl:rotate-180" />}
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function AiBubble({ text }: { text: string }) {
+  return (
+    <div className="flex items-end gap-2 animate-fade-up">
+      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-sunset text-white shadow-glow">
+        <Sparkles className="h-3.5 w-3.5" />
+      </div>
+      <div className="max-w-[85%] rounded-2xl rounded-br-sm bg-card px-4 py-3 text-sm font-medium leading-relaxed text-foreground shadow-soft">
+        {text}
       </div>
     </div>
   );
@@ -169,17 +227,7 @@ interface BlockProps {
 function ChatBlock({ index, answers, setAnswers, active }: BlockProps) {
   return (
     <div className="space-y-3 animate-fade-up">
-      {/* AI question */}
-      <div className="flex items-end gap-2">
-        <div className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-sunset text-white shadow-glow">
-          <Sparkles className="h-3.5 w-3.5" />
-        </div>
-        <div className="max-w-[85%] rounded-2xl rounded-br-sm bg-card px-4 py-3 text-sm font-medium leading-relaxed text-foreground shadow-soft">
-          {questions[index]}
-        </div>
-      </div>
-
-      {/* Interactive */}
+      <AiBubble text={questions[index]} />
       <div className={`pr-10 ${active ? "" : "opacity-60 pointer-events-none"}`}>
         {index === 0 && <TypeGrid value={answers.type} onChange={(v) => setAnswers({ ...answers, type: v })} />}
         {index === 1 && (
@@ -189,37 +237,13 @@ function ChatBlock({ index, answers, setAnswers, active }: BlockProps) {
           />
         )}
         {index === 2 && (
-          <NumberChooser
-            value={answers.days}
-            min={2}
-            max={21}
-            step={1}
-            suffix="ימים"
-            presets={[3, 5, 7, 10, 14]}
-            onChange={(v) => setAnswers({ ...answers, days: v })}
-          />
+          <NumberChooser value={answers.days} min={2} max={21} step={1} suffix="ימים" presets={[3, 5, 7, 10, 14]} onChange={(v) => setAnswers({ ...answers, days: v })} />
         )}
         {index === 3 && (
-          <NumberChooser
-            value={answers.budget}
-            min={1000}
-            max={30000}
-            step={500}
-            suffix="₪ לאדם"
-            presets={[3000, 5000, 8000, 12000, 20000]}
-            onChange={(v) => setAnswers({ ...answers, budget: v })}
-          />
+          <NumberChooser value={answers.budget} min={1000} max={30000} step={500} suffix="₪ לאדם" presets={[3000, 5000, 8000, 12000, 20000]} onChange={(v) => setAnswers({ ...answers, budget: v })} />
         )}
         {index === 4 && (
-          <NumberChooser
-            value={answers.people}
-            min={1}
-            max={10}
-            step={1}
-            suffix="נוסעים"
-            presets={[1, 2, 3, 4, 6]}
-            onChange={(v) => setAnswers({ ...answers, people: v })}
-          />
+          <NumberChooser value={answers.people} min={1} max={10} step={1} suffix="נוסעים" presets={[1, 2, 3, 4, 6]} onChange={(v) => setAnswers({ ...answers, people: v })} />
         )}
         {index === 5 && <StyleGrid value={answers.style} onChange={(v) => setAnswers({ ...answers, style: v })} />}
       </div>
@@ -237,9 +261,7 @@ function TypeGrid({ value, onChange }: { value: TripType | null; onChange: (v: T
             key={t.id}
             onClick={() => onChange(t.id)}
             className={`group relative overflow-hidden rounded-2xl border p-3 text-right transition ${
-              active
-                ? "border-transparent bg-gradient-sunset text-white shadow-glow"
-                : "border-border bg-card text-foreground hover:border-primary/50"
+              active ? "border-transparent bg-gradient-sunset text-white shadow-glow" : "border-border bg-card text-foreground hover:border-primary/50"
             }`}
           >
             <div className="text-2xl">{t.emoji}</div>
@@ -262,9 +284,7 @@ function StyleGrid({ value, onChange }: { value: TripStyle | null; onChange: (v:
             key={s.id}
             onClick={() => onChange(s.id)}
             className={`flex items-center gap-3 rounded-2xl border p-4 text-right transition ${
-              active
-                ? "border-transparent bg-gradient-aurora text-white shadow-glow"
-                : "border-border bg-card text-foreground hover:border-primary/50"
+              active ? "border-transparent bg-gradient-aurora text-white shadow-glow" : "border-border bg-card text-foreground hover:border-primary/50"
             }`}
           >
             <span className="text-2xl">{s.emoji}</span>
@@ -288,9 +308,7 @@ function DestinationPicker({ value, onChange }: { value: string; onChange: (v: s
       <button
         onClick={() => onChange("surprise")}
         className={`w-full rounded-2xl border-2 border-dashed p-3 text-sm font-bold transition ${
-          value === "surprise"
-            ? "border-primary bg-primary/10 text-primary"
-            : "border-border bg-transparent text-muted-foreground hover:border-primary/50"
+          value === "surprise" ? "border-primary bg-primary/10 text-primary" : "border-border bg-transparent text-muted-foreground hover:border-primary/50"
         }`}
       >
         ✨ תפתיע/י אותי — NITZI יבחר יעד מושלם
@@ -323,15 +341,7 @@ function NumberChooser({
         <div className="text-4xl font-black text-gradient-sunset">{value.toLocaleString()}</div>
         <div className="text-xs font-semibold text-muted-foreground">{suffix}</div>
       </div>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="mt-4 w-full accent-primary"
-      />
+      <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} className="mt-4 w-full accent-primary" />
       <div className="mt-3 flex flex-wrap justify-center gap-1.5">
         {presets.map((p) => (
           <button
