@@ -1,15 +1,50 @@
 import { useNavigate } from "@tanstack/react-router";
+import { useRef, useState, useEffect } from "react";
 import { destinations, type Category } from "@/lib/nitzi-data";
 import { dealIdFor } from "@/lib/deals";
-import { ArrowLeft, BadgeCheck, Sparkles } from "lucide-react";
+import { ArrowLeft, BadgeCheck, ChevronLeft, ChevronRight, Info, Sparkles } from "lucide-react";
 
 export function DestinationCarousel({ category, asDeals = false }: { category: Category; asDeals?: boolean }) {
   const navigate = useNavigate();
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
+
   const items = category.destinations
     .map((n) => destinations.find((d) => d.name === n))
     .filter((d): d is (typeof destinations)[number] => Boolean(d));
 
   const isAi = category.id === "ai";
+
+  const updateArrows = () => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    // RTL: scrollLeft is <= 0 in most browsers.
+    const max = el.scrollWidth - el.clientWidth;
+    const abs = Math.abs(el.scrollLeft);
+    setCanPrev(abs > 4);
+    setCanNext(abs < max - 4);
+  };
+
+  useEffect(() => {
+    updateArrows();
+    const el = scrollerRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", updateArrows, { passive: true });
+    window.addEventListener("resize", updateArrows);
+    return () => {
+      el.removeEventListener("scroll", updateArrows);
+      window.removeEventListener("resize", updateArrows);
+    };
+  }, []);
+
+  const scrollByDir = (dir: 1 | -1) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    const amount = Math.round(el.clientWidth * 0.85) * dir;
+    // In RTL flex overflow, positive scrollLeft moves right — invert for user perception
+    el.scrollBy({ left: -amount, behavior: "smooth" });
+  };
 
   const open = (name: string) => {
     if (asDeals) {
@@ -27,19 +62,41 @@ export function DestinationCarousel({ category, asDeals = false }: { category: C
 
   return (
     <section className="animate-fade-up">
-      <div className="mb-3 flex items-end justify-between px-1">
-        <div>
+      <div className="mb-3 flex items-end justify-between gap-2 px-1">
+        <div className="min-w-0">
           <h3 className="flex items-center gap-2 text-lg font-black text-foreground sm:text-xl">
             {isAi && <Sparkles className="h-4 w-4 text-primary" />}
             {category.title}
           </h3>
           <p className="text-xs text-muted-foreground sm:text-sm">{category.subtitle}</p>
         </div>
-        <button className="flex items-center gap-1 text-xs font-bold text-primary">
-          הכל <ArrowLeft className="h-3 w-3 rtl:rotate-180" />
-        </button>
+        <div className="flex items-center gap-1.5">
+          <button
+            aria-label="הקודם"
+            disabled={!canPrev}
+            onClick={() => scrollByDir(-1)}
+            className="hidden h-9 w-9 place-items-center rounded-full border border-border bg-card text-foreground shadow-soft transition hover:border-primary disabled:opacity-40 disabled:hover:border-border sm:grid"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+          <button
+            aria-label="הבא"
+            disabled={!canNext}
+            onClick={() => scrollByDir(1)}
+            className="hidden h-9 w-9 place-items-center rounded-full border border-border bg-card text-foreground shadow-soft transition hover:border-primary disabled:opacity-40 disabled:hover:border-border sm:grid"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <button className="flex items-center gap-1 text-xs font-bold text-primary">
+            הכל <ArrowLeft className="h-3 w-3 rtl:rotate-180" />
+          </button>
+        </div>
       </div>
-      <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] sm:-mx-8 sm:gap-4 sm:px-8 [&::-webkit-scrollbar]:hidden">
+
+      <div
+        ref={scrollerRef}
+        className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 scroll-smooth [scrollbar-width:none] sm:-mx-8 sm:gap-4 sm:px-8 [&::-webkit-scrollbar]:hidden"
+      >
         {items.map((d) => (
           <button
             key={d.name}
@@ -62,8 +119,13 @@ export function DestinationCarousel({ category, asDeals = false }: { category: C
                 </span>
               )}
               {asDeals && !isAi && (
-                <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-emerald-500/90 px-2 py-1 text-[10px] font-black text-white backdrop-blur-md">
-                  <BadgeCheck className="h-3 w-3" /> מחיר מאומת
+                <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-amber-400/95 px-2 py-1 text-[10px] font-black text-amber-950 backdrop-blur-md">
+                  <Info className="h-3 w-3" /> תצוגה מקדימה
+                </span>
+              )}
+              {!asDeals && (
+                <span className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-white/25 px-2 py-1 text-[10px] font-bold text-white backdrop-blur-md">
+                  <BadgeCheck className="h-3 w-3" /> יעד מומלץ
                 </span>
               )}
               <div className="absolute inset-x-0 bottom-0 p-4 text-white">
@@ -72,7 +134,7 @@ export function DestinationCarousel({ category, asDeals = false }: { category: C
                 <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-white/85">{d.tagline}</p>
                 <div className="mt-2 flex items-center justify-between text-[10px] font-bold">
                   <span className="rounded-full bg-white/20 px-2 py-0.5 backdrop-blur">{d.weather}</span>
-                  <span>{asDeals ? "מ־" : "מ־"}₪{d.avgBudgetPerPerson.toLocaleString()}</span>
+                  <span>מ־₪{d.avgBudgetPerPerson.toLocaleString()}</span>
                 </div>
               </div>
             </div>
