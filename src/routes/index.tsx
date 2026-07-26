@@ -6,6 +6,8 @@ import { SearchEngine } from "@/components/SearchEngine";
 import { DestinationCarousel } from "@/components/DestinationCarousel";
 import { SecretDealCard } from "@/components/SecretDealCard";
 import { SignInModal } from "@/components/SignInModal";
+import { Footer } from "@/components/Footer";
+import { DemoDataNotice } from "@/components/DemoDataNotice";
 import { categories } from "@/lib/nitzi-data";
 import { displayNameOf, useAuth } from "@/lib/auth";
 import { LogIn, Sparkles, User as UserIcon } from "lucide-react";
@@ -100,7 +102,11 @@ function Home() {
         </div>
       </section>
 
-      <div className="mx-auto mt-8 w-full max-w-6xl sm:mt-12">
+      <div className="mx-auto mt-8 w-full max-w-6xl px-5 sm:mt-12 sm:px-8">
+        <DemoDataNotice />
+      </div>
+
+      <div className="mx-auto mt-6 w-full max-w-6xl">
         <SecretDealCard />
       </div>
 
@@ -110,9 +116,7 @@ function Home() {
         ))}
       </div>
 
-      <footer className="mx-auto mt-14 max-w-6xl px-5 text-center text-[11px] text-muted-foreground">
-        NITZI · העוזר האישי לחופשות · MVP
-      </footer>
+      <Footer />
 
       <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} onSignedIn={() => navigate({ to: "/account" })} />
     </div>
