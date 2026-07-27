@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { NitziLogo } from "@/components/NitziLogo";
 import {
-  ArrowLeft, Bookmark, Calendar, Clock, Cloud, Hotel, MapPin, Package as PackageIcon,
+  ArrowLeft, Bookmark, Calendar, Clock, Cloud, GitCompare, Hotel, MapPin, Package as PackageIcon,
   Plane, Share2, Sparkles, Star, Utensils, Wallet, Wand2,
 } from "lucide-react";
 import { defaultAnswers, pickDestination, tripTypes, styles, type QuizAnswers } from "@/lib/nitzi-data";
@@ -10,6 +10,11 @@ import { getProviders } from "@/lib/providers/registry";
 import type { Flight, Hotel as HotelT, Package as PackageT } from "@/lib/providers/types";
 import { budgetFit, rank, scoreFlight, scoreHotel, scorePackage } from "@/lib/ranking";
 import { amenityLabel, explainFlight, explainHotel, explainPackage } from "@/lib/explain";
+import { setResultsCache } from "@/lib/results-cache";
+import { isCompared, toggleCompare, useCompare } from "@/lib/compare-store";
+import { CompareBar } from "@/components/CompareBar";
+import { WhyNitziButton } from "@/components/WhyNitziButton";
+
 
 
 export const Route = createFileRoute("/result")({
