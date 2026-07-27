@@ -299,8 +299,22 @@ function DealPage() {
                 <li className="flex gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />סטטוס זמינות: {availabilityChip.text}</li>
                 <li className="flex gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />לפני התשלום נבצע בדיקת מחיר נוספת ונציג לך כל שינוי לפני חיוב.</li>
               </ul>
+              <div className="mt-3">
+                <WhyNitziButton
+                  score={Math.round(85 + (deal.rating - 8) * 5)}
+                  reasons={[
+                    `מחיר לאדם ${fmtILS(deal.price.perPerson)} — כולל טיסה ומלון.`,
+                    `${deal.nights} לילות ב-${deal.hotel.name} (${deal.hotel.stars}★, דירוג ${deal.hotel.guestRating}/10).`,
+                    `${deal.flight.stops === 0 ? "טיסה ישירה" : `${deal.flight.stops} עצירות`} עם ${deal.flight.airline}.`,
+                    `המחיר אומת ${agoLabel(deal.price.verifiedAt)} מול ${deal.price.source} וייבדק שוב לפני חיוב.`,
+                  ]}
+                />
+              </div>
             </Section>
+
+            <SimilarPicks excludeName={dest.name} title="אולי תאהב גם..." />
           </div>
+
 
           <aside className="hidden lg:block">
             <div className="sticky top-24 space-y-3">
