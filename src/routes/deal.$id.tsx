@@ -301,14 +301,15 @@ function DealPage() {
               </ul>
               <div className="mt-3">
                 <WhyNitziButton
-                  score={Math.round(85 + (deal.rating - 8) * 5)}
+                  score={Math.round(85 + (deal.hotel.guestRating - 8) * 5)}
                   reasons={[
                     `מחיר לאדם ${fmtILS(deal.price.perPerson)} — כולל טיסה ומלון.`,
-                    `${deal.nights} לילות ב-${deal.hotel.name} (${deal.hotel.stars}★, דירוג ${deal.hotel.guestRating}/10).`,
-                    `${deal.flight.stops === 0 ? "טיסה ישירה" : `${deal.flight.stops} עצירות`} עם ${deal.flight.airline}.`,
+                    `${deal.dates.nights} לילות ב-${deal.hotel.name} (${deal.hotel.stars}★, דירוג ${deal.hotel.guestRating}/10).`,
+                    `${deal.outbound.stops === 0 ? "טיסה ישירה" : `${deal.outbound.stops} עצירות`} עם ${deal.outbound.airline}.`,
                     `המחיר אומת ${agoLabel(deal.price.verifiedAt)} מול ${deal.price.source} וייבדק שוב לפני חיוב.`,
                   ]}
                 />
+
               </div>
             </Section>
 
