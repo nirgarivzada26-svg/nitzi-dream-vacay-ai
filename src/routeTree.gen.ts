@@ -11,9 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResultRouteImport } from './routes/result'
 import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as CompareRouteImport } from './routes/compare'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PackageIdRouteImport } from './routes/package.$id'
+import { Route as HotelIdRouteImport } from './routes/hotel.$id'
+import { Route as FlightIdRouteImport } from './routes/flight.$id'
 import { Route as DealIdRouteImport } from './routes/deal.$id'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedCheckoutIdRouteImport } from './routes/_authenticated/checkout.$id'
@@ -28,6 +32,11 @@ const QuizRoute = QuizRouteImport.update({
   path: '/quiz',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -40,6 +49,21 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PackageIdRoute = PackageIdRouteImport.update({
+  id: '/package/$id',
+  path: '/package/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HotelIdRoute = HotelIdRouteImport.update({
+  id: '/hotel/$id',
+  path: '/hotel/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FlightIdRoute = FlightIdRouteImport.update({
+  id: '/flight/$id',
+  path: '/flight/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DealIdRoute = DealIdRouteImport.update({
@@ -61,19 +85,27 @@ const AuthenticatedCheckoutIdRoute = AuthenticatedCheckoutIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/compare': typeof CompareRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
   '/account': typeof AuthenticatedAccountRoute
   '/deal/$id': typeof DealIdRoute
+  '/flight/$id': typeof FlightIdRoute
+  '/hotel/$id': typeof HotelIdRoute
+  '/package/$id': typeof PackageIdRoute
   '/checkout/$id': typeof AuthenticatedCheckoutIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/compare': typeof CompareRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
   '/account': typeof AuthenticatedAccountRoute
   '/deal/$id': typeof DealIdRoute
+  '/flight/$id': typeof FlightIdRoute
+  '/hotel/$id': typeof HotelIdRoute
+  '/package/$id': typeof PackageIdRoute
   '/checkout/$id': typeof AuthenticatedCheckoutIdRoute
 }
 export interface FileRoutesById {
@@ -81,10 +113,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/compare': typeof CompareRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/deal/$id': typeof DealIdRoute
+  '/flight/$id': typeof FlightIdRoute
+  '/hotel/$id': typeof HotelIdRoute
+  '/package/$id': typeof PackageIdRoute
   '/_authenticated/checkout/$id': typeof AuthenticatedCheckoutIdRoute
 }
 export interface FileRouteTypes {
@@ -92,29 +128,41 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/compare'
     | '/quiz'
     | '/result'
     | '/account'
     | '/deal/$id'
+    | '/flight/$id'
+    | '/hotel/$id'
+    | '/package/$id'
     | '/checkout/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/compare'
     | '/quiz'
     | '/result'
     | '/account'
     | '/deal/$id'
+    | '/flight/$id'
+    | '/hotel/$id'
+    | '/package/$id'
     | '/checkout/$id'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/compare'
     | '/quiz'
     | '/result'
     | '/_authenticated/account'
     | '/deal/$id'
+    | '/flight/$id'
+    | '/hotel/$id'
+    | '/package/$id'
     | '/_authenticated/checkout/$id'
   fileRoutesById: FileRoutesById
 }
@@ -122,9 +170,13 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CompareRoute: typeof CompareRoute
   QuizRoute: typeof QuizRoute
   ResultRoute: typeof ResultRoute
   DealIdRoute: typeof DealIdRoute
+  FlightIdRoute: typeof FlightIdRoute
+  HotelIdRoute: typeof HotelIdRoute
+  PackageIdRoute: typeof PackageIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -141,6 +193,13 @@ declare module '@tanstack/react-router' {
       path: '/quiz'
       fullPath: '/quiz'
       preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -162,6 +221,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/package/$id': {
+      id: '/package/$id'
+      path: '/package/$id'
+      fullPath: '/package/$id'
+      preLoaderRoute: typeof PackageIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hotel/$id': {
+      id: '/hotel/$id'
+      path: '/hotel/$id'
+      fullPath: '/hotel/$id'
+      preLoaderRoute: typeof HotelIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/flight/$id': {
+      id: '/flight/$id'
+      path: '/flight/$id'
+      fullPath: '/flight/$id'
+      preLoaderRoute: typeof FlightIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/deal/$id': {
@@ -205,20 +285,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  CompareRoute: CompareRoute,
   QuizRoute: QuizRoute,
   ResultRoute: ResultRoute,
   DealIdRoute: DealIdRoute,
+  FlightIdRoute: FlightIdRoute,
+  HotelIdRoute: HotelIdRoute,
+  PackageIdRoute: PackageIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
