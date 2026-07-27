@@ -129,7 +129,7 @@ function Result() {
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-md space-y-5 pt-5">
+      <div className="mx-auto w-full max-w-5xl space-y-5 pt-5">
         {/* Hero image */}
         <section className="relative mx-5 overflow-hidden rounded-[2rem] shadow-glow animate-fade-up">
           <img src={dest.image} alt={dest.name} width={800} height={1000} className="h-[380px] w-full object-cover" />
