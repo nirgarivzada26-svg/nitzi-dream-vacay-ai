@@ -477,32 +477,49 @@ function fmtDur(min: number) {
   return `${h}ש׳ ${m ? `${m}ד׳` : ""}`.trim();
 }
 
+function CompareToggle({ id, kind }: { id: string; kind: "hotel" | "package" }) {
+  const active = isCompared(id, kind);
+  return (
+    <button
+      onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCompare({ id, kind }); }}
+      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-black transition ${active ? "border-primary bg-primary text-white" : "border-border bg-card text-muted-foreground hover:border-primary hover:text-primary"}`}
+      aria-label="השווה"
+    >
+      <GitCompare className="h-3 w-3" /> {active ? "בהשוואה" : "השווה"}
+    </button>
+  );
+}
+
 function HotelRow({ hotel, answers }: { hotel: HotelT & { score: number }; answers: QuizAnswers }) {
   const fit = budgetFit(hotel, answers);
   const nights = answers.days;
   const totalStay = hotel.pricePerNight * nights;
   return (
-    <div className="rounded-2xl border border-border/70 bg-muted/40 p-3">
-      <div className="flex items-start gap-3">
-        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gradient-ocean text-white">
-          <Hotel className="h-5 w-5" />
+    <Link
+      to="/hotel/$id"
+      params={{ id: hotel.id }}
+      className="block rounded-2xl border border-border/70 bg-muted/40 p-4 transition hover:border-primary/50 hover:bg-muted/60"
+    >
+      <div className="flex items-start gap-4">
+        <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-gradient-ocean text-white">
+          <Hotel className="h-6 w-6" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <p className="truncate text-sm font-bold text-foreground">{hotel.name}</p>
-              <div className="mt-0.5 flex items-center gap-2 text-[11px] text-muted-foreground">
+              <p className="truncate text-base font-black text-foreground">{hotel.name}</p>
+              <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
                 <Stars n={hotel.stars} />
-                <span>· {hotel.guestRating.toFixed(1)}/10 ({hotel.reviewsCount})</span>
+                <span>· {hotel.guestRating.toFixed(1)}/10 ({hotel.reviewsCount.toLocaleString()})</span>
               </div>
-              <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
+              <p className="mt-0.5 truncate text-xs text-muted-foreground">
                 <MapPin className="mr-0.5 inline h-3 w-3" />
                 {hotel.location}
                 {hotel.distanceToBeachKm != null && ` · ${hotel.distanceToBeachKm} ק״מ מהים`}
               </p>
             </div>
             <div className="shrink-0 text-left">
-              <div className="text-sm font-black text-foreground">{fmtILS(hotel.pricePerNight)}</div>
+              <div className="text-lg font-black text-foreground">{fmtILS(hotel.pricePerNight)}</div>
               <div className="text-[10px] text-muted-foreground">ללילה</div>
               <div className="mt-0.5 text-[10px] text-muted-foreground">סה״כ {fmtILS(totalStay)}</div>
             </div>
@@ -514,17 +531,27 @@ function HotelRow({ hotel, answers }: { hotel: HotelT & { score: number }; answe
               </span>
             ))}
           </div>
-          <div className="mt-2 flex items-center justify-between gap-2">
-            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-              fit === "within" ? "bg-emerald-50 text-emerald-800"
-              : fit === "slightly-over" ? "bg-amber-50 text-amber-800"
-              : "bg-rose-50 text-rose-800"
-            }`}>
-              {fit === "within" ? "בתקציב" : fit === "slightly-over" ? "מעט מעל" : "חורג"}
-            </span>
-            <span className="rounded-full bg-gradient-sunset px-2 py-0.5 text-[10px] font-black text-white">
-              התאמה {hotel.score}%
-            </span>
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5">
+              <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                fit === "within" ? "bg-emerald-50 text-emerald-800"
+                : fit === "slightly-over" ? "bg-amber-50 text-amber-800"
+                : "bg-rose-50 text-rose-800"
+              }`}>
+                {fit === "within" ? "בתקציב" : fit === "slightly-over" ? "מעט מעל" : "חורג"}
+              </span>
+              {hotel.score >= 88 && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-sunset px-2 py-0.5 text-[10px] font-black text-white">
+                  <Sparkles className="h-3 w-3" /> הבחירה של NITZI
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-1.5">
+              <CompareToggle id={hotel.id} kind="hotel" />
+              <span className="rounded-full bg-gradient-sunset px-2 py-0.5 text-[10px] font-black text-white">
+                התאמה {hotel.score}%
+              </span>
+            </div>
           </div>
           <p className="mt-2 flex gap-1 rounded-xl bg-card/70 p-2 text-[11px] leading-relaxed text-foreground">
             <Sparkles className="mt-0.5 h-3 w-3 shrink-0 text-primary" />
@@ -532,7 +559,7 @@ function HotelRow({ hotel, answers }: { hotel: HotelT & { score: number }; answe
           </p>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -547,19 +574,23 @@ function FlightRow({
   const isCheapest = flight.id === cheapest?.id;
   const isFastest = flight.id === fastest?.id;
   return (
-    <div className="rounded-2xl border border-border/70 bg-muted/40 p-3">
+    <Link
+      to="/flight/$id"
+      params={{ id: flight.id }}
+      className="block rounded-2xl border border-border/70 bg-muted/40 p-4 transition hover:border-primary/50 hover:bg-muted/60"
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-ocean text-white">
-              <Plane className="h-4 w-4" />
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-ocean text-white">
+              <Plane className="h-5 w-5" />
             </div>
             <div className="min-w-0">
-              <p className="truncate text-sm font-bold text-foreground">{flight.airline}</p>
+              <p className="truncate text-base font-black text-foreground">{flight.airline}</p>
               <p className="text-[11px] text-muted-foreground">טיסה {flight.flightNumber}</p>
             </div>
           </div>
-          <div className="mt-2 flex items-center gap-2 text-[12px] font-semibold text-foreground">
+          <div className="mt-2 flex items-center gap-2 text-sm font-black text-foreground">
             <span>{fmtTime(flight.departAt)}</span>
             <span className="text-muted-foreground">{flight.origin}</span>
             <span className="text-muted-foreground">→</span>
@@ -574,7 +605,7 @@ function FlightRow({
           </div>
         </div>
         <div className="shrink-0 text-left">
-          <div className="text-sm font-black text-foreground">{fmtILS(flight.price)}</div>
+          <div className="text-lg font-black text-foreground">{fmtILS(flight.price)}</div>
           <div className="text-[10px] text-muted-foreground">לאדם</div>
           <div className="mt-1 rounded-full bg-gradient-sunset px-2 py-0.5 text-[10px] font-black text-white">
             {flight.score}%
@@ -585,24 +616,28 @@ function FlightRow({
         <Sparkles className="mt-0.5 h-3 w-3 shrink-0 text-primary" />
         <span>{explainFlight(flight, answers, cheapest, fastest)}</span>
       </p>
-    </div>
+    </Link>
   );
 }
 
 function PackageRow({ pkg, answers }: { pkg: PackageT & { score: number }; answers: QuizAnswers }) {
   const savePct = Math.round((pkg.savings / Math.max(1, pkg.separatePrice)) * 100);
   return (
-    <div className="rounded-2xl border border-border/70 bg-muted/40 p-3">
+    <Link
+      to="/package/$id"
+      params={{ id: pkg.id }}
+      className="block rounded-2xl border border-border/70 bg-muted/40 p-4 transition hover:border-primary/50 hover:bg-muted/60"
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="truncate text-sm font-bold text-foreground">{pkg.title}</p>
-          <div className="mt-0.5 flex items-center gap-2 text-[11px] text-muted-foreground">
+          <p className="truncate text-base font-black text-foreground">{pkg.title}</p>
+          <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
             <Stars n={pkg.hotel.stars} />
             <span>· דירוג {pkg.rating}/10</span>
           </div>
         </div>
         <div className="shrink-0 text-left">
-          <div className="text-sm font-black text-foreground">{fmtILS(pkg.totalPrice)}</div>
+          <div className="text-lg font-black text-foreground">{fmtILS(pkg.totalPrice)}</div>
           <div className="text-[10px] text-muted-foreground line-through">{fmtILS(pkg.separatePrice)}</div>
           <div className="mt-0.5 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
             חיסכון {savePct}%
@@ -614,19 +649,23 @@ function PackageRow({ pkg, answers }: { pkg: PackageT & { score: number }; answe
           <span key={inc} className="rounded-full bg-card px-2 py-0.5 text-[10px] font-semibold text-foreground">✓ {inc}</span>
         ))}
       </div>
-      <div className="mt-2 flex items-center justify-between">
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
         <span className="text-[11px] text-muted-foreground">
           <Plane className="mr-0.5 inline h-3 w-3" />{pkg.flight.airline} · {pkg.flight.stops === 0 ? "ישירה" : `${pkg.flight.stops} עצירות`}
         </span>
-        <span className="rounded-full bg-gradient-sunset px-2 py-0.5 text-[10px] font-black text-white">
-          התאמה {pkg.score}%
-        </span>
+        <div className="flex items-center gap-1.5">
+          <CompareToggle id={pkg.id} kind="package" />
+          <span className="rounded-full bg-gradient-sunset px-2 py-0.5 text-[10px] font-black text-white">
+            התאמה {pkg.score}%
+          </span>
+        </div>
       </div>
       <p className="mt-2 flex gap-1 rounded-xl bg-card/70 p-2 text-[11px] leading-relaxed text-foreground">
         <Sparkles className="mt-0.5 h-3 w-3 shrink-0 text-primary" />
         <span>{explainPackage(pkg, answers)}</span>
       </p>
-    </div>
+    </Link>
   );
 }
+
 
