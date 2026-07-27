@@ -263,6 +263,10 @@ function DealPage() {
               <p className="mt-2 text-[11px] text-muted-foreground">מפה אינטראקטיבית תתווסף בגרסה הבאה.</p>
             </Section>
 
+            <Section title="ציר זמן החופשה" icon={<Sparkles className="h-4 w-4" />}>
+              <TripTimeline destinationName={dest.name} itinerary={dest.itinerary} restaurants={deal.restaurants} attractions={deal.attractions} />
+            </Section>
+
             <Section title="אטרקציות מומלצות" icon={<Sparkles className="h-4 w-4" />}>
               <div className="flex flex-wrap gap-2">
                 {deal.attractions.map((a) => (
@@ -270,6 +274,7 @@ function DealPage() {
                 ))}
               </div>
             </Section>
+
 
             <Section title="מסעדות נבחרות" icon={<Utensils className="h-4 w-4" />}>
               <ul className="space-y-2 text-sm">
