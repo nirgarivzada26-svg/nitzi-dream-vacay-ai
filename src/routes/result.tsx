@@ -347,9 +347,11 @@ function Result() {
           </div>
         </div>
       </div>
+      <CompareBar />
     </div>
   );
 }
+
 
 function LoadingState() {
   const lines = [
