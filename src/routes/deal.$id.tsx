@@ -10,6 +10,10 @@ import { SignInModal } from "@/components/SignInModal";
 import { getDeal, revalidateDeal, type Deal, type RevalidationResult } from "@/lib/deals";
 import { setAuthIntent, useAuth } from "@/lib/auth";
 import { addFavorite, isDealFavorited, removeFavorite } from "@/lib/user-data";
+import { TripTimeline } from "@/components/TripTimeline";
+import { SimilarPicks } from "@/components/SimilarPicks";
+import { WhyNitziButton } from "@/components/WhyNitziButton";
+
 
 export const Route = createFileRoute("/deal/$id")({
   head: ({ params }) => ({
