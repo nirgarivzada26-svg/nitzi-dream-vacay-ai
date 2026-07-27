@@ -52,6 +52,8 @@ function Result() {
 
   const dest = useMemo(() => pickDestination(answers), [answers]);
 
+  useCompare(); // subscribe so compare buttons re-render
+
   useEffect(() => {
     let cancelled = false;
     const providers = getProviders();
@@ -64,12 +66,21 @@ function Result() {
       ]);
       if (cancelled) return;
       const prices = f.map((x) => x.price);
-      setHotels(rank(h, (x) => scoreHotel(x, answers)));
-      setFlights(rank(f, (x) => scoreFlight(x, answers, prices)));
-      setPackages(rank(p, (x) => scorePackage(x, answers)));
+      const rankedH = rank(h, (x) => scoreHotel(x, answers));
+      const rankedF = rank(f, (x) => scoreFlight(x, answers, prices));
+      const rankedP = rank(p, (x) => scorePackage(x, answers));
+      setHotels(rankedH);
+      setFlights(rankedF);
+      setPackages(rankedP);
+      setResultsCache({
+        answers, destinationName: dest.name,
+        hotels: rankedH, flights: rankedF, packages: rankedP,
+        savedAt: Date.now(),
+      });
     })();
     return () => { cancelled = true; };
   }, [answers, dest]);
+
 
   const cheapestFlight = useMemo(() => flights.slice().sort((a, b) => a.price - b.price)[0], [flights]);
   const fastestFlight = useMemo(() => flights.slice().sort((a, b) => a.durationMinutes - b.durationMinutes)[0], [flights]);
