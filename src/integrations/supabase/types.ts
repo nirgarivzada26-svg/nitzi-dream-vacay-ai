@@ -148,6 +148,24 @@ export type Database = {
           },
         ]
       }
+      ai_rate_limits: {
+        Row: {
+          hits: number
+          identity: string
+          window_start: string
+        }
+        Insert: {
+          hits?: number
+          identity: string
+          window_start?: string
+        }
+        Update: {
+          hits?: number
+          identity?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           created_at: string
@@ -504,6 +522,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ai_rate_limit_hit: {
+        Args: { _identity: string; _limit: number; _window_seconds: number }
+        Returns: boolean
+      }
       claim_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
