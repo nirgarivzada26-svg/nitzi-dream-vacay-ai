@@ -42,15 +42,8 @@ const emptyPassenger = (): Passenger => ({
   firstName: "", lastName: "", birthDate: "", passport: "", passportExpiry: "",
 });
 
-type ExtraId = "bag" | "trolley" | "seat" | "insurance" | "transfers" | "meals";
-const EXTRAS: { id: ExtraId; label: string; note: string; price: number; perPerson: boolean }[] = [
-  { id: "bag", label: "מזוודה 23 ק״ג", note: "לכיוון הלוך-חזור", price: 150, perPerson: true },
-  { id: "trolley", label: "טרולי עלייה למטוס", note: "8 ק״ג", price: 90, perPerson: true },
-  { id: "seat", label: "בחירת מושב", note: "מושבים צמודים בטיסה", price: 120, perPerson: true },
-  { id: "insurance", label: "ביטוח נסיעות", note: "כולל כיסוי רפואי וביטולים", price: 120, perPerson: true },
-  { id: "transfers", label: "העברות שדה תעופה–מלון", note: "כלול בחבילה", price: 0, perPerson: false },
-  { id: "meals", label: "שדרוג ארוחות", note: "חצי פנסיון במלון", price: 240, perPerson: true },
-];
+
+
 
 const STEPS = ["פרטי נוסעים", "שירותים נוספים", "סיכום", "תשלום", "אישור"];
 
