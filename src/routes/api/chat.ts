@@ -191,6 +191,20 @@ export const Route = createFileRoute("/api/chat")({
           result.toUIMessageStreamResponse({
             originalMessages: messages as UIMessage[],
             sendReasoning: true,
+            onError: (error) => {
+              const message = error instanceof Error ? error.message : String(error);
+              // Recorded so the commercial checklist and monitoring pulse can
+              // see real agent failures instead of assuming health.
+              void import("@/lib/app-errors.server").then(({ logAppError }) =>
+                logAppError({
+                  source: "ai",
+                  message,
+                  route: "/api/chat",
+                  userId: null,
+                }),
+              );
+              return "אירעה שגיאה בסוכן. נסה שוב.";
+            },
           }),
           runIdFetch,
         );

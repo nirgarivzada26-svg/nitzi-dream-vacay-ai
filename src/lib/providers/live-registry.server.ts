@@ -27,20 +27,26 @@ import {
 import { liveModeEnabled, providerOrder } from "./credentials.server";
 import { runWithFailover, type ChainMember } from "./failover.server";
 import { launchGateOpen } from "@/lib/launch/launch-gate.server";
+import { commercialGateOpen } from "@/lib/launch/commercial-gate.server";
 import { providerFail } from "./contracts";
 import type { ProviderResult } from "./contracts";
 
 /**
- * Sprint 9 gate: live suppliers are only reachable after a full-pass launch
- * checklist was recorded. Until then callers get "not configured" and the
- * demo provider keeps serving — never invented inventory.
+ * Launch gates: live suppliers are only reachable after BOTH the product
+ * checklist (Sprint 9) and the commercial checklist were recorded as full
+ * passes. Until then callers get "not configured" and the demo provider keeps
+ * serving — never invented inventory.
  */
 async function gateBlocked<T>(): Promise<ProviderResult<T> | null> {
   if (!liveModeEnabled()) return null;
-  if (await launchGateOpen()) return null;
+  const [product, commercial] = await Promise.all([launchGateOpen(), commercialGateOpen()]);
+  if (product && commercial) return null;
+  const missing = [!product ? "צ׳קליסט ההשקה" : null, !commercial ? "הצ׳קליסט המסחרי" : null]
+    .filter(Boolean)
+    .join(" ו");
   return providerFail<T>("launch-gate", {
     code: "not_configured",
-    message: "LIVE_MODE חסום — צ׳קליסט ההשקה טרם עבר במלואו",
+    message: `LIVE_MODE חסום — ${missing} טרם עבר במלואו`,
     retryable: false,
   });
 }

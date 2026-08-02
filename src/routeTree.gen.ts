@@ -20,6 +20,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AiIndexRouteImport } from './routes/ai.index'
 import { Route as PackageIdRouteImport } from './routes/package.$id'
+import { Route as LegalDocRouteImport } from './routes/legal.$doc'
 import { Route as HotelIdRouteImport } from './routes/hotel.$id'
 import { Route as FlightIdRouteImport } from './routes/flight.$id'
 import { Route as DestinationSlugRouteImport } from './routes/destination.$slug'
@@ -41,9 +42,11 @@ import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin/notifications'
 import { Route as AuthenticatedAdminLaunchRouteImport } from './routes/_authenticated/admin/launch'
 import { Route as AuthenticatedAdminFlightsRouteImport } from './routes/_authenticated/admin/flights'
+import { Route as AuthenticatedAdminCommercialRouteImport } from './routes/_authenticated/admin/commercial'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as ApiPublicWebhooksProviderRouteImport } from './routes/api/public/webhooks/$provider'
+import { Route as ApiPublicMonitoringPulseRouteImport } from './routes/api/public/monitoring/pulse'
 
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
@@ -97,6 +100,11 @@ const AiIndexRoute = AiIndexRouteImport.update({
 const PackageIdRoute = PackageIdRouteImport.update({
   id: '/package/$id',
   path: '/package/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalDocRoute = LegalDocRouteImport.update({
+  id: '/legal/$doc',
+  path: '/legal/$doc',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HotelIdRoute = HotelIdRouteImport.update({
@@ -213,6 +221,12 @@ const AuthenticatedAdminFlightsRoute =
     path: '/flights',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminCommercialRoute =
+  AuthenticatedAdminCommercialRouteImport.update({
+    id: '/commercial',
+    path: '/commercial',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -228,6 +242,12 @@ const ApiPublicWebhooksProviderRoute =
   ApiPublicWebhooksProviderRouteImport.update({
     id: '/api/public/webhooks/$provider',
     path: '/api/public/webhooks/$provider',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicMonitoringPulseRoute =
+  ApiPublicMonitoringPulseRouteImport.update({
+    id: '/api/public/monitoring/pulse',
+    path: '/api/public/monitoring/pulse',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -248,10 +268,12 @@ export interface FileRoutesByFullPath {
   '/destination/$slug': typeof DestinationSlugRoute
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
+  '/legal/$doc': typeof LegalDocRoute
   '/package/$id': typeof PackageIdRoute
   '/ai/': typeof AiIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/commercial': typeof AuthenticatedAdminCommercialRoute
   '/admin/flights': typeof AuthenticatedAdminFlightsRoute
   '/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
@@ -265,6 +287,7 @@ export interface FileRoutesByFullPath {
   '/booking/$id': typeof AuthenticatedBookingIdRoute
   '/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/monitoring/pulse': typeof ApiPublicMonitoringPulseRoute
   '/api/public/webhooks/$provider': typeof ApiPublicWebhooksProviderRoute
 }
 export interface FileRoutesByTo {
@@ -283,10 +306,12 @@ export interface FileRoutesByTo {
   '/destination/$slug': typeof DestinationSlugRoute
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
+  '/legal/$doc': typeof LegalDocRoute
   '/package/$id': typeof PackageIdRoute
   '/ai': typeof AiIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/commercial': typeof AuthenticatedAdminCommercialRoute
   '/admin/flights': typeof AuthenticatedAdminFlightsRoute
   '/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
@@ -300,6 +325,7 @@ export interface FileRoutesByTo {
   '/booking/$id': typeof AuthenticatedBookingIdRoute
   '/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api/public/monitoring/pulse': typeof ApiPublicMonitoringPulseRoute
   '/api/public/webhooks/$provider': typeof ApiPublicWebhooksProviderRoute
 }
 export interface FileRoutesById {
@@ -321,10 +347,12 @@ export interface FileRoutesById {
   '/destination/$slug': typeof DestinationSlugRoute
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
+  '/legal/$doc': typeof LegalDocRoute
   '/package/$id': typeof PackageIdRoute
   '/ai/': typeof AiIndexRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/_authenticated/admin/commercial': typeof AuthenticatedAdminCommercialRoute
   '/_authenticated/admin/flights': typeof AuthenticatedAdminFlightsRoute
   '/_authenticated/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/_authenticated/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
@@ -338,6 +366,7 @@ export interface FileRoutesById {
   '/_authenticated/booking/$id': typeof AuthenticatedBookingIdRoute
   '/_authenticated/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/monitoring/pulse': typeof ApiPublicMonitoringPulseRoute
   '/api/public/webhooks/$provider': typeof ApiPublicWebhooksProviderRoute
 }
 export interface FileRouteTypes {
@@ -359,10 +388,12 @@ export interface FileRouteTypes {
     | '/destination/$slug'
     | '/flight/$id'
     | '/hotel/$id'
+    | '/legal/$doc'
     | '/package/$id'
     | '/ai/'
     | '/admin/analytics'
     | '/admin/audit'
+    | '/admin/commercial'
     | '/admin/flights'
     | '/admin/launch'
     | '/admin/notifications'
@@ -376,6 +407,7 @@ export interface FileRouteTypes {
     | '/booking/$id'
     | '/checkout/$id'
     | '/admin/'
+    | '/api/public/monitoring/pulse'
     | '/api/public/webhooks/$provider'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -394,10 +426,12 @@ export interface FileRouteTypes {
     | '/destination/$slug'
     | '/flight/$id'
     | '/hotel/$id'
+    | '/legal/$doc'
     | '/package/$id'
     | '/ai'
     | '/admin/analytics'
     | '/admin/audit'
+    | '/admin/commercial'
     | '/admin/flights'
     | '/admin/launch'
     | '/admin/notifications'
@@ -411,6 +445,7 @@ export interface FileRouteTypes {
     | '/booking/$id'
     | '/checkout/$id'
     | '/admin'
+    | '/api/public/monitoring/pulse'
     | '/api/public/webhooks/$provider'
   id:
     | '__root__'
@@ -431,10 +466,12 @@ export interface FileRouteTypes {
     | '/destination/$slug'
     | '/flight/$id'
     | '/hotel/$id'
+    | '/legal/$doc'
     | '/package/$id'
     | '/ai/'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/audit'
+    | '/_authenticated/admin/commercial'
     | '/_authenticated/admin/flights'
     | '/_authenticated/admin/launch'
     | '/_authenticated/admin/notifications'
@@ -448,6 +485,7 @@ export interface FileRouteTypes {
     | '/_authenticated/booking/$id'
     | '/_authenticated/checkout/$id'
     | '/_authenticated/admin/'
+    | '/api/public/monitoring/pulse'
     | '/api/public/webhooks/$provider'
   fileRoutesById: FileRoutesById
 }
@@ -467,8 +505,10 @@ export interface RootRouteChildren {
   DestinationSlugRoute: typeof DestinationSlugRoute
   FlightIdRoute: typeof FlightIdRoute
   HotelIdRoute: typeof HotelIdRoute
+  LegalDocRoute: typeof LegalDocRoute
   PackageIdRoute: typeof PackageIdRoute
   AiIndexRoute: typeof AiIndexRoute
+  ApiPublicMonitoringPulseRoute: typeof ApiPublicMonitoringPulseRoute
   ApiPublicWebhooksProviderRoute: typeof ApiPublicWebhooksProviderRoute
 }
 
@@ -549,6 +589,13 @@ declare module '@tanstack/react-router' {
       path: '/package/$id'
       fullPath: '/package/$id'
       preLoaderRoute: typeof PackageIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/$doc': {
+      id: '/legal/$doc'
+      path: '/legal/$doc'
+      fullPath: '/legal/$doc'
+      preLoaderRoute: typeof LegalDocRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hotel/$id': {
@@ -698,6 +745,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminFlightsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/commercial': {
+      id: '/_authenticated/admin/commercial'
+      path: '/commercial'
+      fullPath: '/admin/commercial'
+      preLoaderRoute: typeof AuthenticatedAdminCommercialRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/audit': {
       id: '/_authenticated/admin/audit'
       path: '/audit'
@@ -719,12 +773,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWebhooksProviderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/monitoring/pulse': {
+      id: '/api/public/monitoring/pulse'
+      path: '/api/public/monitoring/pulse'
+      fullPath: '/api/public/monitoring/pulse'
+      preLoaderRoute: typeof ApiPublicMonitoringPulseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
+  AuthenticatedAdminCommercialRoute: typeof AuthenticatedAdminCommercialRoute
   AuthenticatedAdminFlightsRoute: typeof AuthenticatedAdminFlightsRoute
   AuthenticatedAdminLaunchRoute: typeof AuthenticatedAdminLaunchRoute
   AuthenticatedAdminNotificationsRoute: typeof AuthenticatedAdminNotificationsRoute
@@ -742,6 +804,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
   {
     AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
     AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
+    AuthenticatedAdminCommercialRoute: AuthenticatedAdminCommercialRoute,
     AuthenticatedAdminFlightsRoute: AuthenticatedAdminFlightsRoute,
     AuthenticatedAdminLaunchRoute: AuthenticatedAdminLaunchRoute,
     AuthenticatedAdminNotificationsRoute: AuthenticatedAdminNotificationsRoute,
@@ -793,8 +856,10 @@ const rootRouteChildren: RootRouteChildren = {
   DestinationSlugRoute: DestinationSlugRoute,
   FlightIdRoute: FlightIdRoute,
   HotelIdRoute: HotelIdRoute,
+  LegalDocRoute: LegalDocRoute,
   PackageIdRoute: PackageIdRoute,
   AiIndexRoute: AiIndexRoute,
+  ApiPublicMonitoringPulseRoute: ApiPublicMonitoringPulseRoute,
   ApiPublicWebhooksProviderRoute: ApiPublicWebhooksProviderRoute,
 }
 export const routeTree = rootRouteImport

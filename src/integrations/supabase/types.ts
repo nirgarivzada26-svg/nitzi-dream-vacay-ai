@@ -166,6 +166,36 @@ export type Database = {
         }
         Relationships: []
       }
+      app_error_log: {
+        Row: {
+          context: Json
+          created_at: string
+          id: string
+          message: string
+          route: string | null
+          source: string
+          user_id: string | null
+        }
+        Insert: {
+          context?: Json
+          created_at?: string
+          id?: string
+          message: string
+          route?: string | null
+          source?: string
+          user_id?: string | null
+        }
+        Update: {
+          context?: Json
+          created_at?: string
+          id?: string
+          message?: string
+          route?: string | null
+          source?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           cancel_reason: string | null
