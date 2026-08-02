@@ -155,7 +155,9 @@ function Result() {
           <MiniStat icon={<Calendar className="h-4 w-4" />} label="משך" value={`${answers.days} ימים`} />
         </div>
 
+        <div className="mx-5 grid gap-5 lg:grid-cols-2 [&>section]:mx-0">
         {/* Why */}
+
         <Card>
           <SectionTitle icon={<Wand2 className="h-4 w-4" />} title="למה זה מתאים לך" />
           <ul className="mt-3 space-y-2 text-sm text-foreground">
