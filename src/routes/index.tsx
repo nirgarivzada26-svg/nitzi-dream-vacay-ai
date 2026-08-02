@@ -4,6 +4,7 @@ import heroImg from "@/assets/hero-main.jpg";
 import { NitziLogo } from "@/components/NitziLogo";
 import { SearchEngine } from "@/components/SearchEngine";
 import { DestinationCarousel } from "@/components/DestinationCarousel";
+import { DealRails } from "@/components/DealRails";
 import { SecretDealCard } from "@/components/SecretDealCard";
 import { SignInModal } from "@/components/SignInModal";
 import { Footer } from "@/components/Footer";
@@ -110,11 +111,16 @@ function Home() {
         <SecretDealCard />
       </div>
 
-      <div className="mx-auto mt-10 flex w-full max-w-6xl flex-col gap-10 px-5 sm:px-8 sm:mt-14">
+      <div className="mx-auto mt-12 w-full max-w-6xl px-5 sm:mt-16 sm:px-8">
+        <DealRails />
+      </div>
+
+      <div className="mx-auto mt-14 flex w-full max-w-6xl flex-col gap-10 px-5 sm:px-8">
         {categories.map((c) => (
           <DestinationCarousel key={c.id} category={c} asDeals={c.id === "lastminute" || c.id === "ai"} />
         ))}
       </div>
+
 
       <Footer />
 

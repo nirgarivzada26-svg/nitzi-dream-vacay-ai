@@ -30,10 +30,23 @@ export interface DealFlight {
   durationMinutes: number;
 }
 
+export type BoardBasis = "room-only" | "breakfast" | "half-board" | "all-inclusive";
+
+export const boardLabels: Record<BoardBasis, string> = {
+  "room-only": "לינה בלבד",
+  breakfast: "ארוחת בוקר",
+  "half-board": "חצי פנסיון",
+  "all-inclusive": "הכל כלול",
+};
+
 export interface Deal {
   id: string; // stable slug (destination name urlencoded)
   destination: Destination;
   title: string;
+  board: BoardBasis;
+  listPricePerPerson: number; // pre-discount reference price
+  discountPct: number;        // 0-100
+  freeCancellation: boolean;
   hotel: {
     name: string;
     note: string;
@@ -109,10 +122,21 @@ function buildDeal(dest: Destination, opts?: { secret?: boolean; seed?: string }
   const hotel = dest.hotels[Math.floor(r() * dest.hotels.length)];
   const stars = 4 + Math.floor(r() * 2);
 
+  const board: BoardBasis = pick(r, [
+    "breakfast", "breakfast", "half-board", "all-inclusive", "all-inclusive", "room-only",
+  ] as BoardBasis[]);
+  const listPricePerPerson = Math.round((perPerson * (1.12 + r() * 0.26)) / 10) * 10;
+  const discountPct = Math.max(0, Math.round((1 - perPerson / listPricePerPerson) * 100));
+  const freeCancellation = r() > 0.3;
+
   return {
     id: dealIdFor(dest.name),
     destination: dest,
     title: `${nights} לילות ב${dest.name} · ${hotel.name}`,
+    board,
+    listPricePerPerson,
+    discountPct,
+    freeCancellation,
     hotel: {
       name: hotel.name,
       note: hotel.note,
@@ -201,15 +225,27 @@ export async function revalidateDeal(deal: Deal): Promise<RevalidationResult> {
   return { status: "sold-out", deal: { ...deal, price: { ...deal.price, availability: "sold-out", verifiedAt: new Date().toISOString() } } };
 }
 
-export function listDeals(): Deal[] {
-  return destinations.map((d) => buildDeal(d));
+/** All deals. `variants` > 1 produces several distinct offers per destination
+ *  (different hotel / dates / board), each with its own stable id. */
+export function listDeals(variants = 1): Deal[] {
+  const out: Deal[] = [];
+  for (const d of destinations) {
+    for (let v = 0; v < variants; v++) {
+      const deal = buildDeal(d, { seed: v === 0 ? `deal|${d.name}` : `deal|${d.name}|v${v}` });
+      out.push(v === 0 ? deal : { ...deal, id: `${dealIdFor(d.name)}~v${v}` });
+    }
+  }
+  return out;
 }
 
 export function getDeal(id: string): Deal | null {
-  const decoded = decodeURIComponent(id);
-  const dest = destinations.find((d) => d.name === decoded);
+  const raw = decodeURIComponent(id);
+  const [namePart, variantPart] = raw.split("~v");
+  const dest = destinations.find((d) => d.name === namePart);
   if (!dest) return null;
-  return buildDeal(dest);
+  const v = variantPart ? Number(variantPart) : 0;
+  const deal = buildDeal(dest, { seed: v ? `deal|${dest.name}|v${v}` : `deal|${dest.name}` });
+  return v ? { ...deal, id: `${dealIdFor(dest.name)}~v${v}` } : deal;
 }
 
 // Secret deal rotates every 6 hours. Deterministic per slot so all viewers see
