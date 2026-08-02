@@ -47,7 +47,7 @@ export function buildDealRails(): DealRail[] {
       title: "דילים חמים",
       subtitle: "ההנחות הגדולות ביותר שנמצאו כרגע",
       emoji: "🔥",
-      deals: byDiscount.slice(0, 10),
+      deals: uniqueByDestination(byDiscount).slice(0, 10),
     },
     {
       id: "lastminute",
@@ -95,7 +95,7 @@ export function buildDealRails(): DealRail[] {
       title: "ההמלצות של NITZI",
       subtitle: "יחס מחיר-תמורה הכי טוב שמצאנו",
       emoji: "🧠",
-      deals: byValue.slice(0, 10),
+      deals: uniqueByDestination(byValue).slice(0, 10),
     },
   ];
 
