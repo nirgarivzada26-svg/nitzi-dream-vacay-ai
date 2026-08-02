@@ -40,7 +40,7 @@ function Home() {
   return (
     <div dir="rtl" className="min-h-screen bg-background pb-16">
       <section className="relative">
-        <div className="relative min-h-[720px] w-full overflow-hidden sm:min-h-[780px] lg:min-h-[860px]">
+        <div className="relative w-full overflow-hidden">
           <img
             src={heroImg}
             alt="חוף טורקיז מלמעלה"
