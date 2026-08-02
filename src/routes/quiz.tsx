@@ -118,7 +118,7 @@ function Quiz() {
       <div aria-hidden className="pointer-events-none absolute top-1/3 -right-24 h-72 w-72 rounded-full bg-gradient-ocean opacity-25 blur-3xl" />
 
       <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur-lg">
-        <div className="mx-auto flex w-full max-w-md items-center justify-between px-5 py-3">
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-5 py-3">
           <button
             onClick={back}
             aria-label="חזרה"
@@ -139,7 +139,7 @@ function Quiz() {
         </div>
       </header>
 
-      <div ref={scrollRef} className="mx-auto w-full max-w-md flex-1 space-y-4 overflow-y-auto px-5 py-6">
+      <div ref={scrollRef} className="mx-auto w-full max-w-3xl flex-1 space-y-4 overflow-y-auto px-5 py-6">
         <AiBubble text={intro} />
         {Array.from({ length: step + 1 }).map((_, i) => {
           const react = i > 0 ? reactionFor(i, answers) : null;
@@ -154,7 +154,7 @@ function Quiz() {
       </div>
 
       <div className="sticky bottom-0 z-20 border-t border-border/60 bg-background/90 px-5 py-4 backdrop-blur-lg">
-        <div className="mx-auto flex w-full max-w-md items-center gap-3">
+        <div className="mx-auto flex w-full max-w-3xl items-center gap-3">
           <div className="flex-1 truncate rounded-2xl border border-border bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
             {getSummary(step, answers)}
           </div>
