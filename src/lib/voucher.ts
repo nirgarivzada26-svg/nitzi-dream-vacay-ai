@@ -67,10 +67,7 @@ function factRows(b: DocumentBooking, snap: Snap): [string, string][] {
   ];
   if (snap.hotel?.name) rows.push(["מלון", snap.hotel.name]);
   if (snap.outbound?.airline) {
-    rows.push([
-      "טיסת הלוך",
-      `${snap.outbound.airline} ${snap.outbound.flightNumber ?? ""}`.trim(),
-    ]);
+    rows.push(["טיסת הלוך", `${snap.outbound.airline} ${snap.outbound.flightNumber ?? ""}`.trim()]);
   }
   if (snap.inbound?.airline) {
     rows.push(["טיסת חזור", `${snap.inbound.airline} ${snap.inbound.flightNumber ?? ""}`.trim()]);

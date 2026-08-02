@@ -310,7 +310,11 @@ function SupportPage() {
       </main>
 
       <Footer />
-      <SignInModal open={signIn} onClose={() => setSignIn(false)} onSignedIn={() => setSignIn(false)} />
+      <SignInModal
+        open={signIn}
+        onClose={() => setSignIn(false)}
+        onSignedIn={() => setSignIn(false)}
+      />
     </div>
   );
 }

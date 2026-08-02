@@ -195,9 +195,9 @@ function DestinationPage() {
                 <MapPin className="h-4 w-4 text-primary" /> סקירה
               </h2>
               <p className="mt-2 text-sm font-semibold leading-relaxed text-muted-foreground">
-                {dest.name} נמצאת ב{dest.country} ({dest.region}). {dest.tagline} מזג האוויר האופייני:{" "}
-                {dest.weather || "לא זמין"}. טיסה ישירה מישראל אורכת כ-{dest.flightHours} שעות,
-                והתקציב הממוצע לאדם לחופשה ביעד עומד על {fmtILS(dest.avgBudgetPerPerson)}.
+                {dest.name} נמצאת ב{dest.country} ({dest.region}). {dest.tagline} מזג האוויר
+                האופייני: {dest.weather || "לא זמין"}. טיסה ישירה מישראל אורכת כ-{dest.flightHours}{" "}
+                שעות, והתקציב הממוצע לאדם לחופשה ביעד עומד על {fmtILS(dest.avgBudgetPerPerson)}.
               </p>
               <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-black text-emerald-800">
                 <BadgeCheck className="h-3.5 w-3.5" /> נתוני היעד מגיעים ממאגר היעדים המנוהל של

@@ -161,7 +161,10 @@ function ManageBookingPage() {
   const upcoming = new Date(b.start_date).getTime() > Date.now();
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gradient-to-b from-sand/50 via-background to-background">
+    <div
+      dir="rtl"
+      className="min-h-screen bg-gradient-to-b from-sand/50 via-background to-background"
+    >
       <div className="mx-auto w-full max-w-[1600px] px-5 pb-24 pt-8 sm:px-10">
         <Link
           to="/account"
@@ -257,7 +260,9 @@ function ManageBookingPage() {
               {snap?.booking?.payment?.method && (
                 <p className="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground">
                   <CreditCard className="h-3.5 w-3.5" /> שולם באמצעות{" "}
-                  {snap.booking.payment.method === "card" ? "כרטיס אשראי" : snap.booking.payment.method}
+                  {snap.booking.payment.method === "card"
+                    ? "כרטיס אשראי"
+                    : snap.booking.payment.method}
                 </p>
               )}
             </section>
