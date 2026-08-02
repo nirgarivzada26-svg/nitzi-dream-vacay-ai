@@ -525,8 +525,10 @@ async function adminChecks(): Promise<LaunchCheck[]> {
     }),
     await run("admin.revenue", "הכנסות", async () => {
       const o = await admin.buildOverview();
-      return typeof o.revenueTotal === "number"
-        ? ok(`סה״כ הכנסות מחושב מהזמנות אמיתיות: ${Math.round(o.revenueTotal)}₪`)
+      return typeof o.revenueMonth === "number"
+        ? ok(
+            `הכנסות מחושבות מהזמנות אמיתיות: חודש ${Math.round(o.revenueMonth)}₪, ${o.totalOrders} הזמנות`,
+          )
         : fail("לא חושבו הכנסות", "בדוק את buildOverview");
     }),
     await run("admin.reports", "דוחות", async () => {
@@ -536,9 +538,9 @@ async function adminChecks(): Promise<LaunchCheck[]> {
         : fail("דוחות אינם זמינים", "בדוק את /admin/reports");
     }),
     await run("admin.audit", "יומן פעולות", async () => {
-      const audit = await admin.buildAudit({});
+      const audit = await admin.buildAudit({ page: 1, pageSize: 20 });
       return routeExists("_authenticated/admin/audit")
-        ? ok(`יומן פעולות פעיל (${audit.total ?? audit.rows.length} רשומות)`)
+        ? ok(`יומן פעולות פעיל (${audit.total} רשומות)`)
         : fail("חסר מסך יומן פעולות", "צור /admin/audit");
     }),
     await run("admin.provider-health", "בריאות ספקים", () => {
