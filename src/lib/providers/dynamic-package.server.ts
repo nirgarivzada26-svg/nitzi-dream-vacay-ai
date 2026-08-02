@@ -122,7 +122,7 @@ export function buildDynamicPackage(
     nights,
     people,
     perPerson,
-    total: total + (extrasTotal === 0 ? 0 : 0),
+    total,
     currency: "ILS",
     quote,
     providerIds: Array.from(new Set(providerIds)),
