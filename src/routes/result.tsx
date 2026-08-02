@@ -5,7 +5,10 @@ import {
   ArrowLeft, Bookmark, Calendar, Clock, Cloud, GitCompare, Hotel, MapPin, Package as PackageIcon,
   Plane, Share2, Sparkles, Star, Utensils, Wallet, Wand2,
 } from "lucide-react";
-import { defaultAnswers, pickDestination, tripTypes, styles, type QuizAnswers } from "@/lib/nitzi-data";
+import { defaultAnswers, tripTypes, styles, type QuizAnswers } from "@/lib/nitzi-data";
+import { pickDestination, type Destination } from "@/lib/catalog";
+import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
+import { DestinationImage } from "@/components/DestinationImage";
 import { getProviders } from "@/lib/providers/registry";
 import type { Flight, Hotel as HotelT, Package as PackageT } from "@/lib/providers/types";
 import { budgetFit, rank, scoreFlight, scoreHotel, scorePackage } from "@/lib/ranking";
@@ -26,12 +29,50 @@ export const Route = createFileRoute("/result")({
       { property: "og:description", content: "יעד, מסלול יומי, מלונות ואטרקציות — הכל בפנים." },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
   component: Result,
 });
 
 function Result() {
-  const navigate = useNavigate();
+  const catalog = useDestinations();
   const [answers, setAnswers] = useState<QuizAnswers>(defaultAnswers);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("nitzi:answers");
+      if (raw) setAnswers(JSON.parse(raw));
+    } catch {}
+    setReady(true);
+  }, []);
+
+  const dest = useMemo(() => pickDestination(catalog, answers), [catalog, answers]);
+
+  if (!ready) return <LoadingState />;
+
+  // The catalog is the single source of truth: if we can't resolve a real
+  // destination we say so instead of inventing one.
+  if (!dest) {
+    return (
+      <div dir="rtl" className="grid min-h-screen place-items-center bg-background px-6 text-center">
+        <div className="max-w-md">
+          <h1 className="text-2xl font-black text-foreground">לא מצאנו יעד מתאים</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            נסה לשנות את היעד, התאריכים או התקציב — אנחנו מציגים רק יעדים שקיימים במאגר שלנו.
+          </p>
+          <Link to="/" className="mt-5 inline-block rounded-2xl bg-gradient-sunset px-5 py-2.5 text-sm font-black text-white shadow-glow">
+            חזרה לחיפוש
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return <ResultView key={dest.slug} answers={answers} dest={dest} />;
+}
+
+function ResultView({ answers, dest }: { answers: QuizAnswers; dest: Destination }) {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
   const [showAll, setShowAll] = useState(false);
@@ -41,16 +82,9 @@ function Result() {
 
 
   useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem("nitzi:answers");
-      if (raw) setAnswers(JSON.parse(raw));
-    } catch {}
     const t = setTimeout(() => setLoading(false), 2200);
     return () => clearTimeout(t);
   }, []);
-
-
-  const dest = useMemo(() => pickDestination(answers), [answers]);
 
   useCompare(); // subscribe so compare buttons re-render
 
@@ -132,7 +166,7 @@ function Result() {
       <div className="mx-auto w-full max-w-[1600px] space-y-5 pt-5">
         {/* Hero image */}
         <section className="relative mx-5 overflow-hidden rounded-[2rem] shadow-glow animate-fade-up">
-          <img src={dest.image} alt={dest.name} width={800} height={1000} className="h-[380px] w-full object-cover lg:h-[520px]" />
+          <DestinationImage destination={dest} className="h-[380px] w-full object-cover lg:h-[520px]" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
           <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-[11px] font-bold text-white backdrop-blur-md">
             <Sparkles className="h-3 w-3" /> ההמלצה של NITZI
