@@ -173,13 +173,15 @@ function DealPage() {
     navigate({ to: "/checkout/$id", params: { id: deal.id } });
   };
 
-  const availabilityChip = useMemo(() => {
-    if (deal.price.availability === "sold-out")
-      return { text: "אזל המלאי", cls: "bg-rose-100 text-rose-800" };
-    if (deal.price.availability === "limited")
-      return { text: "מקומות אחרונים", cls: "bg-amber-100 text-amber-900" };
-    return { text: "זמין להזמנה", cls: "bg-emerald-100 text-emerald-800" };
-  }, [deal.price.availability]);
+  // Plain computation (not useMemo) — this sits after an early return, so a
+  // hook here would break the rules-of-hooks ordering.
+  const availabilityChip =
+    deal.price.availability === "sold-out"
+      ? { text: "אזל המלאי", cls: "bg-rose-100 text-rose-800" }
+      : deal.price.availability === "limited"
+        ? { text: "מקומות אחרונים", cls: "bg-amber-100 text-amber-900" }
+        : { text: "זמין להזמנה", cls: "bg-emerald-100 text-emerald-800" };
+
 
   return (
     <div dir="rtl" className="min-h-screen bg-background pb-28">
