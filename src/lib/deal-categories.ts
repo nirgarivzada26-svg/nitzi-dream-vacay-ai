@@ -23,6 +23,14 @@ export interface DealRail {
 
 const daysUntil = (iso: string) => (new Date(iso).getTime() - Date.now()) / 86400000;
 
+/** One offer per destination, keeping the first (best-ranked) occurrence. */
+const uniqueByDestination = (deals: Deal[]) => {
+  const seen = new Set<string>();
+  return deals.filter((d) =>
+    seen.has(d.destination.name) ? false : (seen.add(d.destination.name), true),
+  );
+};
+
 export function buildDealRails(): DealRail[] {
   const all = listDeals(3);
 
