@@ -3,13 +3,13 @@ import { useState } from "react";
 import heroImg from "@/assets/hero-main.jpg";
 import { NitziLogo } from "@/components/NitziLogo";
 import { SearchEngine } from "@/components/SearchEngine";
-import { DestinationCarousel } from "@/components/DestinationCarousel";
 import { DealRails } from "@/components/DealRails";
 import { SecretDealCard } from "@/components/SecretDealCard";
 import { SignInModal } from "@/components/SignInModal";
 import { Footer } from "@/components/Footer";
 import { DemoDataNotice } from "@/components/DemoDataNotice";
-import { categories } from "@/lib/nitzi-data";
+import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
+import { DestinationImage } from "@/components/DestinationImage";
 import { displayNameOf, useAuth } from "@/lib/auth";
 import { LogIn, Sparkles, User as UserIcon } from "lucide-react";
 
@@ -29,6 +29,7 @@ export const Route = createFileRoute("/")({
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Heebo:wght@700;800;900&display=swap" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
   component: Home,
 });
 
@@ -116,16 +117,53 @@ function Home() {
         <DealRails />
       </div>
 
-      <div className="mx-auto mt-14 flex w-full max-w-[1600px] flex-col gap-10 px-5 sm:px-8">
-        {categories.map((c) => (
-          <DestinationCarousel key={c.id} category={c} asDeals={c.id === "lastminute" || c.id === "ai"} />
-        ))}
-      </div>
+      <PopularDestinations />
 
 
       <Footer />
 
       <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} onSignedIn={() => navigate({ to: "/account" })} />
     </div>
+  );
+}
+
+/** Browse the managed catalog — every card links into a real search. */
+function PopularDestinations() {
+  const catalog = useDestinations();
+  const popular = catalog.filter((d) => d.isPopular).slice(0, 12);
+  if (popular.length === 0) return null;
+
+  return (
+    <section className="mx-auto mt-14 w-full max-w-[1600px] px-5 sm:mt-20 sm:px-8">
+      <div className="mb-5 flex items-end justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-black text-foreground sm:text-3xl">יעדים פופולריים</h2>
+          <p className="mt-1 text-sm text-muted-foreground">הכי מבוקשים כרגע מתל אביב</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+        {popular.map((d) => (
+          <Link
+            key={d.slug}
+            to="/result"
+            search={{ destination: d.slug }}
+            className="group relative h-44 overflow-hidden rounded-3xl border border-border/60 shadow-soft transition hover:shadow-glow sm:h-52"
+          >
+            <DestinationImage
+              destination={d}
+              className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-3 text-white">
+              <p className="text-[11px] font-bold text-white/85">{d.country} {d.emoji}</p>
+              <p className="text-lg font-black leading-tight">{d.name}</p>
+              <p className="mt-0.5 text-[11px] text-white/80">
+                {d.hasOffers ? `מ־₪${d.avgBudgetPerPerson.toLocaleString()} לאדם` : "אין דילים כרגע"}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
   );
 }
