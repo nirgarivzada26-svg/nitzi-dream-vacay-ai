@@ -504,7 +504,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      claim_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role:
