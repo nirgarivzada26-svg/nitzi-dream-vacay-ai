@@ -264,9 +264,6 @@ export function AgentChat({
           </PromptInput>
         </div>
       </div>
-
-        </div>
-      </div>
     </div>
   );
 }
