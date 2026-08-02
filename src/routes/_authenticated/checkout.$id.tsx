@@ -60,6 +60,9 @@ function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
   const [placed, setPlaced] = useState<{ id: string } | null>(null);
   const [emailSent, setEmailSent] = useState(false);
+  const submitBooking = useServerFn(placeBooking);
+  const idemKey = useRef<string | null>(null);
+
 
   const [passengers, setPassengers] = useState<Passenger[]>(() =>
     Array.from({ length: deal?.people ?? 2 }, emptyPassenger),
