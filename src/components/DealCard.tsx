@@ -3,6 +3,7 @@ import { BadgeCheck, Clock, Moon, Plane, Star } from "lucide-react";
 import { boardLabels, type Deal } from "@/lib/deals";
 import { DestinationImage } from "@/components/DestinationImage";
 import { SmartPriceBadge } from "@/components/SmartPriceBadge";
+import { DealCardActions } from "@/components/DealCardActions";
 
 const fmt = (n: number) => `₪${Math.round(n).toLocaleString()}`;
 const fmtDate = (iso: string) =>
@@ -11,15 +12,20 @@ const fmtDate = (iso: string) =>
 export function DealCard({ deal, fluid = false }: { deal: Deal; fluid?: boolean }) {
   const d = deal;
   return (
-    <Link
-      to="/deal/$id"
-      params={{ id: d.id }}
-      draggable={false}
-      className={`group relative overflow-hidden rounded-3xl border border-border/60 bg-card text-right shadow-soft transition hover:shadow-glow active:scale-[0.99] ${
+    <div
+      className={`group relative ${
         fluid ? "w-full" : "w-[280px] shrink-0 snap-start sm:w-[320px] lg:w-[360px]"
       }`}
     >
+      <DealCardActions deal={d} />
+      <Link
+        to="/deal/$id"
+        params={{ id: d.id }}
+        draggable={false}
+        className="block overflow-hidden rounded-3xl border border-border/60 bg-card text-right shadow-soft transition hover:shadow-glow active:scale-[0.99]"
+      >
       <div className="relative h-[220px] w-full overflow-hidden sm:h-[240px]">
+
         <DestinationImage
           destination={d.destination}
           className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
@@ -91,6 +97,8 @@ export function DealCard({ deal, fluid = false }: { deal: Deal; fluid?: boolean 
           </div>
         </div>
       </div>
-    </Link>
+      </Link>
+    </div>
+
   );
 }

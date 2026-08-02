@@ -52,13 +52,22 @@ export function Carousel({
     const el = ref.current;
     if (!el || e.pointerType === "touch") return;
     drag.current = { active: true, startX: e.clientX, startScroll: el.scrollLeft, moved: false };
-    el.setPointerCapture(e.pointerId);
+    // Pointer capture is claimed only once a real drag starts — capturing on
+    // pointerdown would retarget the click and swallow taps on cards/buttons.
   };
   const onPointerMove = (e: React.PointerEvent) => {
     const el = ref.current;
     if (!el || !drag.current.active) return;
     const dx = e.clientX - drag.current.startX;
-    if (Math.abs(dx) > 4) drag.current.moved = true;
+    if (Math.abs(dx) > 4 && !drag.current.moved) {
+      drag.current.moved = true;
+      try {
+        el.setPointerCapture(e.pointerId);
+      } catch {
+        /* noop */
+      }
+    }
+    if (!drag.current.moved) return;
     el.scrollLeft = drag.current.startScroll - dx;
   };
   const endDrag = (e: React.PointerEvent) => {
