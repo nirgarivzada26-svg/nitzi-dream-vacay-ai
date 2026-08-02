@@ -126,7 +126,7 @@ function PackageDetailPage() {
               <div className="mt-3"><WhyNitziButton reasons={reasons} score={pkg.score} /></div>
             </Section>
 
-            <SimilarPicks excludeName={dest.name} title="חבילות דומות שאולי תאהב" />
+            <SimilarPicks catalog={catalog} excludeSlug={dest.slug} title="חבילות דומות שאולי תאהב" />
           </div>
 
           <aside className="hidden lg:block">

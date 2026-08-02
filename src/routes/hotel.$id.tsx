@@ -143,7 +143,7 @@ function HotelDetailPage() {
               <p className="text-sm text-foreground">ביטול חינם עד 7 ימים לפני צ'ק-אין. לאחר מכן — חיוב של לילה ראשון.</p>
             </Section>
 
-            <SimilarPicks excludeName={dest.name} title="מלונות דומים שאולי תאהב" />
+            <SimilarPicks catalog={catalog} excludeSlug={dest.slug} title="מלונות דומים שאולי תאהב" />
 
             <Section title="מסעדות מומלצות באזור" icon={<Utensils className="h-4 w-4" />}>
               <ul className="space-y-2 text-sm">

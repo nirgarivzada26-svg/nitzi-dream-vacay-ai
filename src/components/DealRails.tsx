@@ -1,10 +1,11 @@
 import { Carousel } from "@/components/Carousel";
 import { DealCard } from "@/components/DealCard";
 import { buildDealRails } from "@/lib/deal-categories";
+import { useDestinations } from "@/lib/use-catalog";
 import { Info } from "lucide-react";
 
 export function DealRails() {
-  const rails = buildDealRails();
+  const rails = buildDealRails(useDestinations());
 
   return (
     <div className="flex flex-col gap-14">

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Flame, Lock, Sparkles, Timer } from "lucide-react";
 import { getSecretDeal } from "@/lib/deals";
+import { useDestinations } from "@/lib/use-catalog";
+import { DestinationImage } from "@/components/DestinationImage";
 import { setAuthIntent, useAuth } from "@/lib/auth";
 import { SignInModal } from "@/components/SignInModal";
 

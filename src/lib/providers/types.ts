@@ -3,7 +3,8 @@
 // To connect a real API (Booking, Skyscanner, Amadeus, Google Maps, …)
 // implement the interfaces and register the provider in ./registry.ts.
 
-import type { QuizAnswers, Destination } from "@/lib/nitzi-data";
+import type { QuizAnswers } from "@/lib/nitzi-data";
+import type { Destination } from "@/lib/catalog";
 
 export interface SearchContext {
   answers: QuizAnswers;

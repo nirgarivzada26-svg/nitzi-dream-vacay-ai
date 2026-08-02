@@ -313,7 +313,7 @@ function DealPage() {
               </div>
             </Section>
 
-            <SimilarPicks excludeName={dest.name} title="אולי תאהב גם..." />
+            <SimilarPicks catalog={catalog} excludeSlug={dest.slug} title="אולי תאהב גם..." />
           </div>
 
 
