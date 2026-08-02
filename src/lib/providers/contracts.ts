@@ -251,6 +251,7 @@ export const EMAIL_TEMPLATES = [
   "welcome",
   "booking_changed",
   "booking_cancelled",
+  "support_reply",
 ] as const;
 export type EmailTemplate = (typeof EMAIL_TEMPLATES)[number];
 
@@ -259,6 +260,7 @@ export const SMS_TEMPLATES = [
   "flight_changed",
   "price_alert",
   "departure_reminder",
+  "support_message",
 ] as const;
 export type SmsTemplate = (typeof SMS_TEMPLATES)[number];
 
