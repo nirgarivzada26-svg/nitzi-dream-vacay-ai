@@ -41,6 +41,7 @@ import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_a
 import { Route as AuthenticatedAdminFlightsRouteImport } from './routes/_authenticated/admin/flights'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
+import { Route as ApiPublicWebhooksProviderRouteImport } from './routes/api/public/webhooks/$provider'
 
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
@@ -209,6 +210,12 @@ const AuthenticatedAdminAnalyticsRoute =
     path: '/analytics',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const ApiPublicWebhooksProviderRoute =
+  ApiPublicWebhooksProviderRouteImport.update({
+    id: '/api/public/webhooks/$provider',
+    path: '/api/public/webhooks/$provider',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -242,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/booking/$id': typeof AuthenticatedBookingIdRoute
   '/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/webhooks/$provider': typeof ApiPublicWebhooksProviderRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -274,6 +282,7 @@ export interface FileRoutesByTo {
   '/booking/$id': typeof AuthenticatedBookingIdRoute
   '/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api/public/webhooks/$provider': typeof ApiPublicWebhooksProviderRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -309,6 +318,7 @@ export interface FileRoutesById {
   '/_authenticated/booking/$id': typeof AuthenticatedBookingIdRoute
   '/_authenticated/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/webhooks/$provider': typeof ApiPublicWebhooksProviderRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -344,6 +354,7 @@ export interface FileRouteTypes {
     | '/booking/$id'
     | '/checkout/$id'
     | '/admin/'
+    | '/api/public/webhooks/$provider'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -376,6 +387,7 @@ export interface FileRouteTypes {
     | '/booking/$id'
     | '/checkout/$id'
     | '/admin'
+    | '/api/public/webhooks/$provider'
   id:
     | '__root__'
     | '/'
@@ -410,6 +422,7 @@ export interface FileRouteTypes {
     | '/_authenticated/booking/$id'
     | '/_authenticated/checkout/$id'
     | '/_authenticated/admin/'
+    | '/api/public/webhooks/$provider'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -430,6 +443,7 @@ export interface RootRouteChildren {
   HotelIdRoute: typeof HotelIdRoute
   PackageIdRoute: typeof PackageIdRoute
   AiIndexRoute: typeof AiIndexRoute
+  ApiPublicWebhooksProviderRoute: typeof ApiPublicWebhooksProviderRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -658,6 +672,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/api/public/webhooks/$provider': {
+      id: '/api/public/webhooks/$provider'
+      path: '/api/public/webhooks/$provider'
+      fullPath: '/api/public/webhooks/$provider'
+      preLoaderRoute: typeof ApiPublicWebhooksProviderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -730,6 +751,7 @@ const rootRouteChildren: RootRouteChildren = {
   HotelIdRoute: HotelIdRoute,
   PackageIdRoute: PackageIdRoute,
   AiIndexRoute: AiIndexRoute,
+  ApiPublicWebhooksProviderRoute: ApiPublicWebhooksProviderRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
