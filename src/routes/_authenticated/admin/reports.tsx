@@ -19,10 +19,10 @@ function ReportsPage() {
   const firstError = orders.error ?? users.error ?? packages.error ?? analytics.error;
   if (firstError) return <AdminError error={firstError} />;
 
-  const ordersData = ordersData;
-  const usersData = usersData;
-  const packagesData = packagesData;
-  const analyticsData = analyticsData;
+  const ordersData = orders.data;
+  const usersData = users.data;
+  const packagesData = packages.data;
+  const analyticsData = analytics.data;
   if (!ordersData || !usersData || !packagesData || !analyticsData) return <AdminLoading />;
 
   const revenue = ordersData
