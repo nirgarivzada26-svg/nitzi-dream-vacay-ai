@@ -29,6 +29,8 @@ import { setAuthIntent, useAuth } from "@/lib/auth";
 import { addFavorite, isDealFavorited, removeFavorite } from "@/lib/user-data";
 import { TripTimeline } from "@/components/TripTimeline";
 import { SimilarPicks } from "@/components/SimilarPicks";
+import { RelatedDeals } from "@/components/RelatedDeals";
+import { recordViewedDeal } from "@/lib/recently-viewed";
 import { WhyNitziButton } from "@/components/WhyNitziButton";
 import { SmartPriceBadge } from "@/components/SmartPriceBadge";
 import { PriceAlertButton } from "@/components/PriceAlertButton";
@@ -96,6 +98,10 @@ function DealPage() {
   const [signInOpen, setSignInOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<null | "save" | "book">(null);
   const [now, setNow] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (deal) recordViewedDeal(deal.id);
+  }, [deal?.id]);
 
   useEffect(() => {
     setNow(Date.now());
