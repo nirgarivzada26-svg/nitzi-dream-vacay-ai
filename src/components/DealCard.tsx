@@ -97,6 +97,8 @@ export function DealCard({ deal, fluid = false }: { deal: Deal; fluid?: boolean 
           </div>
         </div>
       </div>
-    </Link>
+      </Link>
+    </div>
+
   );
 }
