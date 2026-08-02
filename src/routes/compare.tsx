@@ -29,7 +29,7 @@ function ComparePage() {
   return (
     <div dir="rtl" className="min-h-screen bg-background pb-16">
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur-lg">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+        <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-4 py-3 sm:px-6">
           <button onClick={() => navigate({ to: "/result" })} className="grid h-11 w-11 place-items-center rounded-full border border-border bg-card" aria-label="חזרה">
             <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
           </button>
@@ -38,7 +38,7 @@ function ComparePage() {
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6">
+      <div className="mx-auto w-full max-w-[1600px] px-4 pt-6 sm:px-6">
         <h1 className="flex items-center gap-2 text-2xl font-black sm:text-3xl">
           <Sparkles className="h-6 w-6 text-primary" /> השוואה חכמה של NITZI
         </h1>

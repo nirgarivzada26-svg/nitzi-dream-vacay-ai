@@ -113,7 +113,7 @@ function Result() {
       <div aria-hidden className="pointer-events-none absolute -top-32 -right-24 h-80 w-80 rounded-full bg-gradient-sunset opacity-30 blur-3xl" />
 
       <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur-lg">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-5 py-3">
+        <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-5 py-3">
           <button onClick={() => navigate({ to: "/quiz" })} className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card" aria-label="חזרה">
             <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
           </button>
@@ -129,7 +129,7 @@ function Result() {
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-5xl space-y-5 pt-5">
+      <div className="mx-auto w-full max-w-[1600px] space-y-5 pt-5">
         {/* Hero image */}
         <section className="relative mx-5 overflow-hidden rounded-[2rem] shadow-glow animate-fade-up">
           <img src={dest.image} alt={dest.name} width={800} height={1000} className="h-[380px] w-full object-cover" />

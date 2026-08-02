@@ -52,7 +52,7 @@ function Home() {
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 
           <div className="absolute inset-x-0 top-0 z-10">
-            <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 pt-6 sm:px-8">
+            <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-5 pt-6 sm:px-8">
               <NitziLogo />
               <div className="flex items-center gap-2">
                 <div className="hidden items-center gap-1 rounded-full border border-white/30 bg-white/15 px-3 py-1.5 text-[11px] font-bold text-white backdrop-blur-md sm:flex">
@@ -78,7 +78,7 @@ function Home() {
             </div>
           </div>
 
-          <div className="absolute inset-x-0 top-24 z-10 mx-auto flex w-full max-w-6xl flex-col items-center px-5 text-center text-white sm:top-28 sm:px-8 lg:top-32">
+          <div className="absolute inset-x-0 top-24 z-10 mx-auto flex w-full max-w-[1600px] flex-col items-center px-5 text-center text-white sm:top-28 sm:px-8 lg:top-32">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold uppercase tracking-widest backdrop-blur-md">
               <Sparkles className="h-3 w-3" /> NITZI · Travel AI
             </span>
@@ -103,19 +103,19 @@ function Home() {
         </div>
       </section>
 
-      <div className="mx-auto mt-8 w-full max-w-6xl px-5 sm:mt-12 sm:px-8">
+      <div className="mx-auto mt-8 w-full max-w-[1600px] px-5 sm:mt-12 sm:px-8">
         <DemoDataNotice />
       </div>
 
-      <div className="mx-auto mt-6 w-full max-w-6xl">
+      <div className="mx-auto mt-6 w-full max-w-[1600px]">
         <SecretDealCard />
       </div>
 
-      <div className="mx-auto mt-12 w-full max-w-6xl px-5 sm:mt-16 sm:px-8">
+      <div className="mx-auto mt-12 w-full max-w-[1600px] px-5 sm:mt-16 sm:px-8">
         <DealRails />
       </div>
 
-      <div className="mx-auto mt-14 flex w-full max-w-6xl flex-col gap-10 px-5 sm:px-8">
+      <div className="mx-auto mt-14 flex w-full max-w-[1600px] flex-col gap-10 px-5 sm:px-8">
         {categories.map((c) => (
           <DestinationCarousel key={c.id} category={c} asDeals={c.id === "lastminute" || c.id === "ai"} />
         ))}

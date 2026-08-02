@@ -138,7 +138,7 @@ function DealPage() {
   return (
     <div dir="rtl" className="min-h-screen bg-background pb-28">
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur-lg">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+        <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-4 py-3 sm:px-6">
           <button onClick={() => navigate({ to: "/" })} className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card" aria-label="חזרה">
             <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
           </button>
@@ -162,7 +162,7 @@ function DealPage() {
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6 lg:pt-6">
+      <div className="mx-auto w-full max-w-[1600px] px-4 pt-4 sm:px-6 lg:pt-6">
         <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
           <div className="space-y-5">
             <section className="relative overflow-hidden rounded-[2rem] shadow-glow animate-fade-up">
@@ -326,7 +326,7 @@ function DealPage() {
       </div>
 
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 p-3 shadow-glow backdrop-blur lg:hidden">
-        <div className="mx-auto flex max-w-6xl items-center gap-3 px-2">
+        <div className="mx-auto flex max-w-[1600px] items-center gap-3 px-2">
           <div className="min-w-0">
             <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">מחיר לאדם</div>
             <div className="text-xl font-black text-foreground">{fmtILS(deal.price.perPerson)}</div>

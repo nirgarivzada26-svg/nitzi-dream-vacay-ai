@@ -48,7 +48,7 @@ function AccountPage() {
 
   return (
     <div dir="rtl" className="min-h-screen bg-gradient-to-b from-sand/50 via-background to-background pb-16">
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 pt-6 sm:px-8">
+      <header className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-5 pt-6 sm:px-8">
         <Link to="/" className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card">
           <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
         </Link>
@@ -61,7 +61,7 @@ function AccountPage() {
         </button>
       </header>
 
-      <section className="mx-auto mt-8 w-full max-w-6xl px-5 sm:px-8">
+      <section className="mx-auto mt-8 w-full max-w-[1600px] px-5 sm:px-8">
         <div className="rounded-[2rem] border border-border bg-card p-6 shadow-glow sm:p-8">
           <div className="flex items-center gap-3">
             <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-sunset text-white shadow-glow">
@@ -76,7 +76,7 @@ function AccountPage() {
         </div>
       </section>
 
-      <nav className="mx-auto mt-6 flex w-full max-w-6xl gap-2 overflow-x-auto px-5 pb-2 sm:px-8">
+      <nav className="mx-auto mt-6 flex w-full max-w-[1600px] gap-2 overflow-x-auto px-5 pb-2 sm:px-8">
         <TabLink id="bookings" active={active} label="הזמנות" icon={<Calendar className="h-3.5 w-3.5" />} />
         <TabLink id="trips" active={active} label="חופשות שמורות" icon={<BookmarkCheck className="h-3.5 w-3.5" />} />
         <TabLink id="favorites" active={active} label="מועדפים" icon={<Heart className="h-3.5 w-3.5" />} />
@@ -85,7 +85,7 @@ function AccountPage() {
         <TabLink id="profile" active={active} label="פרופיל" icon={<Settings className="h-3.5 w-3.5" />} />
       </nav>
 
-      <section className="mx-auto mt-4 w-full max-w-6xl px-5 sm:px-8">
+      <section className="mx-auto mt-4 w-full max-w-[1600px] px-5 sm:px-8">
         {active === "bookings" && <BookingsTab />}
         {active === "trips" && <TripsTab />}
         {active === "favorites" && <FavoritesTab />}
