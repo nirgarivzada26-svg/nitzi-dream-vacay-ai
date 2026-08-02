@@ -48,18 +48,84 @@ const SYSTEM = `אתה NITZI — סוכן נסיעות אישי חכם, לא צ'
 
 type ChatBody = { messages?: unknown; profile?: unknown };
 
+// Abuse guards for a public LLM endpoint: bounded payload + per-identity quota.
+const MAX_MESSAGES = 60;
+const MAX_BODY_CHARS = 24_000;
+const RATE_LIMIT = 40; // requests
+const RATE_WINDOW_SECONDS = 3600;
+
+/** Signed-in user id when a bearer token is present, otherwise the client IP. */
+async function identify(request: Request): Promise<string> {
+  const bearer = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+  if (bearer) {
+    try {
+      const { createClient } = await import("@supabase/supabase-js");
+      const sb = createClient(
+        process.env["SUPABASE_URL"]!,
+        process.env["SUPABASE_PUBLISHABLE_KEY"]!,
+        { auth: { persistSession: false, autoRefreshToken: false } },
+      );
+      const { data } = await sb.auth.getUser(bearer);
+      if (data.user) return `user:${data.user.id}`;
+    } catch {
+      /* fall through to IP */
+    }
+  }
+  const ip =
+    request.headers.get("cf-connecting-ip") ||
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    "unknown";
+  return `ip:${ip}`;
+}
+
+async function withinQuota(identity: string): Promise<boolean> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.rpc("ai_rate_limit_hit", {
+      _identity: identity,
+      _limit: RATE_LIMIT,
+      _window_seconds: RATE_WINDOW_SECONDS,
+    });
+    if (error) return true; // never block on limiter failure
+    return data !== false;
+  } catch {
+    return true;
+  }
+}
+
 export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const body = (await request.json()) as ChatBody;
+        const raw = await request.text();
+        if (raw.length > MAX_BODY_CHARS) {
+          return new Response("Message too long", { status: 413 });
+        }
+        let body: ChatBody;
+        try {
+          body = JSON.parse(raw) as ChatBody;
+        } catch {
+          return new Response("Invalid JSON", { status: 400 });
+        }
         const messages = body.messages;
-        if (!Array.isArray(messages)) {
+        if (!Array.isArray(messages) || messages.length === 0) {
           return new Response("Messages are required", { status: 400 });
+        }
+        if (messages.length > MAX_MESSAGES) {
+          return new Response("Conversation too long", { status: 413 });
+        }
+
+        const identity = await identify(request);
+        if (!(await withinQuota(identity))) {
+          return new Response("הגעת למכסת השיחות לשעה. נסה שוב בעוד קצת.", {
+            status: 429,
+            headers: { "retry-after": String(RATE_WINDOW_SECONDS) },
+          });
         }
 
         const apiKey = process.env["LOVABLE_API_KEY"];
         if (!apiKey) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
+
 
         const runIdFetch = createLovableAiGatewayRunIdFetch(getLovableAiGatewayRunId(request));
         const lovable = createNitziAiProvider(apiKey, runIdFetch);
