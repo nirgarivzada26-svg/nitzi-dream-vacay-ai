@@ -6,6 +6,7 @@ import { useSyncExternalStore } from "react";
 
 const KEY = "nitzi:recently-viewed";
 const LIMIT = 12;
+const EMPTY: string[] = [];
 
 let state: string[] = load();
 const listeners = new Set<() => void>();
@@ -42,6 +43,6 @@ export function useRecentlyViewed(): string[] {
       return () => listeners.delete(cb);
     },
     () => state,
-    () => [],
+    () => EMPTY,
   );
 }
