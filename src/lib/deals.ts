@@ -30,10 +30,23 @@ export interface DealFlight {
   durationMinutes: number;
 }
 
+export type BoardBasis = "room-only" | "breakfast" | "half-board" | "all-inclusive";
+
+export const boardLabels: Record<BoardBasis, string> = {
+  "room-only": "לינה בלבד",
+  breakfast: "ארוחת בוקר",
+  "half-board": "חצי פנסיון",
+  "all-inclusive": "הכל כלול",
+};
+
 export interface Deal {
   id: string; // stable slug (destination name urlencoded)
   destination: Destination;
   title: string;
+  board: BoardBasis;
+  listPricePerPerson: number; // pre-discount reference price
+  discountPct: number;        // 0-100
+  freeCancellation: boolean;
   hotel: {
     name: string;
     note: string;
