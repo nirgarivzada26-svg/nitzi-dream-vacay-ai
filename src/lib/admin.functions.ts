@@ -29,8 +29,15 @@ export const claimSuperAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ ok: true }> => {
     const m = await import("./admin.server");
-    if ((await m.staffCount()) > 0) throw new m.AdminError("כבר קיים מנהל במערכת");
-    await m.setUserRole(context.userId, "super_admin", true);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Atomic bootstrap: the DB takes an advisory lock and refuses a second claim,
+    // so two concurrent requests can never both become super admin.
+    const { data: claimed, error } = await supabaseAdmin.rpc("claim_super_admin", {
+      _user_id: context.userId,
+    });
+    if (error) throw new m.AdminError(error.message);
+    if (!claimed) throw new m.AdminError("כבר קיים מנהל במערכת");
+
     await m.logAudit({
       actorId: context.userId,
       actorEmail: (context.claims as { email?: string } | null)?.email ?? null,
