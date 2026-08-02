@@ -109,9 +109,16 @@ export async function listBookings(): Promise<BookingRow[]> {
   if (error) throw error;
   return (data ?? []) as unknown as BookingRow[];
 }
-export async function createBooking(deal: Deal): Promise<BookingRow> {
+export interface BookingDetails {
+  passengers?: unknown[];
+  extras?: Record<string, unknown>;
+  payment?: { method: string };
+  extrasTotal?: number;
+}
+export async function createBooking(deal: Deal, details?: BookingDetails): Promise<BookingRow> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("not signed in");
+  const extrasTotal = details?.extrasTotal ?? 0;
   const { data, error } = await supabase.from("bookings").insert({
     user_id: user.id,
     deal_id: deal.id,
@@ -119,12 +126,12 @@ export async function createBooking(deal: Deal): Promise<BookingRow> {
     people: deal.people,
     nights: deal.dates.nights,
     price_per_person: deal.price.perPerson,
-    total_price: deal.price.total,
+    total_price: deal.price.total + extrasTotal,
     currency: deal.price.currency,
     start_date: deal.dates.start.slice(0, 10),
     end_date: deal.dates.end.slice(0, 10),
     status: "confirmed",
-    snapshot: deal as unknown as never,
+    snapshot: { ...deal, booking: details ?? null } as unknown as never,
   }).select("*").single();
   if (error) throw error;
   return data as unknown as BookingRow;
