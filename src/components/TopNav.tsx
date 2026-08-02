@@ -11,7 +11,7 @@ const ITEMS = [
   { to: "/", label: "בית", icon: Home },
   { to: "/flights", label: "טיסות", icon: Plane },
   { to: "/packages", label: "חבילות", icon: Palmtree },
-  { to: "/quiz", label: "NITZI AI", icon: Bot },
+  { to: "/ai", label: "NITZI AI", icon: Bot },
 ] as const;
 
 /** Global navigation. `overlay` renders on top of a hero image. */

@@ -19,7 +19,7 @@ export function SearchEngine({ size = "md" }: { size?: "md" | "lg" }) {
     try {
       sessionStorage.setItem("nitzi:seed", JSON.stringify({ destination, people, budget, purpose }));
     } catch {}
-    navigate({ to: "/quiz" });
+    navigate({ to: "/ai" });
   };
 
   const runSearch = () => {

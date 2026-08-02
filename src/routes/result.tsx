@@ -148,7 +148,7 @@ function ResultView({ answers, dest }: { answers: QuizAnswers; dest: Destination
 
       <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur-lg">
         <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-5 py-3">
-          <button onClick={() => navigate({ to: "/quiz" })} className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card" aria-label="חזרה">
+          <button onClick={() => navigate({ to: "/ai" })} className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card" aria-label="חזרה">
             <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
           </button>
           <NitziLogo />
@@ -373,7 +373,7 @@ function ResultView({ answers, dest }: { answers: QuizAnswers; dest: Destination
         </Card>
 
         <div className="mx-5 flex flex-col gap-2 pt-2">
-          <Link to="/quiz" className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-sunset py-3 text-center text-sm font-black text-white shadow-glow">
+          <Link to="/ai" className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-sunset py-3 text-center text-sm font-black text-white shadow-glow">
             <Sparkles className="h-4 w-4" /> צור לי חופשה אחרת
           </Link>
           <div className="grid grid-cols-2 gap-2">
