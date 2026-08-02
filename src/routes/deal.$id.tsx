@@ -13,6 +13,8 @@ import { addFavorite, isDealFavorited, removeFavorite } from "@/lib/user-data";
 import { TripTimeline } from "@/components/TripTimeline";
 import { SimilarPicks } from "@/components/SimilarPicks";
 import { WhyNitziButton } from "@/components/WhyNitziButton";
+import { SmartPriceBadge } from "@/components/SmartPriceBadge";
+
 import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
 import { DestinationImage } from "@/components/DestinationImage";
 
