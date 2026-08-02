@@ -117,18 +117,26 @@ function CheckoutPage() {
 
   const confirm = async () => {
     setBusy(true); setError(null);
+    // Stable key so a double-click / retry can never create two bookings.
+    if (!idemKey.current) idemKey.current = crypto.randomUUID();
     try {
-      const row = await createBooking(deal, {
-        passengers,
-        extras: { ...extras, contact },
-        payment: { method: payMethod },
-        extrasTotal,
+      const row = await submitBooking({
+        data: {
+          dealId: deal.id,
+          idempotencyKey: idemKey.current,
+          passengers,
+          extras: selectedExtras,
+          contact,
+          paymentMethod: payMethod,
+          confirmedPerPerson: deal.price.perPerson,
+        },
       });
       setPlaced({ id: row.id });
       setStep(4);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "שגיאה בהזמנה");
     } finally { setBusy(false); }
+
   };
 
   const downloadConfirmation = () => {
