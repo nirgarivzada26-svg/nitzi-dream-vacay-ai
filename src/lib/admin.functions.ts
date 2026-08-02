@@ -128,7 +128,11 @@ export const adminPackageAction = createServerFn({ method: "POST" })
           (settings.find((s) => s.key === "featured_deal_slugs")?.value as string[] | null) ?? []
         ).map(String),
       );
-      for (const s of data.slugs) data.action === "feature" ? cur.add(s) : cur.delete(s);
+      for (const s of data.slugs) {
+        if (data.action === "feature") cur.add(s);
+        else cur.delete(s);
+      }
+
       await m.saveSetting("featured_deal_slugs", [...cur], context.userId);
     }
 
