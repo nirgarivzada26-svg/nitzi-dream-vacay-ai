@@ -104,7 +104,13 @@ export function imageFor(slug: string, countryCode: string): string | null {
 }
 
 const TRIP_TYPES: TripType[] = [
-  "beach", "adventure", "romantic", "family", "friends", "nightlife", "nature",
+  "beach",
+  "adventure",
+  "romantic",
+  "family",
+  "friends",
+  "nightlife",
+  "nature",
 ];
 
 function toHotels(value: DestinationHotel[] | null): DestinationHotel[] {
@@ -128,9 +134,7 @@ export function rowToDestination(row: DestinationRow): Destination {
     weather: row.weather,
     flightHours: Number(row.flight_hours),
     avgBudgetPerPerson: row.avg_budget_per_person,
-    matches: (row.matches ?? []).filter((m): m is TripType =>
-      TRIP_TYPES.includes(m as TripType),
-    ),
+    matches: (row.matches ?? []).filter((m): m is TripType => TRIP_TYPES.includes(m as TripType)),
     isPopular: row.is_popular,
     hasOffers: row.has_offers,
     image: imageFor(row.slug, row.country_code),
@@ -160,10 +164,7 @@ export function findDestination(
  * Resolve the destination a set of quiz answers points at. Only catalog
  * destinations are ever returned — we never fabricate an off-catalog place.
  */
-export function pickDestination(
-  catalog: Destination[],
-  answers: QuizAnswers,
-): Destination | null {
+export function pickDestination(catalog: Destination[], answers: QuizAnswers): Destination | null {
   if (catalog.length === 0) return null;
 
   const explicit = findDestination(catalog, answers.destination);

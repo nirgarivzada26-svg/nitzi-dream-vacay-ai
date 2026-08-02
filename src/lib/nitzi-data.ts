@@ -6,7 +6,14 @@ import laplandImg from "@/assets/dest-lapland.jpg";
 import amalfiImg from "@/assets/dest-amalfi.jpg";
 import dubaiImg from "@/assets/dest-dubai.jpg";
 
-export type TripType = "beach" | "adventure" | "romantic" | "family" | "friends" | "nightlife" | "nature";
+export type TripType =
+  | "beach"
+  | "adventure"
+  | "romantic"
+  | "family"
+  | "friends"
+  | "nightlife"
+  | "nature";
 export type TripStyle = "chill" | "luxury" | "young" | "smart";
 
 export interface QuizAnswers {
@@ -45,7 +52,6 @@ export const styles: { id: TripStyle; label: string; emoji: string }[] = [
 ];
 
 // Destination data lives in the database catalog — see src/lib/catalog.ts.
-
 
 export const tripPurposes = [
   { id: "any", label: "כל סוג" },

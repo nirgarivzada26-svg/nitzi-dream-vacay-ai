@@ -55,17 +55,26 @@ export interface NotificationPreferences {
 
 // Favorites
 export async function listFavorites(): Promise<FavoriteRow[]> {
-  const { data, error } = await supabase.from("favorites").select("*").order("created_at", { ascending: false });
+  const { data, error } = await supabase
+    .from("favorites")
+    .select("*")
+    .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as unknown as FavoriteRow[];
 }
 export async function isDealFavorited(dealId: string): Promise<boolean> {
-  const { data, error } = await supabase.from("favorites").select("id").eq("deal_id", dealId).maybeSingle();
+  const { data, error } = await supabase
+    .from("favorites")
+    .select("id")
+    .eq("deal_id", dealId)
+    .maybeSingle();
   if (error) return false;
   return !!data;
 }
 export async function addFavorite(deal: Deal): Promise<void> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error("not signed in");
   const { error } = await supabase.from("favorites").insert({
     user_id: user.id,
@@ -82,12 +91,22 @@ export async function removeFavorite(dealId: string): Promise<void> {
 
 // Saved trips
 export async function listSavedTrips(): Promise<SavedTripRow[]> {
-  const { data, error } = await supabase.from("saved_trips").select("*").order("created_at", { ascending: false });
+  const { data, error } = await supabase
+    .from("saved_trips")
+    .select("*")
+    .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as unknown as SavedTripRow[];
 }
-export async function saveTrip(input: { title: string; destinationName: string; answers: QuizAnswers; snapshot: unknown }): Promise<void> {
-  const { data: { user } } = await supabase.auth.getUser();
+export async function saveTrip(input: {
+  title: string;
+  destinationName: string;
+  answers: QuizAnswers;
+  snapshot: unknown;
+}): Promise<void> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error("not signed in");
   const { error } = await supabase.from("saved_trips").insert({
     user_id: user.id,
@@ -105,41 +124,21 @@ export async function deleteSavedTrip(id: string): Promise<void> {
 
 // Bookings
 export async function listBookings(): Promise<BookingRow[]> {
-  const { data, error } = await supabase.from("bookings").select("*").order("created_at", { ascending: false });
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("*")
+    .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as unknown as BookingRow[];
 }
-export interface BookingDetails {
-  passengers?: unknown[];
-  extras?: Record<string, unknown>;
-  payment?: { method: string };
-  extrasTotal?: number;
-}
-export async function createBooking(deal: Deal, details?: BookingDetails): Promise<BookingRow> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("not signed in");
-  const extrasTotal = details?.extrasTotal ?? 0;
-  const { data, error } = await supabase.from("bookings").insert({
-    user_id: user.id,
-    deal_id: deal.id,
-    destination_name: deal.destination.name,
-    people: deal.people,
-    nights: deal.dates.nights,
-    price_per_person: deal.price.perPerson,
-    total_price: deal.price.total + extrasTotal,
-    currency: deal.price.currency,
-    start_date: deal.dates.start.slice(0, 10),
-    end_date: deal.dates.end.slice(0, 10),
-    status: "confirmed",
-    snapshot: { ...deal, booking: details ?? null } as unknown as never,
-  }).select("*").single();
-  if (error) throw error;
-  return data as unknown as BookingRow;
-}
+// Bookings are created exclusively by the server (src/lib/bookings.functions.ts),
+// which recomputes the price from the catalog. The browser can only read them.
 
 // Search history
 export async function logSearch(answers: QuizAnswers, destinationName?: string): Promise<void> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return; // silent no-op when guest
   await supabase.from("search_history").insert({
     user_id: user.id,
@@ -148,29 +147,48 @@ export async function logSearch(answers: QuizAnswers, destinationName?: string):
   });
 }
 export async function listSearchHistory(): Promise<SearchHistoryRow[]> {
-  const { data, error } = await supabase.from("search_history").select("*").order("created_at", { ascending: false }).limit(50);
+  const { data, error } = await supabase
+    .from("search_history")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(50);
   if (error) throw error;
   return (data ?? []) as unknown as SearchHistoryRow[];
 }
 export async function clearSearchHistory(): Promise<void> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return;
   await supabase.from("search_history").delete().eq("user_id", user.id);
 }
 
 // Notification preferences
 export async function getNotifPrefs(): Promise<NotificationPreferences> {
-  const { data } = await supabase.from("notification_preferences").select("deals, email, sms, push").maybeSingle();
-  return (data ?? { deals: false, email: false, sms: false, push: false }) as NotificationPreferences;
+  const { data } = await supabase
+    .from("notification_preferences")
+    .select("deals, email, sms, push")
+    .maybeSingle();
+  return (data ?? {
+    deals: false,
+    email: false,
+    sms: false,
+    push: false,
+  }) as NotificationPreferences;
 }
 export async function updateNotifPrefs(prefs: Partial<NotificationPreferences>): Promise<void> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error("not signed in");
-  const { error } = await supabase.from("notification_preferences").upsert({
-    user_id: user.id,
-    ...prefs,
-    updated_at: new Date().toISOString(),
-  }, { onConflict: "user_id" });
+  const { error } = await supabase.from("notification_preferences").upsert(
+    {
+      user_id: user.id,
+      ...prefs,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "user_id" },
+  );
   if (error) throw error;
 }
 
@@ -181,11 +199,19 @@ export interface ProfileRow {
   avatar_url: string | null;
 }
 export async function getProfile(): Promise<ProfileRow | null> {
-  const { data } = await supabase.from("profiles").select("id, display_name, avatar_url").maybeSingle();
+  const { data } = await supabase
+    .from("profiles")
+    .select("id, display_name, avatar_url")
+    .maybeSingle();
   return (data ?? null) as ProfileRow | null;
 }
-export async function updateProfile(patch: { display_name?: string; avatar_url?: string }): Promise<void> {
-  const { data: { user } } = await supabase.auth.getUser();
+export async function updateProfile(patch: {
+  display_name?: string;
+  avatar_url?: string;
+}): Promise<void> {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error("not signed in");
   const { error } = await supabase.from("profiles").upsert({ id: user.id, ...patch });
   if (error) throw error;

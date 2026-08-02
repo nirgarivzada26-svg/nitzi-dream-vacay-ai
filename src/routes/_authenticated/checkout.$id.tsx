@@ -4,13 +4,25 @@
 // explicit approval. No real charge is made in the MVP.
 
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  ArrowLeft, BadgeCheck, CheckCircle2, CreditCard, Download, Mail, RefreshCw,
-  ShieldCheck, Timer, User, Wallet, XCircle,
+  ArrowLeft,
+  BadgeCheck,
+  CheckCircle2,
+  CreditCard,
+  Download,
+  Mail,
+  RefreshCw,
+  ShieldCheck,
+  Timer,
+  User,
+  Wallet,
+  XCircle,
 } from "lucide-react";
 import { getDeal, revalidateDeal, type Deal, type RevalidationResult } from "@/lib/deals";
-import { createBooking } from "@/lib/user-data";
+import { placeBooking } from "@/lib/bookings.functions";
+import { EXTRAS, computeExtras, type ExtraId } from "@/lib/booking-extras";
 import { NitziLogo } from "@/components/NitziLogo";
 import { SmartPriceBadge } from "@/components/SmartPriceBadge";
 import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
@@ -19,7 +31,10 @@ export const Route = createFileRoute("/_authenticated/checkout/$id")({
   head: ({ params }) => ({
     meta: [
       { title: `אישור הזמנה — NITZI` },
-      { name: "description", content: `סיום ההזמנה ל${decodeURIComponent(params.id)} עם בדיקת מחיר לפני חיוב.` },
+      {
+        name: "description",
+        content: `סיום ההזמנה ל${decodeURIComponent(params.id)} עם בדיקת מחיר לפני חיוב.`,
+      },
       { property: "og:title", content: "אישור הזמנה — NITZI" },
       { property: "og:description", content: "בדיקת מחיר וזמינות לפני החיוב." },
       { name: "robots", content: "noindex" },
@@ -32,22 +47,19 @@ export const Route = createFileRoute("/_authenticated/checkout/$id")({
 const fmtILS = (n: number) => `₪${Math.round(n).toLocaleString()}`;
 
 interface Passenger {
-  firstName: string; lastName: string; birthDate: string;
-  passport: string; passportExpiry: string;
+  firstName: string;
+  lastName: string;
+  birthDate: string;
+  passport: string;
+  passportExpiry: string;
 }
 const emptyPassenger = (): Passenger => ({
-  firstName: "", lastName: "", birthDate: "", passport: "", passportExpiry: "",
+  firstName: "",
+  lastName: "",
+  birthDate: "",
+  passport: "",
+  passportExpiry: "",
 });
-
-type ExtraId = "bag" | "trolley" | "seat" | "insurance" | "transfers" | "meals";
-const EXTRAS: { id: ExtraId; label: string; note: string; price: number; perPerson: boolean }[] = [
-  { id: "bag", label: "מזוודה 23 ק״ג", note: "לכיוון הלוך-חזור", price: 150, perPerson: true },
-  { id: "trolley", label: "טרולי עלייה למטוס", note: "8 ק״ג", price: 90, perPerson: true },
-  { id: "seat", label: "בחירת מושב", note: "מושבים צמודים בטיסה", price: 120, perPerson: true },
-  { id: "insurance", label: "ביטוח נסיעות", note: "כולל כיסוי רפואי וביטולים", price: 120, perPerson: true },
-  { id: "transfers", label: "העברות שדה תעופה–מלון", note: "כלול בחבילה", price: 0, perPerson: false },
-  { id: "meals", label: "שדרוג ארוחות", note: "חצי פנסיון במלון", price: 240, perPerson: true },
-];
 
 const STEPS = ["פרטי נוסעים", "שירותים נוספים", "סיכום", "תשלום", "אישור"];
 
@@ -64,13 +76,20 @@ function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
   const [placed, setPlaced] = useState<{ id: string } | null>(null);
   const [emailSent, setEmailSent] = useState(false);
+  const submitBooking = useServerFn(placeBooking);
+  const idemKey = useRef<string | null>(null);
 
   const [passengers, setPassengers] = useState<Passenger[]>(() =>
     Array.from({ length: deal?.people ?? 2 }, emptyPassenger),
   );
   const [contact, setContact] = useState({ email: "", phone: "" });
   const [extras, setExtras] = useState<Record<ExtraId, boolean>>({
-    bag: true, trolley: false, seat: false, insurance: true, transfers: true, meals: false,
+    bag: true,
+    trolley: false,
+    seat: false,
+    insurance: true,
+    transfers: true,
+    meals: false,
   });
   const [payMethod, setPayMethod] = useState<"card" | "apple" | "google">("card");
   const [card, setCard] = useState({ number: "", name: "", expiry: "", cvc: "" });
@@ -81,19 +100,23 @@ function CheckoutPage() {
       if (!deal) return;
       const res = await revalidateDeal(deal);
       if (!alive) return;
-      setDeal(res.deal); setReval(res); setChecking(false);
+      setDeal(res.deal);
+      setReval(res);
+      setChecking(false);
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const people = deal?.people ?? 2;
+  const selectedExtras = useMemo(
+    () => (Object.keys(extras) as ExtraId[]).filter((k) => extras[k]),
+    [extras],
+  );
   const extrasLines = useMemo(
-    () =>
-      EXTRAS.filter((e) => extras[e.id] && e.price > 0).map((e) => ({
-        label: e.label,
-        amount: e.perPerson ? e.price * people : e.price,
-      })),
-    [extras, people],
+    () => computeExtras(selectedExtras, people).lines,
+    [selectedExtras, people],
   );
   const extrasTotal = extrasLines.reduce((s, l) => s + l.amount, 0);
   const grandTotal = (deal?.price.total ?? 0) + extrasTotal;
@@ -103,7 +126,12 @@ function CheckoutPage() {
       <div dir="rtl" className="grid min-h-screen place-items-center px-6 text-center">
         <div>
           <h1 className="text-2xl font-black">הדיל לא נמצא</h1>
-          <Link to="/" className="mt-4 inline-block rounded-2xl bg-gradient-sunset px-4 py-2 text-sm font-black text-white shadow-glow">חזרה לבית</Link>
+          <Link
+            to="/"
+            className="mt-4 inline-block rounded-2xl bg-gradient-sunset px-4 py-2 text-sm font-black text-white shadow-glow"
+          >
+            חזרה לבית
+          </Link>
         </div>
       </div>
     );
@@ -112,26 +140,43 @@ function CheckoutPage() {
   const changed = reval?.status === "changed";
   const soldOut = reval?.status === "sold-out" || deal.price.availability === "sold-out";
 
-  const passengersValid = passengers.every(
-    (p) => p.firstName && p.lastName && p.birthDate && p.passport && p.passportExpiry,
-  ) && /\S+@\S+\.\S+/.test(contact.email) && contact.phone.length >= 9;
+  const passengersValid =
+    passengers.every(
+      (p) => p.firstName && p.lastName && p.birthDate && p.passport && p.passportExpiry,
+    ) &&
+    /\S+@\S+\.\S+/.test(contact.email) &&
+    contact.phone.length >= 9;
   const paymentValid =
-    payMethod !== "card" || (card.number.replace(/\s/g, "").length >= 14 && card.name && card.expiry && card.cvc.length >= 3);
+    payMethod !== "card" ||
+    (card.number.replace(/\s/g, "").length >= 14 &&
+      card.name &&
+      card.expiry &&
+      card.cvc.length >= 3);
 
   const confirm = async () => {
-    setBusy(true); setError(null);
+    setBusy(true);
+    setError(null);
+    // Stable key so a double-click / retry can never create two bookings.
+    if (!idemKey.current) idemKey.current = crypto.randomUUID();
     try {
-      const row = await createBooking(deal, {
-        passengers,
-        extras: { ...extras, contact },
-        payment: { method: payMethod },
-        extrasTotal,
+      const row = await submitBooking({
+        data: {
+          dealId: deal.id,
+          idempotencyKey: idemKey.current,
+          passengers,
+          extras: selectedExtras,
+          contact,
+          paymentMethod: payMethod,
+          confirmedPerPerson: deal.price.perPerson,
+        },
       });
       setPlaced({ id: row.id });
       setStep(4);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "שגיאה בהזמנה");
-    } finally { setBusy(false); }
+    } finally {
+      setBusy(false);
+    }
   };
 
   const downloadConfirmation = () => {
@@ -152,15 +197,22 @@ function CheckoutPage() {
 </body></html>`;
     const url = URL.createObjectURL(new Blob([html], { type: "text/html" }));
     const a = document.createElement("a");
-    a.href = url; a.download = `nitzi-booking-${placed.id.slice(0, 8)}.html`; a.click();
+    a.href = url;
+    a.download = `nitzi-booking-${placed.id.slice(0, 8)}.html`;
+    a.click();
     URL.revokeObjectURL(url);
   };
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gradient-to-b from-sand/60 via-background to-background pb-20">
+    <div
+      dir="rtl"
+      className="min-h-screen bg-gradient-to-b from-sand/60 via-background to-background pb-20"
+    >
       <header className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-5 pt-6 sm:px-10">
         <button
-          onClick={() => (step > 0 && !placed ? setStep(step - 1) : navigate({ to: "/deal/$id", params: { id } }))}
+          onClick={() =>
+            step > 0 && !placed ? setStep(step - 1) : navigate({ to: "/deal/$id", params: { id } })
+          }
           className="grid h-11 w-11 place-items-center rounded-full border border-border bg-card"
         >
           <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
@@ -183,7 +235,9 @@ function CheckoutPage() {
                       : "border border-border bg-card text-muted-foreground"
                 }`}
               >
-                <span className="grid h-5 w-5 place-items-center rounded-full bg-white/25 text-[11px]">{i + 1}</span>
+                <span className="grid h-5 w-5 place-items-center rounded-full bg-white/25 text-[11px]">
+                  {i + 1}
+                </span>
                 {s}
               </span>
               {i < STEPS.length - 1 && <span className="hidden h-px w-6 bg-border sm:block" />}
@@ -196,7 +250,9 @@ function CheckoutPage() {
             {step === 0 && (
               <section>
                 <h1 className="text-2xl font-black text-foreground sm:text-3xl">פרטי נוסעים</h1>
-                <p className="mt-1 text-sm text-muted-foreground">כפי שמופיע בדרכון — כדי שלא תהיה בעיה בצ׳ק-אין.</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  כפי שמופיע בדרכון — כדי שלא תהיה בעיה בצ׳ק-אין.
+                </p>
                 <div className="mt-6 space-y-6">
                   {passengers.map((p, i) => (
                     <div key={i} className="rounded-3xl border border-border bg-muted/30 p-5">
@@ -204,17 +260,49 @@ function CheckoutPage() {
                         <User className="h-4 w-4 text-primary" /> נוסע {i + 1}
                       </div>
                       <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                        <Field label="שם פרטי" value={p.firstName} onChange={(v) => updatePassenger(setPassengers, i, { firstName: v })} />
-                        <Field label="שם משפחה" value={p.lastName} onChange={(v) => updatePassenger(setPassengers, i, { lastName: v })} />
-                        <Field label="תאריך לידה" type="date" value={p.birthDate} onChange={(v) => updatePassenger(setPassengers, i, { birthDate: v })} />
-                        <Field label="מספר דרכון" value={p.passport} onChange={(v) => updatePassenger(setPassengers, i, { passport: v })} />
-                        <Field label="תוקף דרכון" type="date" value={p.passportExpiry} onChange={(v) => updatePassenger(setPassengers, i, { passportExpiry: v })} />
+                        <Field
+                          label="שם פרטי"
+                          value={p.firstName}
+                          onChange={(v) => updatePassenger(setPassengers, i, { firstName: v })}
+                        />
+                        <Field
+                          label="שם משפחה"
+                          value={p.lastName}
+                          onChange={(v) => updatePassenger(setPassengers, i, { lastName: v })}
+                        />
+                        <Field
+                          label="תאריך לידה"
+                          type="date"
+                          value={p.birthDate}
+                          onChange={(v) => updatePassenger(setPassengers, i, { birthDate: v })}
+                        />
+                        <Field
+                          label="מספר דרכון"
+                          value={p.passport}
+                          onChange={(v) => updatePassenger(setPassengers, i, { passport: v })}
+                        />
+                        <Field
+                          label="תוקף דרכון"
+                          type="date"
+                          value={p.passportExpiry}
+                          onChange={(v) => updatePassenger(setPassengers, i, { passportExpiry: v })}
+                        />
                       </div>
                     </div>
                   ))}
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <Field label="אימייל ליצירת קשר" type="email" value={contact.email} onChange={(v) => setContact((c) => ({ ...c, email: v }))} />
-                    <Field label="טלפון" type="tel" value={contact.phone} onChange={(v) => setContact((c) => ({ ...c, phone: v }))} />
+                    <Field
+                      label="אימייל ליצירת קשר"
+                      type="email"
+                      value={contact.email}
+                      onChange={(v) => setContact((c) => ({ ...c, email: v }))}
+                    />
+                    <Field
+                      label="טלפון"
+                      type="tel"
+                      value={contact.phone}
+                      onChange={(v) => setContact((c) => ({ ...c, phone: v }))}
+                    />
                   </div>
                 </div>
               </section>
@@ -223,7 +311,9 @@ function CheckoutPage() {
             {step === 1 && (
               <section>
                 <h1 className="text-2xl font-black text-foreground sm:text-3xl">שירותים נוספים</h1>
-                <p className="mt-1 text-sm text-muted-foreground">בחר מה להוסיף לחבילה. אפשר לשנות גם אחרי ההזמנה.</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  בחר מה להוסיף לחבילה. אפשר לשנות גם אחרי ההזמנה.
+                </p>
                 <div className="mt-6 grid gap-3 sm:grid-cols-2">
                   {EXTRAS.map((e) => {
                     const on = extras[e.id];
@@ -233,7 +323,9 @@ function CheckoutPage() {
                         key={e.id}
                         onClick={() => setExtras((x) => ({ ...x, [e.id]: !x[e.id] }))}
                         className={`flex items-center justify-between rounded-3xl border p-4 text-right transition ${
-                          on ? "border-primary bg-primary/5 shadow-soft" : "border-border bg-card hover:border-primary/40"
+                          on
+                            ? "border-primary bg-primary/5 shadow-soft"
+                            : "border-border bg-card hover:border-primary/40"
                         }`}
                       >
                         <div>
@@ -244,7 +336,9 @@ function CheckoutPage() {
                           <div className="text-base font-black text-foreground">
                             {amount === 0 ? "כלול" : `+${fmtILS(amount)}`}
                           </div>
-                          <div className={`text-[11px] font-bold ${on ? "text-primary" : "text-muted-foreground"}`}>
+                          <div
+                            className={`text-[11px] font-bold ${on ? "text-primary" : "text-muted-foreground"}`}
+                          >
                             {on ? "נבחר" : "הוסף"}
                           </div>
                         </div>
@@ -259,14 +353,25 @@ function CheckoutPage() {
               <section>
                 <h1 className="text-2xl font-black text-foreground sm:text-3xl">סיכום ההזמנה</h1>
                 <div className="mt-6 space-y-2 rounded-3xl border border-border bg-muted/30 p-5 text-sm">
-                  <Row label="חבילה" value={`${deal.destination.name} · ${deal.dates.nights} לילות · ${people} נוסעים`} />
+                  <Row
+                    label="חבילה"
+                    value={`${deal.destination.name} · ${deal.dates.nights} לילות · ${people} נוסעים`}
+                  />
                   <Row label="מלון" value={deal.hotel.name} />
-                  <Row label="טיסה" value={`${deal.outbound.airline} ${deal.outbound.flightNumber}`} />
-                  <Row label="נוסעים" value={passengers.map((p) => `${p.firstName} ${p.lastName}`).join(" · ")} />
+                  <Row
+                    label="טיסה"
+                    value={`${deal.outbound.airline} ${deal.outbound.flightNumber}`}
+                  />
+                  <Row
+                    label="נוסעים"
+                    value={passengers.map((p) => `${p.firstName} ${p.lastName}`).join(" · ")}
+                  />
                 </div>
                 <div className="mt-4 space-y-2 rounded-3xl border border-border p-5 text-sm">
                   <Row label="חבילה" value={fmtILS(deal.price.total)} />
-                  {extrasLines.map((l) => <Row key={l.label} label={l.label} value={fmtILS(l.amount)} />)}
+                  {extrasLines.map((l) => (
+                    <Row key={l.label} label={l.label} value={fmtILS(l.amount)} />
+                  ))}
                   <div className="mt-2 flex items-center justify-between border-t border-border pt-3 text-lg font-black">
                     <span>סה״כ</span>
                     <span className="text-gradient-sunset">{fmtILS(grandTotal)}</span>
@@ -278,18 +383,24 @@ function CheckoutPage() {
             {step === 3 && (
               <section>
                 <h1 className="text-2xl font-black text-foreground sm:text-3xl">תשלום</h1>
-                <p className="mt-1 text-sm text-muted-foreground">בגרסת ה-MVP לא מבוצע חיוב אמיתי.</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  בגרסת ה-MVP לא מבוצע חיוב אמיתי.
+                </p>
                 <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                  {([
-                    { id: "card", label: "כרטיס אשראי" },
-                    { id: "apple", label: "Apple Pay" },
-                    { id: "google", label: "Google Pay" },
-                  ] as const).map((m) => (
+                  {(
+                    [
+                      { id: "card", label: "כרטיס אשראי" },
+                      { id: "apple", label: "Apple Pay" },
+                      { id: "google", label: "Google Pay" },
+                    ] as const
+                  ).map((m) => (
                     <button
                       key={m.id}
                       onClick={() => setPayMethod(m.id)}
                       className={`rounded-3xl border p-4 text-sm font-black transition ${
-                        payMethod === m.id ? "border-primary bg-primary/5 shadow-soft" : "border-border bg-card"
+                        payMethod === m.id
+                          ? "border-primary bg-primary/5 shadow-soft"
+                          : "border-border bg-card"
                       }`}
                     >
                       {m.label}
@@ -298,13 +409,33 @@ function CheckoutPage() {
                 </div>
                 {payMethod === "card" && (
                   <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                    <Field label="מספר כרטיס" value={card.number} onChange={(v) => setCard((c) => ({ ...c, number: v }))} />
-                    <Field label="שם בעל הכרטיס" value={card.name} onChange={(v) => setCard((c) => ({ ...c, name: v }))} />
-                    <Field label="תוקף (MM/YY)" value={card.expiry} onChange={(v) => setCard((c) => ({ ...c, expiry: v }))} />
-                    <Field label="CVC" value={card.cvc} onChange={(v) => setCard((c) => ({ ...c, cvc: v }))} />
+                    <Field
+                      label="מספר כרטיס"
+                      value={card.number}
+                      onChange={(v) => setCard((c) => ({ ...c, number: v }))}
+                    />
+                    <Field
+                      label="שם בעל הכרטיס"
+                      value={card.name}
+                      onChange={(v) => setCard((c) => ({ ...c, name: v }))}
+                    />
+                    <Field
+                      label="תוקף (MM/YY)"
+                      value={card.expiry}
+                      onChange={(v) => setCard((c) => ({ ...c, expiry: v }))}
+                    />
+                    <Field
+                      label="CVC"
+                      value={card.cvc}
+                      onChange={(v) => setCard((c) => ({ ...c, cvc: v }))}
+                    />
                   </div>
                 )}
-                {error && <div className="mt-4 rounded-2xl bg-rose-50 p-3 text-[12px] font-bold text-rose-800">{error}</div>}
+                {error && (
+                  <div className="mt-4 rounded-2xl bg-rose-50 p-3 text-[12px] font-bold text-rose-800">
+                    {error}
+                  </div>
+                )}
               </section>
             )}
 
@@ -313,10 +444,16 @@ function CheckoutPage() {
                 <div className="text-5xl">🎉</div>
                 <h1 className="mt-3 text-3xl font-black text-foreground">ההזמנה אושרה</h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  מספר הזמנה: <span className="font-black text-foreground">{placed.id.slice(0, 8).toUpperCase()}</span>
+                  מספר הזמנה:{" "}
+                  <span className="font-black text-foreground">
+                    {placed.id.slice(0, 8).toUpperCase()}
+                  </span>
                 </p>
                 <div className="mx-auto mt-6 flex max-w-lg flex-wrap justify-center gap-3">
-                  <button onClick={downloadConfirmation} className="flex items-center gap-2 rounded-2xl bg-gradient-sunset px-5 py-3 text-sm font-black text-white shadow-glow">
+                  <button
+                    onClick={downloadConfirmation}
+                    className="flex items-center gap-2 rounded-2xl bg-gradient-sunset px-5 py-3 text-sm font-black text-white shadow-glow"
+                  >
                     <Download className="h-4 w-4" /> קבל אישור (PDF)
                   </button>
                   <button
@@ -325,8 +462,18 @@ function CheckoutPage() {
                   >
                     <Mail className="h-4 w-4" /> שלח למייל
                   </button>
-                  <Link to="/account" className="rounded-2xl border border-border bg-card px-5 py-3 text-sm font-black text-foreground">אזור אישי</Link>
-                  <Link to="/" className="rounded-2xl border border-border bg-card px-5 py-3 text-sm font-bold text-muted-foreground">אחר כך</Link>
+                  <Link
+                    to="/account"
+                    className="rounded-2xl border border-border bg-card px-5 py-3 text-sm font-black text-foreground"
+                  >
+                    אזור אישי
+                  </Link>
+                  <Link
+                    to="/"
+                    className="rounded-2xl border border-border bg-card px-5 py-3 text-sm font-bold text-muted-foreground"
+                  >
+                    אחר כך
+                  </Link>
                 </div>
                 {emailSent && (
                   <p className="mt-4 text-[12px] font-bold text-amber-900">
@@ -345,32 +492,49 @@ function CheckoutPage() {
               </div>
               <div className="mt-3 rounded-2xl border border-border bg-muted/40 p-4 text-sm">
                 {checking ? (
-                  <div className="flex items-center gap-2"><RefreshCw className="h-4 w-4 animate-spin text-primary" /> בודק מול {deal.price.source}…</div>
+                  <div className="flex items-center gap-2">
+                    <RefreshCw className="h-4 w-4 animate-spin text-primary" /> בודק מול{" "}
+                    {deal.price.source}…
+                  </div>
                 ) : soldOut ? (
                   <div className="text-rose-800">
-                    <div className="flex items-center gap-2 font-black"><XCircle className="h-4 w-4" /> אזל המלאי</div>
+                    <div className="flex items-center gap-2 font-black">
+                      <XCircle className="h-4 w-4" /> אזל המלאי
+                    </div>
                     <p className="mt-1 text-[12px]">לא בוצע חיוב.</p>
                   </div>
                 ) : changed ? (
                   <div className="text-amber-900">
-                    <div className="flex items-center gap-2 font-black"><Timer className="h-4 w-4" /> המחיר השתנה</div>
+                    <div className="flex items-center gap-2 font-black">
+                      <Timer className="h-4 w-4" /> המחיר השתנה
+                    </div>
                     <p className="mt-1 text-[12px]">
-                      קודם: <span className="line-through">{fmtILS(reval!.status === "changed" ? reval.oldPrice : 0)}</span> · חדש: <span className="font-black">{fmtILS(deal.price.total)}</span>
+                      קודם:{" "}
+                      <span className="line-through">
+                        {fmtILS(reval!.status === "changed" ? reval.oldPrice : 0)}
+                      </span>{" "}
+                      · חדש: <span className="font-black">{fmtILS(deal.price.total)}</span>
                     </p>
                   </div>
                 ) : (
                   <div className="text-emerald-800">
-                    <div className="flex items-center gap-2 font-black"><BadgeCheck className="h-4 w-4" /> המחיר אומת</div>
+                    <div className="flex items-center gap-2 font-black">
+                      <BadgeCheck className="h-4 w-4" /> המחיר אומת
+                    </div>
                     <p className="mt-1 text-[12px]">תשלם בדיוק את מה שראית.</p>
                   </div>
                 )}
               </div>
 
-              <div className="mt-4"><SmartPriceBadge deal={deal} full /></div>
+              <div className="mt-4">
+                <SmartPriceBadge deal={deal} full />
+              </div>
 
               <div className="mt-4 space-y-2 text-sm">
                 <Row label="חבילה" value={fmtILS(deal.price.total)} />
-                {extrasLines.map((l) => <Row key={l.label} label={l.label} value={fmtILS(l.amount)} />)}
+                {extrasLines.map((l) => (
+                  <Row key={l.label} label={l.label} value={fmtILS(l.amount)} />
+                ))}
                 <div className="flex items-center justify-between border-t border-border pt-2 text-lg font-black">
                   <span>סה״כ</span>
                   <span className="text-gradient-sunset">{fmtILS(grandTotal)}</span>
@@ -380,7 +544,10 @@ function CheckoutPage() {
               {!placed && (
                 <div className="mt-4 flex gap-2">
                   {step > 0 && (
-                    <button onClick={() => setStep(step - 1)} className="rounded-2xl border border-border px-4 py-3 text-sm font-bold text-foreground">
+                    <button
+                      onClick={() => setStep(step - 1)}
+                      className="rounded-2xl border border-border px-4 py-3 text-sm font-bold text-foreground"
+                    >
                       חזרה
                     </button>
                   )}
@@ -398,7 +565,11 @@ function CheckoutPage() {
                       disabled={busy || soldOut || !paymentValid}
                       className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-sunset py-3 text-sm font-black text-white shadow-glow disabled:opacity-50"
                     >
-                      {payMethod === "card" ? <CreditCard className="h-4 w-4" /> : <Wallet className="h-4 w-4" />}
+                      {payMethod === "card" ? (
+                        <CreditCard className="h-4 w-4" />
+                      ) : (
+                        <Wallet className="h-4 w-4" />
+                      )}
                       {busy ? "מאשר…" : changed ? "מאשר מחיר חדש ומזמין" : "אישור סופי והזמנה"}
                     </button>
                   )}
@@ -406,13 +577,21 @@ function CheckoutPage() {
               )}
 
               {step === 0 && !passengersValid && (
-                <p className="mt-2 text-center text-[11px] text-muted-foreground">נא למלא את כל פרטי הנוסעים ופרטי הקשר.</p>
+                <p className="mt-2 text-center text-[11px] text-muted-foreground">
+                  נא למלא את כל פרטי הנוסעים ופרטי הקשר.
+                </p>
               )}
 
               <div className="mt-5 flex items-center justify-center gap-4 text-[10px] text-muted-foreground">
-                <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> תשלום מאובטח</span>
-                <span className="flex items-center gap-1"><BadgeCheck className="h-3 w-3" /> מחיר מאומת</span>
-                <span className="flex items-center gap-1"><ShieldCheck className="h-3 w-3" /> מדיניות ביטול</span>
+                <span className="flex items-center gap-1">
+                  <CheckCircle2 className="h-3 w-3" /> תשלום מאובטח
+                </span>
+                <span className="flex items-center gap-1">
+                  <BadgeCheck className="h-3 w-3" /> מחיר מאומת
+                </span>
+                <span className="flex items-center gap-1">
+                  <ShieldCheck className="h-3 w-3" /> מדיניות ביטול
+                </span>
               </div>
             </div>
           </aside>
@@ -430,8 +609,16 @@ function updatePassenger(
   set((list) => list.map((p, i) => (i === index ? { ...p, ...patch } : p)));
 }
 
-function Field({ label, value, onChange, type = "text" }: {
-  label: string; value: string; onChange: (v: string) => void; type?: string;
+function Field({
+  label,
+  value,
+  onChange,
+  type = "text",
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
 }) {
   return (
     <label className="block text-right">

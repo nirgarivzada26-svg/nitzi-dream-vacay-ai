@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { MessageSquarePlus, Trash2 } from "lucide-react";
-import { deleteConversation, listConversations, type ConversationRow } from "@/lib/ai-conversations";
+import {
+  deleteConversation,
+  listConversations,
+  type ConversationRow,
+} from "@/lib/ai-conversations";
 import { useAuth } from "@/lib/auth";
 
 export function ConversationSidebar({ activeId }: { activeId?: string }) {
@@ -10,16 +14,28 @@ export function ConversationSidebar({ activeId }: { activeId?: string }) {
   const [rows, setRows] = useState<ConversationRow[]>([]);
 
   useEffect(() => {
-    if (!user) { setRows([]); return; }
+    if (!user) {
+      setRows([]);
+      return;
+    }
     let alive = true;
     listConversations()
-      .then((r) => { if (alive) setRows(r); })
-      .catch(() => { if (alive) setRows([]); });
-    return () => { alive = false; };
+      .then((r) => {
+        if (alive) setRows(r);
+      })
+      .catch(() => {
+        if (alive) setRows([]);
+      });
+    return () => {
+      alive = false;
+    };
   }, [user, activeId]);
 
   return (
-    <aside className="hidden w-[280px] shrink-0 flex-col border-s border-border/60 bg-card/40 lg:flex" dir="rtl">
+    <aside
+      className="hidden w-[280px] shrink-0 flex-col border-s border-border/60 bg-card/40 lg:flex"
+      dir="rtl"
+    >
       <div className="p-4">
         <Link
           to="/ai"
@@ -36,7 +52,9 @@ export function ConversationSidebar({ activeId }: { activeId?: string }) {
           </p>
         )}
         {user && rows.length === 0 && (
-          <p className="px-2 text-[12px] font-bold text-muted-foreground">אין עדיין שיחות שמורות.</p>
+          <p className="px-2 text-[12px] font-bold text-muted-foreground">
+            אין עדיין שיחות שמורות.
+          </p>
         )}
         <ul className="space-y-1">
           {rows.map((row) => (

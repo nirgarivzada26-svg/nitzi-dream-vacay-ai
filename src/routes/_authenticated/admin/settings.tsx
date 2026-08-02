@@ -12,9 +12,15 @@ export const Route = createFileRoute("/_authenticated/admin/settings")({
 });
 
 const LABELS: Record<string, { label: string; hint: string }> = {
-  default_origin_airport: { label: "שדה תעופה ברירת מחדל", hint: "קוד IATA שממולא אוטומטית בחיפוש (למשל TLV)" },
+  default_origin_airport: {
+    label: "שדה תעופה ברירת מחדל",
+    hint: "קוד IATA שממולא אוטומטית בחיפוש (למשל TLV)",
+  },
   commission_pct: { label: "אחוז עמלה", hint: "העמלה שנלקחת מכל הזמנה" },
-  featured_deal_slugs: { label: "דילים מקודמים", hint: "רשימת יעדים שמוצגים בראש דף הבית (מופרדים בפסיק)" },
+  featured_deal_slugs: {
+    label: "דילים מקודמים",
+    hint: "רשימת יעדים שמוצגים בראש דף הבית (מופרדים בפסיק)",
+  },
   support_email: { label: "אימייל תמיכה", hint: "כתובת שמופיעה באישורי הזמנה" },
   currency: { label: "מטבע ברירת מחדל", hint: "מטבע התצוגה באתר" },
 };
@@ -30,9 +36,17 @@ function toText(v: SettingRow["value"]): string {
 function fromText(original: SettingRow["value"], text: string): unknown {
   if (typeof original === "number") return Number(text);
   if (typeof original === "boolean") return text === "true";
-  if (Array.isArray(original)) return text.split(",").map((s) => s.trim()).filter(Boolean);
+  if (Array.isArray(original))
+    return text
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
   if (original && typeof original === "object") {
-    try { return JSON.parse(text); } catch { return original; }
+    try {
+      return JSON.parse(text);
+    } catch {
+      return original;
+    }
   }
   return text;
 }
@@ -75,8 +89,14 @@ function SettingsPage() {
             const isBool = typeof s.value === "boolean";
             return (
               <div key={s.key} className="rounded-2xl border border-border bg-card p-4">
-                <label className="text-sm font-black" htmlFor={`setting-${s.key}`}>{meta.label}</label>
-                {meta.hint ? <p className="mb-2 text-[11px] text-muted-foreground">{meta.hint}</p> : <div className="mb-2" />}
+                <label className="text-sm font-black" htmlFor={`setting-${s.key}`}>
+                  {meta.label}
+                </label>
+                {meta.hint ? (
+                  <p className="mb-2 text-[11px] text-muted-foreground">{meta.hint}</p>
+                ) : (
+                  <div className="mb-2" />
+                )}
                 <div className="flex items-center gap-2">
                   {isBool ? (
                     <select

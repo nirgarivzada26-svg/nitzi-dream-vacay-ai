@@ -3,7 +3,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Plane, Power } from "lucide-react";
 import {
-  AdminError, AdminLoading, DataTable, SectionCard, StatCard, dateTime, money,
+  AdminError,
+  AdminLoading,
+  DataTable,
+  SectionCard,
+  StatCard,
+  dateTime,
+  money,
 } from "@/components/admin/AdminUI";
 import { adminFlights, adminSetFlightEnabled } from "@/lib/admin.functions";
 import type { AdminFlightRow } from "@/lib/admin-types";
@@ -41,12 +47,14 @@ function FlightsPage() {
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="מסלולים במלאי" value={data.length.toLocaleString("he-IL")} icon={Plane} />
-        <StatCard label="מסלולים פעילים" value={enabled.toLocaleString("he-IL")} icon={Power} tone="success" />
-        <StatCard label="ספקים מחוברים" value={providers.length.toLocaleString("he-IL")} />
         <StatCard
-          label="עדכון אחרון"
-          value={data[0] ? dateTime(data[0].lastUpdate) : "—"}
+          label="מסלולים פעילים"
+          value={enabled.toLocaleString("he-IL")}
+          icon={Power}
+          tone="success"
         />
+        <StatCard label="ספקים מחוברים" value={providers.length.toLocaleString("he-IL")} />
+        <StatCard label="עדכון אחרון" value={data[0] ? dateTime(data[0].lastUpdate) : "—"} />
       </div>
 
       <SectionCard title="סטטוס ספקים" subtitle="מקור המלאי כפי שמוגדר בשכבת ה-Providers">
@@ -55,7 +63,10 @@ function FlightsPage() {
             <p className="text-sm text-muted-foreground">לא מחובר ספק טיסות פעיל.</p>
           ) : (
             providers.map((p) => (
-              <span key={p} className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">
+              <span
+                key={p}
+                className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800"
+              >
                 {p} · מחובר
               </span>
             ))
@@ -72,13 +83,38 @@ function FlightsPage() {
           emptyTitle="אין מלאי טיסות"
           emptyHint="חבר ספק טיסות כדי לראות מסלולים."
           columns={[
-            { key: "route", header: "מסלול", render: (r) => <span className="font-bold">{r.route}</span>, sortValue: (r) => r.route },
-            { key: "provider", header: "ספק", render: (r) => r.provider, sortValue: (r) => r.provider },
-            { key: "depart", header: "המראה", render: (r) => dateTime(r.departAt), sortValue: (r) => r.departAt },
+            {
+              key: "route",
+              header: "מסלול",
+              render: (r) => <span className="font-bold">{r.route}</span>,
+              sortValue: (r) => r.route,
+            },
+            {
+              key: "provider",
+              header: "ספק",
+              render: (r) => r.provider,
+              sortValue: (r) => r.provider,
+            },
+            {
+              key: "depart",
+              header: "המראה",
+              render: (r) => dateTime(r.departAt),
+              sortValue: (r) => r.departAt,
+            },
             { key: "arrive", header: "נחיתה", render: (r) => dateTime(r.arriveAt) },
-            { key: "stops", header: "עצירות", render: (r) => (r.stops === 0 ? "ישירה" : `${r.stops}`), sortValue: (r) => r.stops },
+            {
+              key: "stops",
+              header: "עצירות",
+              render: (r) => (r.stops === 0 ? "ישירה" : `${r.stops}`),
+              sortValue: (r) => r.stops,
+            },
             { key: "cabin", header: "מחלקה", render: (r) => r.cabin },
-            { key: "price", header: "מחיר", render: (r) => money(r.price), sortValue: (r) => r.price },
+            {
+              key: "price",
+              header: "מחיר",
+              render: (r) => money(r.price),
+              sortValue: (r) => r.price,
+            },
             { key: "updated", header: "עודכן", render: (r) => dateTime(r.lastUpdate) },
             {
               key: "enabled",

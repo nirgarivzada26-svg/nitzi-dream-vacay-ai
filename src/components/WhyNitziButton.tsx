@@ -3,8 +3,8 @@ import { Sparkles, X, Wand2 } from "lucide-react";
 
 interface Props {
   title?: string;
-  reasons: string[];       // bullet reasons
-  score?: number;          // 0-100 match
+  reasons: string[]; // bullet reasons
+  score?: number; // 0-100 match
   extra?: React.ReactNode; // optional richer content
 }
 
@@ -13,7 +13,11 @@ export function WhyNitziButton({ title = "למה NITZI בחר בזה?", reasons,
   return (
     <>
       <button
-        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(true); }}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setOpen(true);
+        }}
         className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-[11px] font-black text-primary transition hover:bg-primary/20"
       >
         <Wand2 className="h-3.5 w-3.5" /> למה NITZI בחר?
@@ -29,7 +33,11 @@ export function WhyNitziButton({ title = "למה NITZI בחר בזה?", reasons,
             className="relative w-full max-w-lg rounded-t-3xl bg-background p-6 shadow-2xl sm:rounded-3xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <button onClick={() => setOpen(false)} aria-label="סגור" className="absolute left-4 top-4 grid h-9 w-9 place-items-center rounded-full border border-border bg-card">
+            <button
+              onClick={() => setOpen(false)}
+              aria-label="סגור"
+              className="absolute left-4 top-4 grid h-9 w-9 place-items-center rounded-full border border-border bg-card"
+            >
               <X className="h-4 w-4" />
             </button>
 
@@ -47,8 +55,13 @@ export function WhyNitziButton({ title = "למה NITZI בחר בזה?", reasons,
 
             <ul className="mt-5 space-y-2.5 text-sm">
               {reasons.map((r, i) => (
-                <li key={i} className="flex gap-2.5 rounded-2xl border border-border/60 bg-muted/40 p-3">
-                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gradient-sunset text-xs font-black text-white">{i + 1}</span>
+                <li
+                  key={i}
+                  className="flex gap-2.5 rounded-2xl border border-border/60 bg-muted/40 p-3"
+                >
+                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gradient-sunset text-xs font-black text-white">
+                    {i + 1}
+                  </span>
                   <span className="text-foreground">{r}</span>
                 </li>
               ))}
@@ -57,7 +70,8 @@ export function WhyNitziButton({ title = "למה NITZI בחר בזה?", reasons,
             {extra && <div className="mt-4">{extra}</div>}
 
             <p className="mt-5 text-[11px] leading-relaxed text-muted-foreground">
-              ה-AI של NITZI ניתח את התקציב, סגנון החופשה, סוג הנסיעה, מספר הנוסעים והדירוגים כדי להגיע לבחירה הזו.
+              ה-AI של NITZI ניתח את התקציב, סגנון החופשה, סוג הנסיעה, מספר הנוסעים והדירוגים כדי
+              להגיע לבחירה הזו.
             </p>
           </div>
         </div>

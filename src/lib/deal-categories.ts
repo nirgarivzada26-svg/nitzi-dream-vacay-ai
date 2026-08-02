@@ -38,7 +38,8 @@ export function buildDealRails(catalog: Destination[]): DealRail[] {
   const byDiscount = [...all].sort((a, b) => b.discountPct - a.discountPct);
   const byValue = [...all].sort(
     (a, b) =>
-      b.hotel.guestRating * 100 - b.price.perPerson / 50 -
+      b.hotel.guestRating * 100 -
+      b.price.perPerson / 50 -
       (a.hotel.guestRating * 100 - a.price.perPerson / 50),
   );
 
@@ -75,9 +76,10 @@ export function buildDealRails(catalog: Destination[]): DealRail[] {
       title: "משפחות",
       subtitle: "כיף לכל הגילאים, בלי כאב ראש",
       emoji: "👨‍👩‍👧",
-      deals: uniqueByDestination(
-        all.filter((d) => d.destination.matches.includes("family")),
-      ).slice(0, 10),
+      deals: uniqueByDestination(all.filter((d) => d.destination.matches.includes("family"))).slice(
+        0,
+        10,
+      ),
     },
     {
       id: "allinclusive",

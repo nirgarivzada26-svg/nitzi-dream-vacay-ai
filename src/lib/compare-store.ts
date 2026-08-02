@@ -2,17 +2,28 @@
 import { useSyncExternalStore } from "react";
 
 export type CompareKind = "hotel" | "package";
-export interface CompareEntry { id: string; kind: CompareKind }
+export interface CompareEntry {
+  id: string;
+  kind: CompareKind;
+}
 
 const KEY = "nitzi:compare";
 let state: CompareEntry[] = load();
 const listeners = new Set<() => void>();
 
 function load(): CompareEntry[] {
-  try { return JSON.parse(sessionStorage.getItem(KEY) || "[]"); } catch { return []; }
+  try {
+    return JSON.parse(sessionStorage.getItem(KEY) || "[]");
+  } catch {
+    return [];
+  }
 }
 function persist() {
-  try { sessionStorage.setItem(KEY, JSON.stringify(state)); } catch {}
+  try {
+    sessionStorage.setItem(KEY, JSON.stringify(state));
+  } catch {
+    /* non-critical */
+  }
   listeners.forEach((l) => l());
 }
 
@@ -26,14 +37,20 @@ export function toggleCompare(entry: CompareEntry) {
   }
   persist();
 }
-export function clearCompare() { state = []; persist(); }
+export function clearCompare() {
+  state = [];
+  persist();
+}
 export function isCompared(id: string, kind: CompareKind) {
   return state.some((e) => e.id === id && e.kind === kind);
 }
 
 export function useCompare() {
   return useSyncExternalStore(
-    (cb) => { listeners.add(cb); return () => listeners.delete(cb); },
+    (cb) => {
+      listeners.add(cb);
+      return () => listeners.delete(cb);
+    },
     () => state,
     () => state,
   );

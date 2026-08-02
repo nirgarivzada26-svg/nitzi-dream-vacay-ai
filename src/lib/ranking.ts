@@ -4,7 +4,9 @@
 import type { Flight, Hotel, Package } from "./providers/types";
 import type { QuizAnswers } from "./nitzi-data";
 
-function clamp(n: number, min = 0, max = 100) { return Math.max(min, Math.min(max, n)); }
+function clamp(n: number, min = 0, max = 100) {
+  return Math.max(min, Math.min(max, n));
+}
 
 export function scoreHotel(h: Hotel, a: QuizAnswers): number {
   const perNightBudget = (a.budget * 0.35) / Math.max(1, a.days);
@@ -16,7 +18,8 @@ export function scoreHotel(h: Hotel, a: QuizAnswers): number {
   let styleScore = 60;
   if (a.style === "luxury") styleScore = 40 + h.stars * 12;
   if (a.style === "smart") styleScore = 100 - Math.max(0, ratio - 0.8) * 80;
-  if (a.style === "chill" && h.amenities.some((x) => ["spa", "pool", "adults-only"].includes(x))) styleScore = 85;
+  if (a.style === "chill" && h.amenities.some((x) => ["spa", "pool", "adults-only"].includes(x)))
+    styleScore = 85;
   if (a.style === "young" && h.amenities.some((x) => ["bar", "gym"].includes(x))) styleScore = 82;
 
   // Type fit
@@ -31,11 +34,11 @@ export function scoreHotel(h: Hotel, a: QuizAnswers): number {
 
   return Math.round(
     budgetScore * 0.28 +
-    styleScore  * 0.16 +
-    typeScore   * 0.14 +
-    guestScore  * 0.18 +
-    qualityScore * 0.10 +
-    valueScore  * 0.14,
+      styleScore * 0.16 +
+      typeScore * 0.14 +
+      guestScore * 0.18 +
+      qualityScore * 0.1 +
+      valueScore * 0.14,
   );
 }
 
@@ -58,12 +61,12 @@ export function scorePackage(p: Package, a: QuizAnswers): number {
   const budgetScore = clamp(100 - Math.abs(ratio - 0.9) * 90);
   const savingsScore = clamp((p.savings / Math.max(1, p.separatePrice)) * 400);
   const ratingScore = p.rating * 10;
-  return Math.round(budgetScore * 0.45 + ratingScore * 0.35 + savingsScore * 0.20);
+  return Math.round(budgetScore * 0.45 + ratingScore * 0.35 + savingsScore * 0.2);
 }
 
 export function rank<T>(items: T[], scorer: (x: T) => number): (T & { score: number })[] {
   return items
-    .map((x) => ({ ...(x as object), score: scorer(x) } as T & { score: number }))
+    .map((x) => ({ ...(x as object), score: scorer(x) }) as T & { score: number })
     .sort((a, b) => b.score - a.score);
 }
 

@@ -2,7 +2,13 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Download } from "lucide-react";
-import { AdminError, AdminLoading, DataTable, SectionCard, dateTime } from "@/components/admin/AdminUI";
+import {
+  AdminError,
+  AdminLoading,
+  DataTable,
+  SectionCard,
+  dateTime,
+} from "@/components/admin/AdminUI";
 import { exportCsv } from "@/lib/admin-export";
 import { adminAudit } from "@/lib/admin.functions";
 import type { AuditRow, Paged } from "@/lib/admin-types";
@@ -38,7 +44,10 @@ function AuditPage() {
   if (error) return <AdminError error={error} />;
 
   const pages = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
-  const set = (patch: Partial<typeof filters>) => { setFilters({ ...filters, ...patch }); setPage(1); };
+  const set = (patch: Partial<typeof filters>) => {
+    setFilters({ ...filters, ...patch });
+    setPage(1);
+  };
 
   return (
     <div className="space-y-5">
@@ -52,8 +61,12 @@ function AuditPage() {
             onClick={() =>
               exportCsv(
                 data.rows.map((r) => ({
-                  תאריך: r.createdAt, מנהל: r.actorEmail ?? "", פעולה: r.action,
-                  משאב: r.resource, מזהה: r.resourceId ?? "", IP: r.ip ?? "",
+                  תאריך: r.createdAt,
+                  מנהל: r.actorEmail ?? "",
+                  פעולה: r.action,
+                  משאב: r.resource,
+                  מזהה: r.resourceId ?? "",
+                  IP: r.ip ?? "",
                   לפני: r.previousValue ? JSON.stringify(r.previousValue) : "",
                   אחרי: r.newValue ? JSON.stringify(r.newValue) : "",
                 })),
@@ -67,11 +80,36 @@ function AuditPage() {
         }
       >
         <div className="mb-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-          <input value={filters.actor} onChange={(e) => set({ actor: e.target.value })} placeholder="מנהל (אימייל)" className="h-10 rounded-xl border border-border bg-background px-3 text-sm" />
-          <input value={filters.action} onChange={(e) => set({ action: e.target.value })} placeholder="סוג פעולה" className="h-10 rounded-xl border border-border bg-background px-3 text-sm" />
-          <input value={filters.resource} onChange={(e) => set({ resource: e.target.value })} placeholder="משאב" className="h-10 rounded-xl border border-border bg-background px-3 text-sm" />
-          <input type="date" value={filters.from} onChange={(e) => set({ from: e.target.value })} className="h-10 rounded-xl border border-border bg-background px-3 text-sm" />
-          <input type="date" value={filters.to} onChange={(e) => set({ to: e.target.value })} className="h-10 rounded-xl border border-border bg-background px-3 text-sm" />
+          <input
+            value={filters.actor}
+            onChange={(e) => set({ actor: e.target.value })}
+            placeholder="מנהל (אימייל)"
+            className="h-10 rounded-xl border border-border bg-background px-3 text-sm"
+          />
+          <input
+            value={filters.action}
+            onChange={(e) => set({ action: e.target.value })}
+            placeholder="סוג פעולה"
+            className="h-10 rounded-xl border border-border bg-background px-3 text-sm"
+          />
+          <input
+            value={filters.resource}
+            onChange={(e) => set({ resource: e.target.value })}
+            placeholder="משאב"
+            className="h-10 rounded-xl border border-border bg-background px-3 text-sm"
+          />
+          <input
+            type="date"
+            value={filters.from}
+            onChange={(e) => set({ from: e.target.value })}
+            className="h-10 rounded-xl border border-border bg-background px-3 text-sm"
+          />
+          <input
+            type="date"
+            value={filters.to}
+            onChange={(e) => set({ to: e.target.value })}
+            className="h-10 rounded-xl border border-border bg-background px-3 text-sm"
+          />
         </div>
 
         <DataTable<AuditRow>
@@ -80,20 +118,70 @@ function AuditPage() {
           emptyTitle="לא נמצאו פעולות"
           emptyHint="שנה את הסינון או בצע פעולה כלשהי בממשק הניהול."
           columns={[
-            { key: "created", header: "תאריך", render: (r) => dateTime(r.createdAt), sortValue: (r) => r.createdAt },
+            {
+              key: "created",
+              header: "תאריך",
+              render: (r) => dateTime(r.createdAt),
+              sortValue: (r) => r.createdAt,
+            },
             { key: "actor", header: "מנהל", render: (r) => r.actorEmail ?? "—" },
-            { key: "action", header: "פעולה", render: (r) => <span className="font-bold">{r.action}</span> },
-            { key: "resource", header: "משאב", render: (r) => `${r.resource}${r.resourceId ? ` · ${r.resourceId.slice(0, 12)}` : ""}` },
-            { key: "before", header: "לפני", render: (r) => (r.previousValue ? <code dir="ltr" className="text-[11px]">{JSON.stringify(r.previousValue).slice(0, 60)}</code> : "—") },
-            { key: "after", header: "אחרי", render: (r) => (r.newValue ? <code dir="ltr" className="text-[11px]">{JSON.stringify(r.newValue).slice(0, 60)}</code> : "—") },
+            {
+              key: "action",
+              header: "פעולה",
+              render: (r) => <span className="font-bold">{r.action}</span>,
+            },
+            {
+              key: "resource",
+              header: "משאב",
+              render: (r) =>
+                `${r.resource}${r.resourceId ? ` · ${r.resourceId.slice(0, 12)}` : ""}`,
+            },
+            {
+              key: "before",
+              header: "לפני",
+              render: (r) =>
+                r.previousValue ? (
+                  <code dir="ltr" className="text-[11px]">
+                    {JSON.stringify(r.previousValue).slice(0, 60)}
+                  </code>
+                ) : (
+                  "—"
+                ),
+            },
+            {
+              key: "after",
+              header: "אחרי",
+              render: (r) =>
+                r.newValue ? (
+                  <code dir="ltr" className="text-[11px]">
+                    {JSON.stringify(r.newValue).slice(0, 60)}
+                  </code>
+                ) : (
+                  "—"
+                ),
+            },
             { key: "ip", header: "IP", render: (r) => <span dir="ltr">{r.ip ?? "—"}</span> },
           ]}
         />
 
         <div className="mt-3 flex items-center justify-between text-xs font-bold">
-          <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className="rounded-xl border border-border px-3 py-2 disabled:opacity-40">הקודם</button>
-          <span>עמוד {page} מתוך {pages}</span>
-          <button onClick={() => setPage((p) => Math.min(pages, p + 1))} disabled={page >= pages} className="rounded-xl border border-border px-3 py-2 disabled:opacity-40">הבא</button>
+          <button
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+            className="rounded-xl border border-border px-3 py-2 disabled:opacity-40"
+          >
+            הקודם
+          </button>
+          <span>
+            עמוד {page} מתוך {pages}
+          </span>
+          <button
+            onClick={() => setPage((p) => Math.min(pages, p + 1))}
+            disabled={page >= pages}
+            className="rounded-xl border border-border px-3 py-2 disabled:opacity-40"
+          >
+            הבא
+          </button>
         </div>
       </SectionCard>
     </div>

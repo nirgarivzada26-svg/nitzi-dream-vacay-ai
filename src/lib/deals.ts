@@ -17,7 +17,7 @@ export interface DealPrice {
   currency: "ILS";
   verifiedAt: string; // ISO
   availability: Availability;
-  source: string;    // provider id
+  source: string; // provider id
   ttlSeconds: number; // how long this quote is trusted
 }
 
@@ -45,7 +45,7 @@ export interface Deal {
   title: string;
   board: BoardBasis;
   listPricePerPerson: number; // pre-discount reference price
-  discountPct: number;        // 0-100
+  discountPct: number; // 0-100
   freeCancellation: boolean;
   hotel: {
     name: string;
@@ -72,13 +72,18 @@ export interface Deal {
 // always renders the same price/dates within its TTL window.
 function rng(seed: string) {
   let h = 2166136261;
-  for (let i = 0; i < seed.length; i++) { h ^= seed.charCodeAt(i); h = Math.imul(h, 16777619); }
+  for (let i = 0; i < seed.length; i++) {
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
   return () => {
-    h ^= h << 13; h ^= h >>> 17; h ^= h << 5;
+    h ^= h << 13;
+    h ^= h >>> 17;
+    h ^= h << 5;
     return ((h >>> 0) % 100000) / 100000;
   };
 }
-const pick = <T,>(r: () => number, arr: T[]) => arr[Math.floor(r() * arr.length)];
+const pick = <T>(r: () => number, arr: T[]) => arr[Math.floor(r() * arr.length)];
 
 const AIRLINES = [
   { code: "LY", name: "אל על" },
@@ -111,9 +116,11 @@ function buildDeal(dest: Destination, opts?: { secret?: boolean; seed?: string }
   const stopsIn = r() > 0.55 ? 0 : 1;
   const durOut = Math.round(dest.flightHours * 60 + stopsOut * (90 + r() * 90));
   const durIn = Math.round(dest.flightHours * 60 + stopsIn * (90 + r() * 90));
-  const depOut = new Date(start); depOut.setHours(5 + Math.floor(r() * 12), 15 * Math.floor(r() * 4), 0, 0);
+  const depOut = new Date(start);
+  depOut.setHours(5 + Math.floor(r() * 12), 15 * Math.floor(r() * 4), 0, 0);
   const arrOut = new Date(depOut.getTime() + durOut * 60000);
-  const depIn = new Date(end); depIn.setHours(8 + Math.floor(r() * 10), 15 * Math.floor(r() * 4), 0, 0);
+  const depIn = new Date(end);
+  depIn.setHours(8 + Math.floor(r() * 10), 15 * Math.floor(r() * 4), 0, 0);
   const arrIn = new Date(depIn.getTime() + durIn * 60000);
 
   const perPersonBase = dest.avgBudgetPerPerson * (0.78 + r() * 0.18);
@@ -125,7 +132,12 @@ function buildDeal(dest: Destination, opts?: { secret?: boolean; seed?: string }
   const stars = 4 + Math.floor(r() * 2);
 
   const board: BoardBasis = pick(r, [
-    "breakfast", "breakfast", "half-board", "all-inclusive", "all-inclusive", "room-only",
+    "breakfast",
+    "breakfast",
+    "half-board",
+    "all-inclusive",
+    "all-inclusive",
+    "room-only",
   ] as BoardBasis[]);
   const listPricePerPerson = Math.round((perPerson * (1.12 + r() * 0.26)) / 10) * 10;
   const discountPct = Math.max(0, Math.round((1 - perPerson / listPricePerPerson) * 100));
@@ -207,7 +219,10 @@ export async function revalidateDeal(deal: Deal): Promise<RevalidationResult> {
   // ~85% verified, ~12% price change, ~3% sold out
   const roll = Math.random();
   if (roll < 0.85) {
-    return { status: "verified", deal: { ...deal, price: { ...deal.price, verifiedAt: new Date().toISOString() } } };
+    return {
+      status: "verified",
+      deal: { ...deal, price: { ...deal.price, verifiedAt: new Date().toISOString() } },
+    };
   }
   if (roll < 0.97) {
     const delta = Math.round(deal.price.perPerson * (0.03 + Math.random() * 0.08));
@@ -218,11 +233,22 @@ export async function revalidateDeal(deal: Deal): Promise<RevalidationResult> {
       newPrice: newPer * deal.people,
       deal: {
         ...deal,
-        price: { ...deal.price, perPerson: newPer, total: newPer * deal.people, verifiedAt: new Date().toISOString() },
+        price: {
+          ...deal.price,
+          perPerson: newPer,
+          total: newPer * deal.people,
+          verifiedAt: new Date().toISOString(),
+        },
       },
     };
   }
-  return { status: "sold-out", deal: { ...deal, price: { ...deal.price, availability: "sold-out", verifiedAt: new Date().toISOString() } } };
+  return {
+    status: "sold-out",
+    deal: {
+      ...deal,
+      price: { ...deal.price, availability: "sold-out", verifiedAt: new Date().toISOString() },
+    },
+  };
 }
 
 /** All bookable deals from the catalog. `variants` > 1 produces several
@@ -253,9 +279,7 @@ export function getDeal(id: string, catalog: Destination[]): Deal | null {
 // Secret deal rotates every 6 hours. Deterministic per slot so all viewers see
 // the same secret deal until the next rotation.
 const SECRET_ROTATION_HOURS = 6;
-export function getSecretDeal(
-  catalog: Destination[],
-): { deal: Deal; nextRotationAt: Date } | null {
+export function getSecretDeal(catalog: Destination[]): { deal: Deal; nextRotationAt: Date } | null {
   const bookable = catalog.filter((d) => d.hasOffers && d.hotels.length > 0);
   if (bookable.length === 0) return null;
   const slotMs = SECRET_ROTATION_HOURS * 3600 * 1000;

@@ -18,16 +18,16 @@ export interface Hotel {
   id: string;
   name: string;
   image?: string;
-  stars: number;              // 1-5
-  guestRating: number;        // 0-10
+  stars: number; // 1-5
+  guestRating: number; // 0-10
   reviewsCount: number;
-  pricePerNight: number;      // ILS
+  pricePerNight: number; // ILS
   currency: "ILS";
   location: string;
   distanceToCenterKm?: number;
   distanceToBeachKm?: number;
-  amenities: string[];        // "pool" | "spa" | "parking" | "breakfast" | "gym" | "wifi" | "beachfront" | "family" | "adults-only"
-  source: string;             // provider id (e.g. "mock", "booking")
+  amenities: string[]; // "pool" | "spa" | "parking" | "breakfast" | "gym" | "wifi" | "beachfront" | "family" | "adults-only"
+  source: string; // provider id (e.g. "mock", "booking")
   deeplink?: string;
 }
 
@@ -37,11 +37,11 @@ export interface Flight {
   flightNumber: string;
   origin: string;
   destination: string;
-  departAt: string;           // ISO
-  arriveAt: string;           // ISO
+  departAt: string; // ISO
+  arriveAt: string; // ISO
   durationMinutes: number;
   stops: number;
-  price: number;              // ILS, per person
+  price: number; // ILS, per person
   currency: "ILS";
   source: string;
   deeplink?: string;
@@ -53,11 +53,11 @@ export interface Package {
   hotel: Hotel;
   flight: Flight;
   nights: number;
-  totalPrice: number;         // ILS, total for all travellers
-  separatePrice: number;      // ILS, hypothetical unbundled price
-  savings: number;            // separate - total
+  totalPrice: number; // ILS, total for all travellers
+  separatePrice: number; // ILS, hypothetical unbundled price
+  savings: number; // separate - total
   includes: string[];
-  rating: number;             // 0-10
+  rating: number; // 0-10
   source: string;
 }
 

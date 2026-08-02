@@ -65,7 +65,11 @@ export function Carousel({
     const el = ref.current;
     if (!el || !drag.current.active) return;
     drag.current.active = false;
-    try { el.releasePointerCapture(e.pointerId); } catch { /* noop */ }
+    try {
+      el.releasePointerCapture(e.pointerId);
+    } catch {
+      /* noop */
+    }
   };
   const onClickCapture = (e: React.MouseEvent) => {
     if (drag.current.moved) {

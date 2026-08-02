@@ -37,17 +37,30 @@ const columns = [
 
 export function Footer() {
   return (
-    <footer dir="rtl" className="relative mt-20 overflow-hidden border-t border-border/60 bg-gradient-to-b from-background to-muted/40">
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-      <div aria-hidden className="pointer-events-none absolute -top-32 right-1/4 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
-      <div aria-hidden className="pointer-events-none absolute -top-20 left-1/4 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl" />
+    <footer
+      dir="rtl"
+      className="relative mt-20 overflow-hidden border-t border-border/60 bg-gradient-to-b from-background to-muted/40"
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-32 right-1/4 h-64 w-64 rounded-full bg-primary/10 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-20 left-1/4 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl"
+      />
 
       <div className="relative mx-auto max-w-[1600px] px-5 pt-14 pb-8 sm:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
           <div>
             <NitziLogo />
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              NITZI הוא עוזר AI אישי שמציג רק הצעות אמינות, מעודכנות ואיכותיות — ומאפשר לך למצוא ולהזמין את החופשה הבאה בביטחון מלא.
+              NITZI הוא עוזר AI אישי שמציג רק הצעות אמינות, מעודכנות ואיכותיות — ומאפשר לך למצוא
+              ולהזמין את החופשה הבאה בביטחון מלא.
             </p>
             <div className="mt-5 flex items-center gap-2">
               {[
@@ -79,7 +92,10 @@ export function Footer() {
               <ul className="space-y-2">
                 {col.links.map((l) => (
                   <li key={l.label}>
-                    <a href={l.href} className="text-sm text-muted-foreground transition hover:text-primary">
+                    <a
+                      href={l.href}
+                      className="text-sm text-muted-foreground transition hover:text-primary"
+                    >
                       {l.label}
                     </a>
                   </li>
@@ -97,10 +113,15 @@ export function Footer() {
               </span>
               <div>
                 <p className="text-sm font-black text-foreground">קבל דילים סודיים לפני כולם</p>
-                <p className="text-xs text-muted-foreground">התראות רק על דילים מאומתים — בלי ספאם, אפשר לבטל בכל רגע.</p>
+                <p className="text-xs text-muted-foreground">
+                  התראות רק על דילים מאומתים — בלי ספאם, אפשר לבטל בכל רגע.
+                </p>
               </div>
             </div>
-            <form className="flex w-full max-w-sm items-center gap-2" onSubmit={(e) => e.preventDefault()}>
+            <form
+              className="flex w-full max-w-sm items-center gap-2"
+              onSubmit={(e) => e.preventDefault()}
+            >
               <input
                 type="email"
                 required
@@ -117,11 +138,21 @@ export function Footer() {
         <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-border/60 pt-6 text-center text-[11px] text-muted-foreground sm:flex-row sm:text-right">
           <p>© {new Date().getFullYear()} NITZI Travel AI · כל הזכויות שמורות</p>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-            <Link to="/" className="transition hover:text-primary">עמוד הבית</Link>
-            <a href="#privacy" className="transition hover:text-primary">פרטיות</a>
-            <a href="#terms" className="transition hover:text-primary">תנאים</a>
-            <a href="#cookies" className="transition hover:text-primary">עוגיות</a>
-            <a href="#a11y" className="transition hover:text-primary">נגישות</a>
+            <Link to="/" className="transition hover:text-primary">
+              עמוד הבית
+            </Link>
+            <a href="#privacy" className="transition hover:text-primary">
+              פרטיות
+            </a>
+            <a href="#terms" className="transition hover:text-primary">
+              תנאים
+            </a>
+            <a href="#cookies" className="transition hover:text-primary">
+              עוגיות
+            </a>
+            <a href="#a11y" className="transition hover:text-primary">
+              נגישות
+            </a>
           </div>
         </div>
       </div>

@@ -5,8 +5,12 @@ import { ShieldAlert } from "lucide-react";
 import { AdminError, AdminLoading, SectionCard } from "@/components/admin/AdminUI";
 import { adminPermissionMatrix, adminSetPermission } from "@/lib/admin.functions";
 import {
-  ADMIN_PERMISSIONS, ADMIN_ROLES, PERMISSION_LABELS, ROLE_LABELS,
-  type AdminPermission, type AdminRole,
+  ADMIN_PERMISSIONS,
+  ADMIN_ROLES,
+  PERMISSION_LABELS,
+  ROLE_LABELS,
+  type AdminPermission,
+  type AdminRole,
 } from "@/lib/admin-types";
 import { useAdminMe } from "@/lib/use-admin";
 
@@ -65,7 +69,9 @@ function PermissionsPage() {
               <tr className="border-b border-border text-xs text-muted-foreground">
                 <th className="p-2 font-bold">הרשאה</th>
                 {ADMIN_ROLES.map((role) => (
-                  <th key={role} className="p-2 font-bold">{ROLE_LABELS[role]}</th>
+                  <th key={role} className="p-2 font-bold">
+                    {ROLE_LABELS[role]}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -79,10 +85,14 @@ function PermissionsPage() {
                     return (
                       <td key={role} className="p-2">
                         <button
-                          onClick={() => !locked && setPerm.mutate({ role, permission, allowed: !on })}
+                          onClick={() =>
+                            !locked && setPerm.mutate({ role, permission, allowed: !on })
+                          }
                           disabled={locked}
                           className={`h-7 w-12 rounded-full text-[11px] font-bold transition ${
-                            on ? "bg-emerald-100 text-emerald-800" : "bg-muted text-muted-foreground"
+                            on
+                              ? "bg-emerald-100 text-emerald-800"
+                              : "bg-muted text-muted-foreground"
                           } ${locked ? "opacity-60" : "hover:opacity-80"}`}
                         >
                           {on ? "מאושר" : "חסום"}

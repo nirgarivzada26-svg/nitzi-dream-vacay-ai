@@ -85,4 +85,9 @@ export interface AgentComparison {
   cheapestDealId: string | null;
 }
 
-export const AGENT_TOOL_NAMES = ["searchTrips", "buildTrip", "compareTrips", "listCatalog"] as const;
+export const AGENT_TOOL_NAMES = [
+  "searchTrips",
+  "buildTrip",
+  "compareTrips",
+  "listCatalog",
+] as const;

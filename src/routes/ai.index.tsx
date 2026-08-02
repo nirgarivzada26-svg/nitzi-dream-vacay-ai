@@ -19,7 +19,10 @@ export const Route = createFileRoute("/ai/")({
           "שוחח עם סוכן ה-AI של NITZI: ספר מה בא לך, והוא יחפש חבילות, טיסות ומלונות אמיתיים מהקטלוג וימליץ עם הסבר.",
       },
       { property: "og:title", content: "NITZI AI — סוכן החופשות האישי שלך" },
-      { property: "og:description", content: "סוכן AI שמוצא לך חופשה אמיתית מהקטלוג, עם הסבר על כל המלצה." },
+      {
+        property: "og:description",
+        content: "סוכן AI שמוצא לך חופשה אמיתית מהקטלוג, עם הסבר על כל המלצה.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -37,7 +40,11 @@ function AiIndexPage() {
     void (async () => {
       try {
         const id = await createConversation(text);
-        await navigate({ to: "/ai/$conversationId", params: { conversationId: id }, search: { q: text } });
+        await navigate({
+          to: "/ai/$conversationId",
+          params: { conversationId: id },
+          search: { q: text },
+        });
       } catch {
         toast.error("לא הצלחתי לפתוח שיחה חדשה");
       }

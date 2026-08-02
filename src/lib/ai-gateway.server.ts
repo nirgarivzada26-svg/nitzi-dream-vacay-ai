@@ -41,11 +41,18 @@ export function getLovableAiGatewayResponseHeaders(
   return { ...(extra ?? {}) };
 }
 
-export function withLovableAiGatewayRunIdHeader(response: Response, runIdFetch: RunIdFetch): Response {
+export function withLovableAiGatewayRunIdHeader(
+  response: Response,
+  runIdFetch: RunIdFetch,
+): Response {
   if (!runIdFetch.runId) return response;
   const headers = new Headers(response.headers);
   headers.set(RUN_ID_HEADER, runIdFetch.runId);
-  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
 }
 
 /** OpenAI-compatible provider bound to the Lovable AI Gateway. */

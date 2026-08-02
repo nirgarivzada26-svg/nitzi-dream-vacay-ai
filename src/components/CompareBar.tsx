@@ -19,7 +19,11 @@ export function CompareBar() {
         >
           פתח השוואה ←
         </Link>
-        <button onClick={clearCompare} aria-label="נקה" className="grid h-8 w-8 place-items-center rounded-full bg-white/15">
+        <button
+          onClick={clearCompare}
+          aria-label="נקה"
+          className="grid h-8 w-8 place-items-center rounded-full bg-white/15"
+        >
           <X className="h-4 w-4" />
         </button>
       </div>

@@ -11,9 +11,16 @@ export const Route = createFileRoute("/packages")({
   head: () => ({
     meta: [
       { title: "חבילות נופש — כל הדילים של NITZI" },
-      { name: "description", content: "כל חבילות הנופש במקום אחד: טיסה + מלון, סינון לפי מחיר, מדינה, כוכבים, הכל כלול וקרבה לים." },
+      {
+        name: "description",
+        content:
+          "כל חבילות הנופש במקום אחד: טיסה + מלון, סינון לפי מחיר, מדינה, כוכבים, הכל כלול וקרבה לים.",
+      },
       { property: "og:title", content: "כל החבילות — NITZI" },
-      { property: "og:description", content: "טיסה, מלון ומחיר מאומת. סננו לפי תקציב, מדינה ודירוג ומצאו את החופשה שלכם." },
+      {
+        property: "og:description",
+        content: "טיסה, מלון ומחיר מאומת. סננו לפי תקציב, מדינה ודירוג ומצאו את החופשה שלכם.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -74,35 +81,57 @@ function PackagesPage() {
                 <span className="text-gradient-sunset text-sm">₪{maxPrice.toLocaleString()}</span>
               </div>
               <input
-                type="range" min={1000} max={20000} step={250}
-                value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))}
+                type="range"
+                min={1000}
+                max={20000}
+                step={250}
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(Number(e.target.value))}
                 className="mt-2 w-full accent-primary"
               />
             </div>
 
             <label className="block rounded-2xl border border-border/60 bg-muted/40 p-4">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">מדינה</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                מדינה
+              </span>
               <select
-                value={country} onChange={(e) => setCountry(e.target.value)}
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
                 className="mt-1 w-full bg-transparent text-base font-bold text-foreground outline-none"
               >
                 <option value="all">כל המדינות</option>
-                {countries.map((c) => <option key={c} value={c}>{c}</option>)}
+                {countries.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
               </select>
             </label>
 
             <div className="rounded-2xl border border-border/60 bg-muted/40 p-4">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">כוכבים</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                כוכבים
+              </span>
               <div className="mt-2 flex gap-2">
                 {[0, 3, 4, 5].map((s) => (
                   <button
                     key={s}
                     onClick={() => setMinStars(s)}
                     className={`flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-black transition ${
-                      minStars === s ? "bg-gradient-sunset text-white shadow-glow" : "border border-border bg-card text-muted-foreground"
+                      minStars === s
+                        ? "bg-gradient-sunset text-white shadow-glow"
+                        : "border border-border bg-card text-muted-foreground"
                     }`}
                   >
-                    {s === 0 ? "הכל" : <>{s}<Star className="h-3 w-3" /></>}
+                    {s === 0 ? (
+                      "הכל"
+                    ) : (
+                      <>
+                        {s}
+                        <Star className="h-3 w-3" />
+                      </>
+                    )}
                   </button>
                 ))}
               </div>
@@ -111,12 +140,23 @@ function PackagesPage() {
 
           <div className="mt-3 flex flex-wrap gap-2">
             <Toggle on={pool} onClick={() => setPool(!pool)} label="🏊 בריכה" />
-            <Toggle on={allInclusive} onClick={() => setAllInclusive(!allInclusive)} label="🍹 הכל כלול" />
-            <Toggle on={nearBeach} onClick={() => setNearBeach(!nearBeach)} label="🌊 קרוב לים" icon={<Waves className="h-3 w-3" />} />
+            <Toggle
+              on={allInclusive}
+              onClick={() => setAllInclusive(!allInclusive)}
+              label="🍹 הכל כלול"
+            />
+            <Toggle
+              on={nearBeach}
+              onClick={() => setNearBeach(!nearBeach)}
+              label="🌊 קרוב לים"
+              icon={<Waves className="h-3 w-3" />}
+            />
           </div>
         </section>
 
-        <p className="mt-6 text-sm font-bold text-muted-foreground">{filtered.length} חבילות תואמות</p>
+        <p className="mt-6 text-sm font-bold text-muted-foreground">
+          {filtered.length} חבילות תואמות
+        </p>
 
         {filtered.length === 0 ? (
           <div className="mt-4 flex items-center gap-3 rounded-3xl border border-dashed border-border bg-muted/40 p-6 text-sm text-muted-foreground">
@@ -137,12 +177,24 @@ function PackagesPage() {
   );
 }
 
-function Toggle({ on, onClick, label, icon }: { on: boolean; onClick: () => void; label: string; icon?: React.ReactNode }) {
+function Toggle({
+  on,
+  onClick,
+  label,
+  icon,
+}: {
+  on: boolean;
+  onClick: () => void;
+  label: string;
+  icon?: React.ReactNode;
+}) {
   return (
     <button
       onClick={onClick}
       className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-black transition ${
-        on ? "bg-gradient-sunset text-white shadow-glow" : "border border-border bg-card text-muted-foreground"
+        on
+          ? "bg-gradient-sunset text-white shadow-glow"
+          : "border border-border bg-card text-muted-foreground"
       }`}
     >
       {icon} {label}

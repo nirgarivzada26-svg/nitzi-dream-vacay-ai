@@ -78,7 +78,8 @@ export function RecommendationCard({ rec }: { rec: AgentRecommendation }) {
             </span>
           )}
           <span className="flex items-center gap-1 rounded-full bg-muted px-2 py-1">
-            <Star className="h-3 w-3 fill-amber-400 text-amber-400" /> {rec.hotelStars}★ · {rec.guestRating}
+            <Star className="h-3 w-3 fill-amber-400 text-amber-400" /> {rec.hotelStars}★ ·{" "}
+            {rec.guestRating}
           </span>
           <span className="flex items-center gap-1 rounded-full bg-muted px-2 py-1">
             <Moon className="h-3 w-3" /> {rec.nights} לילות
@@ -95,7 +96,10 @@ export function RecommendationCard({ rec }: { rec: AgentRecommendation }) {
 
         <p className="text-[11px] font-semibold text-muted-foreground">
           {fmtDate(rec.startDate)} – {fmtDate(rec.endDate)} · מקור: {rec.source} · עודכן{" "}
-          {new Date(rec.verifiedAt).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })}
+          {new Date(rec.verifiedAt).toLocaleTimeString("he-IL", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </p>
 
         <ul className="space-y-1 rounded-2xl bg-muted/50 p-3 text-[12px] font-semibold leading-relaxed">
@@ -138,7 +142,9 @@ export function RecommendationCard({ rec }: { rec: AgentRecommendation }) {
                   type="button"
                   onClick={onCompare}
                   className={`grid h-10 w-10 place-items-center rounded-2xl border ${
-                    compared ? "border-primary bg-primary/10 text-primary" : "border-border bg-background"
+                    compared
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-background"
                   }`}
                   aria-label="הוסף להשוואה"
                 >
@@ -187,13 +193,19 @@ export function ComparisonTable({ data }: { data: AgentComparison }) {
                 {it.destination}
                 <div className="mt-1 flex flex-wrap gap-1 text-[10px] font-bold">
                   {data.bestValueDealId === it.dealId && (
-                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-primary">הכי משתלם</span>
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-primary">
+                      הכי משתלם
+                    </span>
                   )}
                   {data.cheapestDealId === it.dealId && (
-                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-800">הזול ביותר</span>
+                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-800">
+                      הזול ביותר
+                    </span>
                   )}
                   {data.bestHotelDealId === it.dealId && (
-                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-amber-900">המלון הטוב ביותר</span>
+                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-amber-900">
+                      המלון הטוב ביותר
+                    </span>
                   )}
                 </div>
               </th>

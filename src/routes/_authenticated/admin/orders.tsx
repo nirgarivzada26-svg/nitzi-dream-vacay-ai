@@ -4,7 +4,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Download, ExternalLink, Mail, RotateCcw, XCircle } from "lucide-react";
 import {
-  AdminError, AdminLoading, ConfirmDialog, DataTable, SectionCard, StatusChip, dateTime, money,
+  AdminError,
+  AdminLoading,
+  ConfirmDialog,
+  DataTable,
+  SectionCard,
+  StatusChip,
+  dateTime,
+  money,
 } from "@/components/admin/AdminUI";
 import { exportCsv } from "@/lib/admin-export";
 import { adminOrderAction, adminOrders } from "@/lib/admin.functions";
@@ -35,9 +42,12 @@ function OrdersPage() {
       await qc.cancelQueries({ queryKey: ["admin", "orders"] });
       const prev = qc.getQueryData<AdminOrder[]>(["admin", "orders"]);
       if (prev && v.action !== "resend_email") {
-        qc.setQueryData<AdminOrder[]>(["admin", "orders"], prev.map((o) =>
-          o.id === v.id ? { ...o, status: v.action === "refund" ? "refunded" : "cancelled" } : o,
-        ));
+        qc.setQueryData<AdminOrder[]>(
+          ["admin", "orders"],
+          prev.map((o) =>
+            o.id === v.id ? { ...o, status: v.action === "refund" ? "refunded" : "cancelled" } : o,
+          ),
+        );
       }
       return { prev };
     },
@@ -45,7 +55,8 @@ function OrdersPage() {
       if (ctx?.prev) qc.setQueryData(["admin", "orders"], ctx.prev);
       toast.error(e.message);
     },
-    onSuccess: (_r, v) => toast.success(v.action === "resend_email" ? "אישור ההזמנה נשלח מחדש" : "ההזמנה עודכנה"),
+    onSuccess: (_r, v) =>
+      toast.success(v.action === "resend_email" ? "אישור ההזמנה נשלח מחדש" : "ההזמנה עודכנה"),
     onSettled: () => {
       qc.invalidateQueries({ queryKey: ["admin", "orders"] });
       qc.invalidateQueries({ queryKey: ["admin", "overview"] });
@@ -69,9 +80,17 @@ function OrdersPage() {
             onClick={() =>
               exportCsv(
                 rows.map((o) => ({
-                  "מס' הזמנה": o.id, לקוח: o.customer, אימייל: o.email ?? "", יעד: o.destination,
-                  חבילה: o.dealId, נוסעים: o.people, לילות: o.nights, סכום: o.total,
-                  תשלום: o.paymentMethod ?? "", סטטוס: o.status, נוצר: o.createdAt,
+                  "מס' הזמנה": o.id,
+                  לקוח: o.customer,
+                  אימייל: o.email ?? "",
+                  יעד: o.destination,
+                  חבילה: o.dealId,
+                  נוסעים: o.people,
+                  לילות: o.nights,
+                  סכום: o.total,
+                  תשלום: o.paymentMethod ?? "",
+                  סטטוס: o.status,
+                  נוצר: o.createdAt,
                 })),
                 "nitzi-orders",
               )
@@ -103,14 +122,64 @@ function OrdersPage() {
             </select>
           }
           columns={[
-            { key: "id", header: "מס׳ הזמנה", render: (r) => <span className="font-mono text-xs">{r.id.slice(0, 8)}</span>, sortValue: (r) => r.id },
-            { key: "customer", header: "לקוח", render: (r) => (<div><p className="font-bold">{r.customer}</p><p className="text-[11px] text-muted-foreground">{r.email ?? "—"}</p></div>), sortValue: (r) => r.customer },
-            { key: "dest", header: "יעד", render: (r) => r.destination, sortValue: (r) => r.destination },
-            { key: "package", header: "חבילה", render: (r) => <span className="text-xs">{r.dealId}</span> },
-            { key: "payment", header: "סטטוס תשלום", render: (r) => (r.paymentMethod ? <span className="text-xs font-bold text-emerald-700">שולם · {r.paymentMethod}</span> : <span className="text-xs text-muted-foreground">לא תועד</span>) },
-            { key: "total", header: "סכום", render: (r) => money(r.total, r.currency), sortValue: (r) => r.total },
-            { key: "status", header: "סטטוס הזמנה", render: (r) => <StatusChip status={r.status} />, sortValue: (r) => r.status },
-            { key: "created", header: "תאריך", render: (r) => dateTime(r.createdAt), sortValue: (r) => r.createdAt },
+            {
+              key: "id",
+              header: "מס׳ הזמנה",
+              render: (r) => <span className="font-mono text-xs">{r.id.slice(0, 8)}</span>,
+              sortValue: (r) => r.id,
+            },
+            {
+              key: "customer",
+              header: "לקוח",
+              render: (r) => (
+                <div>
+                  <p className="font-bold">{r.customer}</p>
+                  <p className="text-[11px] text-muted-foreground">{r.email ?? "—"}</p>
+                </div>
+              ),
+              sortValue: (r) => r.customer,
+            },
+            {
+              key: "dest",
+              header: "יעד",
+              render: (r) => r.destination,
+              sortValue: (r) => r.destination,
+            },
+            {
+              key: "package",
+              header: "חבילה",
+              render: (r) => <span className="text-xs">{r.dealId}</span>,
+            },
+            {
+              key: "payment",
+              header: "סטטוס תשלום",
+              render: (r) =>
+                r.paymentMethod ? (
+                  <span className="text-xs font-bold text-emerald-700">
+                    שולם · {r.paymentMethod}
+                  </span>
+                ) : (
+                  <span className="text-xs text-muted-foreground">לא תועד</span>
+                ),
+            },
+            {
+              key: "total",
+              header: "סכום",
+              render: (r) => money(r.total, r.currency),
+              sortValue: (r) => r.total,
+            },
+            {
+              key: "status",
+              header: "סטטוס הזמנה",
+              render: (r) => <StatusChip status={r.status} />,
+              sortValue: (r) => r.status,
+            },
+            {
+              key: "created",
+              header: "תאריך",
+              render: (r) => dateTime(r.createdAt),
+              sortValue: (r) => r.createdAt,
+            },
             {
               key: "actions",
               header: "פעולות",
@@ -133,7 +202,9 @@ function OrdersPage() {
                     <Mail className="h-3.5 w-3.5" />
                   </button>
                   <button
-                    onClick={() => setPending({ id: r.id, action: "refund", label: "לזכות את ההזמנה?" })}
+                    onClick={() =>
+                      setPending({ id: r.id, action: "refund", label: "לזכות את ההזמנה?" })
+                    }
                     disabled={r.status === "refunded"}
                     className="rounded-lg border border-border p-1.5 disabled:opacity-40"
                     title="זיכוי"
@@ -141,7 +212,9 @@ function OrdersPage() {
                     <RotateCcw className="h-3.5 w-3.5" />
                   </button>
                   <button
-                    onClick={() => setPending({ id: r.id, action: "cancel", label: "לבטל את ההזמנה?" })}
+                    onClick={() =>
+                      setPending({ id: r.id, action: "cancel", label: "לבטל את ההזמנה?" })
+                    }
                     disabled={r.status === "cancelled"}
                     className="rounded-lg border border-destructive/40 p-1.5 text-destructive disabled:opacity-40"
                     title="ביטול"
