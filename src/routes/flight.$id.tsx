@@ -52,7 +52,7 @@ function FlightDetailPage() {
   return (
     <div dir="rtl" className="min-h-screen bg-background pb-32">
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur-lg">
-        <div className="mx-auto flex w-full max-w-4xl items-center justify-between px-4 py-3 sm:px-6">
+        <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between px-4 py-3 sm:px-6">
           <button onClick={() => navigate({ to: "/result" })} className="grid h-11 w-11 place-items-center rounded-full border border-border bg-card" aria-label="חזרה">
             <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
           </button>
@@ -61,7 +61,7 @@ function FlightDetailPage() {
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-4xl space-y-5 px-4 pt-5 sm:px-6">
+      <div className="mx-auto w-full max-w-[1400px] space-y-5 px-4 pt-5 sm:px-6">
         <section className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
           <div className="flex items-start justify-between gap-4">
             <div>

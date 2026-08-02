@@ -72,7 +72,7 @@ function CheckoutPage() {
 
   return (
     <div dir="rtl" className="min-h-screen bg-gradient-to-b from-sand/60 via-background to-background pb-16">
-      <header className="mx-auto flex w-full max-w-3xl items-center justify-between px-5 pt-6 sm:px-8">
+      <header className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-5 pt-6 sm:px-8">
         <button onClick={() => navigate({ to: "/deal/$id", params: { id } })} className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card">
           <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
         </button>
@@ -80,7 +80,7 @@ function CheckoutPage() {
         <div className="w-10" />
       </header>
 
-      <div className="mx-auto mt-8 w-full max-w-3xl px-5 sm:px-8">
+      <div className="mx-auto mt-8 w-full max-w-[1200px] px-5 sm:px-8">
         <div className="rounded-[2rem] border border-border bg-card p-6 shadow-glow sm:p-8">
           <div className="text-center">
             <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-sunset text-white shadow-glow">

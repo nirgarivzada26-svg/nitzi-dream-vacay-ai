@@ -40,7 +40,7 @@ function Home() {
   return (
     <div dir="rtl" className="min-h-screen bg-background pb-16">
       <section className="relative">
-        <div className="relative min-h-[720px] w-full overflow-hidden sm:min-h-[780px] lg:min-h-[860px]">
+        <div className="relative w-full overflow-hidden">
           <img
             src={heroImg}
             alt="חוף טורקיז מלמעלה"
@@ -52,7 +52,7 @@ function Home() {
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 
           <div className="absolute inset-x-0 top-0 z-10">
-            <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 pt-6 sm:px-8">
+            <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-5 pt-6 sm:px-8">
               <NitziLogo />
               <div className="flex items-center gap-2">
                 <div className="hidden items-center gap-1 rounded-full border border-white/30 bg-white/15 px-3 py-1.5 text-[11px] font-bold text-white backdrop-blur-md sm:flex">
@@ -78,21 +78,22 @@ function Home() {
             </div>
           </div>
 
-          <div className="absolute inset-x-0 top-24 z-10 mx-auto flex w-full max-w-6xl flex-col items-center px-5 text-center text-white sm:top-28 sm:px-8 lg:top-32">
+          <div className="relative z-10 mx-auto flex w-full max-w-[1600px] flex-col items-center px-5 pt-28 pb-16 text-center text-white sm:px-8 sm:pt-32 lg:pt-36">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold uppercase tracking-widest backdrop-blur-md">
               <Sparkles className="h-3 w-3" /> NITZI · Travel AI
             </span>
-            <h1 className="mt-4 text-4xl font-black leading-[1.05] drop-shadow-lg sm:text-6xl lg:text-7xl">
+            <h1 className="mt-4 text-4xl font-black leading-[1.05] drop-shadow-lg sm:text-6xl lg:text-8xl">
               לאן בא לך <span className="text-gradient-sunset">לברוח</span>
               <br className="sm:hidden" /> הפעם?
             </h1>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/90 sm:text-lg">
-              חפש בעצמך או תן ל-NITZI לבנות לך את החופשה המושלמת ב־60 שניות.
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/90 sm:text-xl">
+              החיים קצרים. תצא לחוות. חפש בעצמך או תן ל-NITZI לבנות לך את החופשה המושלמת ב־60 שניות.
             </p>
 
-            <div className="mt-8 w-full max-w-4xl animate-fade-up">
+            <div className="mt-10 w-full max-w-6xl animate-fade-up">
               <SearchEngine size="lg" />
             </div>
+
 
             <div className="mt-6 hidden items-center gap-6 text-[11px] font-bold text-white/90 sm:flex">
               <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> מחיר נבדק ואומת</span>
@@ -103,19 +104,19 @@ function Home() {
         </div>
       </section>
 
-      <div className="mx-auto mt-8 w-full max-w-6xl px-5 sm:mt-12 sm:px-8">
+      <div className="mx-auto mt-8 w-full max-w-[1600px] px-5 sm:mt-12 sm:px-8">
         <DemoDataNotice />
       </div>
 
-      <div className="mx-auto mt-6 w-full max-w-6xl">
+      <div className="mx-auto mt-6 w-full max-w-[1600px]">
         <SecretDealCard />
       </div>
 
-      <div className="mx-auto mt-12 w-full max-w-6xl px-5 sm:mt-16 sm:px-8">
+      <div className="mx-auto mt-12 w-full max-w-[1600px] px-5 sm:mt-16 sm:px-8">
         <DealRails />
       </div>
 
-      <div className="mx-auto mt-14 flex w-full max-w-6xl flex-col gap-10 px-5 sm:px-8">
+      <div className="mx-auto mt-14 flex w-full max-w-[1600px] flex-col gap-10 px-5 sm:px-8">
         {categories.map((c) => (
           <DestinationCarousel key={c.id} category={c} asDeals={c.id === "lastminute" || c.id === "ai"} />
         ))}

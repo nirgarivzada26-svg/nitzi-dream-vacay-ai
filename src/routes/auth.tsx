@@ -82,7 +82,7 @@ function AuthPage() {
       <div aria-hidden className="pointer-events-none absolute -top-32 -right-24 h-96 w-96 rounded-full bg-gradient-sunset opacity-30 blur-3xl" />
       <div aria-hidden className="pointer-events-none absolute top-40 -left-24 h-80 w-80 rounded-full bg-gradient-ocean opacity-20 blur-3xl" />
 
-      <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 pt-6 sm:px-8">
+      <header className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-5 pt-6 sm:px-8">
         <Link to="/" className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card">
           <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
         </Link>
@@ -90,7 +90,7 @@ function AuthPage() {
         <div className="w-10" />
       </header>
 
-      <div className="mx-auto mt-10 grid w-full max-w-6xl gap-10 px-5 sm:px-8 lg:mt-16 lg:grid-cols-2">
+      <div className="mx-auto mt-10 grid w-full max-w-[1600px] gap-10 px-5 sm:px-8 lg:mt-16 lg:grid-cols-2">
         {/* Left: pitch */}
         <div className="hidden flex-col justify-center lg:flex">
           <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-white/70 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-primary backdrop-blur">

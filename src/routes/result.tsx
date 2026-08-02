@@ -113,7 +113,7 @@ function Result() {
       <div aria-hidden className="pointer-events-none absolute -top-32 -right-24 h-80 w-80 rounded-full bg-gradient-sunset opacity-30 blur-3xl" />
 
       <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur-lg">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-5 py-3">
+        <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-5 py-3">
           <button onClick={() => navigate({ to: "/quiz" })} className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card" aria-label="חזרה">
             <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
           </button>
@@ -129,10 +129,10 @@ function Result() {
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-5xl space-y-5 pt-5">
+      <div className="mx-auto w-full max-w-[1600px] space-y-5 pt-5">
         {/* Hero image */}
         <section className="relative mx-5 overflow-hidden rounded-[2rem] shadow-glow animate-fade-up">
-          <img src={dest.image} alt={dest.name} width={800} height={1000} className="h-[380px] w-full object-cover" />
+          <img src={dest.image} alt={dest.name} width={800} height={1000} className="h-[380px] w-full object-cover lg:h-[520px]" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
           <div className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1.5 text-[11px] font-bold text-white backdrop-blur-md">
             <Sparkles className="h-3 w-3" /> ההמלצה של NITZI
@@ -155,7 +155,9 @@ function Result() {
           <MiniStat icon={<Calendar className="h-4 w-4" />} label="משך" value={`${answers.days} ימים`} />
         </div>
 
+        <div className="mx-5 grid gap-5 lg:grid-cols-2 [&>section]:mx-0">
         {/* Why */}
+
         <Card>
           <SectionTitle icon={<Wand2 className="h-4 w-4" />} title="למה זה מתאים לך" />
           <ul className="mt-3 space-y-2 text-sm text-foreground">
@@ -209,6 +211,9 @@ function Result() {
           </div>
           <p className="mt-2 text-[11px] text-muted-foreground">מפה אינטראקטיבית תתווסף בגרסה הבאה</p>
         </Card>
+        </div>
+
+
 
         {/* NITZI's Picks — top curated by AI */}
         <section className="mx-5 overflow-hidden rounded-3xl border border-primary/30 bg-gradient-to-b from-primary/10 via-card/90 to-card/80 p-5 shadow-glow backdrop-blur animate-fade-up">
@@ -395,7 +400,7 @@ function LoadingState() {
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
-    <section className="mx-5 rounded-3xl border border-border/70 bg-card/80 p-5 shadow-soft backdrop-blur animate-fade-up">
+    <section className="mx-5 rounded-3xl border border-border/70 bg-card/80 p-6 sm:p-7 shadow-soft backdrop-blur animate-fade-up">
       {children}
     </section>
   );
@@ -404,7 +409,7 @@ function SectionTitle({ icon, title }: { icon: React.ReactNode; title: string })
   return (
     <div className="flex items-center gap-2">
       <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-sunset text-white">{icon}</span>
-      <h3 className="text-sm font-black text-foreground">{title}</h3>
+      <h3 className="text-base font-black text-foreground sm:text-lg">{title}</h3>
     </div>
   );
 }

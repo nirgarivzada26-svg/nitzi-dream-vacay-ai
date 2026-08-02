@@ -42,7 +42,7 @@ export function Footer() {
       <div aria-hidden className="pointer-events-none absolute -top-32 right-1/4 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
       <div aria-hidden className="pointer-events-none absolute -top-20 left-1/4 h-64 w-64 rounded-full bg-amber-300/10 blur-3xl" />
 
-      <div className="relative mx-auto max-w-6xl px-5 pt-14 pb-8 sm:px-8">
+      <div className="relative mx-auto max-w-[1600px] px-5 pt-14 pb-8 sm:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
           <div>
             <NitziLogo />
