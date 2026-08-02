@@ -29,6 +29,9 @@ const inputSchema = z.object({
     phone: z.string().trim().max(40).optional().default(""),
   }),
   paymentMethod: z.enum(["card", "apple", "google", "bit"]),
+  // Price the user approved at the revalidation step. Only accepted when it is
+  // at least the catalog price (an approved increase) and within a sane band.
+  confirmedPerPerson: z.number().finite().positive().max(1_000_000).optional(),
 });
 
 export type PlaceBookingInput = z.infer<typeof inputSchema>;
@@ -39,22 +42,24 @@ export const placeBooking = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { fetchDestinationRows } = await import("@/lib/catalog.server");
     const { rowToDestination } = await import("@/lib/catalog");
-    const { getDeal, revalidateDeal } = await import("@/lib/deals");
+    const { getDeal } = await import("@/lib/deals");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const catalog = (await fetchDestinationRows()).map(rowToDestination);
     const deal = getDeal(data.dealId, catalog);
     if (!deal) throw new Error("הדיל אינו זמין יותר");
 
-    // Re-check price/availability with the provider before writing anything.
-    const reval = await revalidateDeal(deal);
-    if (!reval.available) throw new Error("הדיל אזל מהמלאי");
-
-    const perPerson = reval.newPricePerPerson ?? deal.price.perPerson;
+    const catalogPerPerson = deal.price.perPerson;
+    const confirmed = data.confirmedPerPerson;
+    const perPerson =
+      confirmed !== undefined && confirmed >= catalogPerPerson && confirmed <= catalogPerPerson * 1.25
+        ? confirmed
+        : catalogPerPerson;
     const people = deal.people;
     if (data.passengers.length !== people) {
       throw new Error("מספר הנוסעים אינו תואם את הדיל");
     }
+
 
     const base = perPerson * people;
     const { lines, total: extrasTotal } = computeExtras(data.extras, people);
