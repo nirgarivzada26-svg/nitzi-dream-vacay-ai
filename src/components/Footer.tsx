@@ -141,19 +141,18 @@ export function Footer() {
             <Link to="/" className="transition hover:text-primary">
               עמוד הבית
             </Link>
-            <a href="#privacy" className="transition hover:text-primary">
-              פרטיות
-            </a>
-            <a href="#terms" className="transition hover:text-primary">
-              תנאים
-            </a>
-            <a href="#cookies" className="transition hover:text-primary">
-              עוגיות
-            </a>
-            <a href="#a11y" className="transition hover:text-primary">
-              נגישות
-            </a>
+            {FOOTER_LEGAL_LINKS.map((l) => (
+              <Link
+                key={l.slug}
+                to="/legal/$doc"
+                params={{ doc: l.slug }}
+                className="transition hover:text-primary"
+              >
+                {l.label}
+              </Link>
+            ))}
           </div>
+
         </div>
       </div>
     </footer>
