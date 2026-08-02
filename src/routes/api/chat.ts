@@ -10,7 +10,15 @@ import {
 import { buildTrip, compareTrips, listCatalog, searchTrips } from "@/lib/agent/agent-search.server";
 import type { AgentFilters } from "@/lib/agent/agent-types";
 
-const tripTypeEnum = z.enum(["beach", "adventure", "romantic", "family", "friends", "nightlife", "nature"]);
+const tripTypeEnum = z.enum([
+  "beach",
+  "adventure",
+  "romantic",
+  "family",
+  "friends",
+  "nightlife",
+  "nature",
+]);
 const styleEnum = z.enum(["chill", "luxury", "young", "smart"]);
 const boardEnum = z.enum(["room-only", "breakfast", "half-board", "all-inclusive"]);
 
@@ -126,7 +134,6 @@ export const Route = createFileRoute("/api/chat")({
         const apiKey = process.env["LOVABLE_API_KEY"];
         if (!apiKey) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
-
         const runIdFetch = createLovableAiGatewayRunIdFetch(getLovableAiGatewayRunId(request));
         const lovable = createNitziAiProvider(apiKey, runIdFetch);
 
@@ -164,7 +171,8 @@ export const Route = createFileRoute("/api/chat")({
               description:
                 "מרכיב חופשה מטיסה + מלון אמיתיים מהספקים, כשאין חבילה מוכנה ליעד מסוים בקטלוג.",
               inputSchema: z.object({ destination: z.string(), filters: filtersSchema }),
-              execute: async ({ destination, filters }) => buildTrip(destination, filters as AgentFilters),
+              execute: async ({ destination, filters }) =>
+                buildTrip(destination, filters as AgentFilters),
             }),
             compareTrips: tool({
               description: "משווה עד 3 דילים לפי מזהה (dealId) שכבר הוצגו למשתמש.",

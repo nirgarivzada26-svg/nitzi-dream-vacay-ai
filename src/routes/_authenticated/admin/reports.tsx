@@ -3,7 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { FileDown, FileSpreadsheet, FileText } from "lucide-react";
 import { AdminError, AdminLoading, SectionCard, money } from "@/components/admin/AdminUI";
 import { exportCsv, exportExcel, exportPdf, type Row } from "@/lib/admin-export";
-import { adminOrders, adminPackages, adminSearchAnalytics, adminUsers } from "@/lib/admin.functions";
+import {
+  adminOrders,
+  adminPackages,
+  adminSearchAnalytics,
+  adminUsers,
+} from "@/lib/admin.functions";
 import type { AdminOrder, AdminPackageRow, AdminUserRow, SearchAnalytics } from "@/lib/admin-types";
 
 export const Route = createFileRoute("/_authenticated/admin/reports")({
@@ -11,10 +16,26 @@ export const Route = createFileRoute("/_authenticated/admin/reports")({
 });
 
 function ReportsPage() {
-  const orders = useQuery({ queryKey: ["admin", "orders"], queryFn: () => adminOrders() as Promise<AdminOrder[]>, retry: false });
-  const users = useQuery({ queryKey: ["admin", "users"], queryFn: () => adminUsers() as Promise<AdminUserRow[]>, retry: false });
-  const packages = useQuery({ queryKey: ["admin", "packages"], queryFn: () => adminPackages() as Promise<AdminPackageRow[]>, retry: false });
-  const analytics = useQuery({ queryKey: ["admin", "analytics"], queryFn: () => adminSearchAnalytics() as Promise<SearchAnalytics>, retry: false });
+  const orders = useQuery({
+    queryKey: ["admin", "orders"],
+    queryFn: () => adminOrders() as Promise<AdminOrder[]>,
+    retry: false,
+  });
+  const users = useQuery({
+    queryKey: ["admin", "users"],
+    queryFn: () => adminUsers() as Promise<AdminUserRow[]>,
+    retry: false,
+  });
+  const packages = useQuery({
+    queryKey: ["admin", "packages"],
+    queryFn: () => adminPackages() as Promise<AdminPackageRow[]>,
+    retry: false,
+  });
+  const analytics = useQuery({
+    queryKey: ["admin", "analytics"],
+    queryFn: () => adminSearchAnalytics() as Promise<SearchAnalytics>,
+    retry: false,
+  });
 
   const firstError = orders.error ?? users.error ?? packages.error ?? analytics.error;
   if (firstError) return <AdminError error={firstError} />;
@@ -35,9 +56,17 @@ function ReportsPage() {
       title: "דוח הזמנות",
       subtitle: `${ordersData.length.toLocaleString("he-IL")} הזמנות · הכנסות מאושרות ${money(revenue)}`,
       rows: ordersData.map((o) => ({
-        "מס' הזמנה": o.id, לקוח: o.customer, אימייל: o.email ?? "", יעד: o.destination,
-        נוסעים: o.people, לילות: o.nights, סכום: o.total, מטבע: o.currency,
-        סטטוס: o.status, "אמצעי תשלום": o.paymentMethod ?? "", תאריך: o.createdAt,
+        "מס' הזמנה": o.id,
+        לקוח: o.customer,
+        אימייל: o.email ?? "",
+        יעד: o.destination,
+        נוסעים: o.people,
+        לילות: o.nights,
+        סכום: o.total,
+        מטבע: o.currency,
+        סטטוס: o.status,
+        "אמצעי תשלום": o.paymentMethod ?? "",
+        תאריך: o.createdAt,
       })),
     },
     {
@@ -45,11 +74,13 @@ function ReportsPage() {
       title: "דוח הכנסות לפי יעד",
       subtitle: "סכימת הזמנות מאושרות",
       rows: Object.entries(
-        ordersData.filter((o) => o.status === "confirmed").reduce<Record<string, { count: number; total: number }>>((acc, o) => {
-          const cur = acc[o.destination] ?? { count: 0, total: 0 };
-          acc[o.destination] = { count: cur.count + 1, total: cur.total + o.total };
-          return acc;
-        }, {}),
+        ordersData
+          .filter((o) => o.status === "confirmed")
+          .reduce<Record<string, { count: number; total: number }>>((acc, o) => {
+            const cur = acc[o.destination] ?? { count: 0, total: 0 };
+            acc[o.destination] = { count: cur.count + 1, total: cur.total + o.total };
+            return acc;
+          }, {}),
       )
         .sort((a, b) => b[1].total - a[1].total)
         .map(([dest, v]) => ({ יעד: dest, הזמנות: v.count, הכנסות: v.total })),
@@ -59,8 +90,14 @@ function ReportsPage() {
       title: "דוח משתמשים",
       subtitle: `${usersData.length.toLocaleString("he-IL")} משתמשים רשומים`,
       rows: usersData.map((u) => ({
-        שם: u.name, אימייל: u.email ?? "", טלפון: u.phone ?? "", הרשמה: u.createdAt,
-        הזמנות: u.orders, מועדפים: u.favorites, "סה\"כ רכישות": u.spend, פעיל: u.active ? "כן" : "לא",
+        שם: u.name,
+        אימייל: u.email ?? "",
+        טלפון: u.phone ?? "",
+        הרשמה: u.createdAt,
+        הזמנות: u.orders,
+        מועדפים: u.favorites,
+        'סה"כ רכישות': u.spend,
+        פעיל: u.active ? "כן" : "לא",
       })),
     },
     {
@@ -68,8 +105,14 @@ function ReportsPage() {
       title: "דוח ביצועי חבילות",
       subtitle: "צפיות, הזמנות ושיעור המרה",
       rows: packagesData.map((p) => ({
-        חבילה: p.name, יעד: p.destination, מחיר: p.price, צפיות: p.views,
-        הזמנות: p.orders, "המרה %": p.conversionRate, "מחיר חכם": p.smartPrice, פעילה: p.active ? "כן" : "לא",
+        חבילה: p.name,
+        יעד: p.destination,
+        מחיר: p.price,
+        צפיות: p.views,
+        הזמנות: p.orders,
+        "המרה %": p.conversionRate,
+        "מחיר חכם": p.smartPrice,
+        פעילה: p.active ? "כן" : "לא",
       })),
     },
     {
@@ -83,7 +126,9 @@ function ReportsPage() {
   return (
     <div className="space-y-5">
       <h1 className="text-2xl font-black sm:text-3xl">דוחות</h1>
-      <p className="text-xs text-muted-foreground">כל הדוחות נבנים מנתוני המערכת בזמן אמת — ללא ערכים מומצאים.</p>
+      <p className="text-xs text-muted-foreground">
+        כל הדוחות נבנים מנתוני המערכת בזמן אמת — ללא ערכים מומצאים.
+      </p>
 
       <div className="grid gap-4 lg:grid-cols-2">
         {reports.map((r) => (

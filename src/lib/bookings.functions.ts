@@ -52,14 +52,15 @@ export const placeBooking = createServerFn({ method: "POST" })
     const catalogPerPerson = deal.price.perPerson;
     const confirmed = data.confirmedPerPerson;
     const perPerson =
-      confirmed !== undefined && confirmed >= catalogPerPerson && confirmed <= catalogPerPerson * 1.25
+      confirmed !== undefined &&
+      confirmed >= catalogPerPerson &&
+      confirmed <= catalogPerPerson * 1.25
         ? confirmed
         : catalogPerPerson;
     const people = deal.people;
     if (data.passengers.length !== people) {
       throw new Error("מספר הנוסעים אינו תואם את הדיל");
     }
-
 
     const base = perPerson * people;
     const { lines, total: extrasTotal } = computeExtras(data.extras, people);

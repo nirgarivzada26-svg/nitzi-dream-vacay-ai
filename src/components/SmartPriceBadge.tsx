@@ -8,7 +8,9 @@ export function SmartPriceBadge({ deal, full = false }: { deal: Deal; full?: boo
 
   if (!full) {
     return (
-      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-black ${v.cls}`}>
+      <span
+        className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-black ${v.cls}`}
+      >
         {v.emoji} {v.label}
         {v.level !== "normal" && <span className="font-bold">· {Math.abs(v.deltaPct)}%</span>}
       </span>

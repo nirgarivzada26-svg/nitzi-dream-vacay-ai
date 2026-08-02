@@ -4,7 +4,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Download, ShieldCheck, UserCheck, UserX } from "lucide-react";
 import {
-  AdminError, AdminLoading, ConfirmDialog, DataTable, SectionCard, dateTime, money,
+  AdminError,
+  AdminLoading,
+  ConfirmDialog,
+  DataTable,
+  SectionCard,
+  dateTime,
+  money,
 } from "@/components/admin/AdminUI";
 import { exportCsv } from "@/lib/admin-export";
 import { adminUserAction, adminUsers } from "@/lib/admin.functions";
@@ -28,8 +34,11 @@ function UsersPage() {
   });
 
   const act = useMutation({
-    mutationFn: (v: { userId: string; action: "deactivate" | "reactivate" | "set_role" | "unset_role"; role?: AdminRole }) =>
-      adminUserAction({ data: v }),
+    mutationFn: (v: {
+      userId: string;
+      action: "deactivate" | "reactivate" | "set_role" | "unset_role";
+      role?: AdminRole;
+    }) => adminUserAction({ data: v }),
     onSuccess: () => {
       toast.success("המשתמש עודכן");
       qc.invalidateQueries({ queryKey: ["admin", "users"] });
@@ -53,9 +62,15 @@ function UsersPage() {
             onClick={() =>
               exportCsv(
                 data.map((u) => ({
-                  שם: u.name, אימייל: u.email ?? "", טלפון: u.phone ?? "", הרשמה: u.createdAt,
-                  הזמנות: u.orders, מועדפים: u.favorites, "סה\"כ רכישות": u.spend,
-                  תפקידים: u.roles.join("|"), פעיל: u.active ? "כן" : "לא",
+                  שם: u.name,
+                  אימייל: u.email ?? "",
+                  טלפון: u.phone ?? "",
+                  הרשמה: u.createdAt,
+                  הזמנות: u.orders,
+                  מועדפים: u.favorites,
+                  'סה"כ רכישות': u.spend,
+                  תפקידים: u.roles.join("|"),
+                  פעיל: u.active ? "כן" : "לא",
                 })),
                 "nitzi-users",
               )
@@ -73,13 +88,52 @@ function UsersPage() {
           searchPlaceholder="חיפוש לפי שם, אימייל או טלפון…"
           emptyTitle="אין עדיין משתמשים רשומים"
           columns={[
-            { key: "name", header: "שם", render: (r) => (<div><p className="font-bold">{r.name}</p>{r.roles.length ? <p className="text-[11px] text-primary">{r.roles.map((x) => ROLE_LABELS[x]).join(", ")}</p> : null}</div>), sortValue: (r) => r.name },
-            { key: "email", header: "אימייל", render: (r) => r.email ?? "—", sortValue: (r) => r.email ?? "" },
+            {
+              key: "name",
+              header: "שם",
+              render: (r) => (
+                <div>
+                  <p className="font-bold">{r.name}</p>
+                  {r.roles.length ? (
+                    <p className="text-[11px] text-primary">
+                      {r.roles.map((x) => ROLE_LABELS[x]).join(", ")}
+                    </p>
+                  ) : null}
+                </div>
+              ),
+              sortValue: (r) => r.name,
+            },
+            {
+              key: "email",
+              header: "אימייל",
+              render: (r) => r.email ?? "—",
+              sortValue: (r) => r.email ?? "",
+            },
             { key: "phone", header: "טלפון", render: (r) => r.phone ?? "—" },
-            { key: "created", header: "תאריך הרשמה", render: (r) => dateTime(r.createdAt), sortValue: (r) => r.createdAt },
-            { key: "orders", header: "הזמנות", render: (r) => r.orders, sortValue: (r) => r.orders },
-            { key: "fav", header: "מועדפים", render: (r) => r.favorites, sortValue: (r) => r.favorites },
-            { key: "spend", header: "סה״כ רכישות", render: (r) => money(r.spend), sortValue: (r) => r.spend },
+            {
+              key: "created",
+              header: "תאריך הרשמה",
+              render: (r) => dateTime(r.createdAt),
+              sortValue: (r) => r.createdAt,
+            },
+            {
+              key: "orders",
+              header: "הזמנות",
+              render: (r) => r.orders,
+              sortValue: (r) => r.orders,
+            },
+            {
+              key: "fav",
+              header: "מועדפים",
+              render: (r) => r.favorites,
+              sortValue: (r) => r.favorites,
+            },
+            {
+              key: "spend",
+              header: "סה״כ רכישות",
+              render: (r) => money(r.spend),
+              sortValue: (r) => r.spend,
+            },
             {
               key: "actions",
               header: "פעולות",
@@ -104,7 +158,9 @@ function UsersPage() {
                       <option value="">תפקיד…</option>
                       {ADMIN_ROLES.map((role) => (
                         <option key={role} value={role}>
-                          {r.roles.includes(role) ? `הסר ${ROLE_LABELS[role]}` : `הוסף ${ROLE_LABELS[role]}`}
+                          {r.roles.includes(role)
+                            ? `הסר ${ROLE_LABELS[role]}`
+                            : `הוסף ${ROLE_LABELS[role]}`}
                         </option>
                       ))}
                     </select>
@@ -114,7 +170,11 @@ function UsersPage() {
                     className={`rounded-lg border p-1.5 ${r.active ? "border-destructive/40 text-destructive" : "border-border"}`}
                     title={r.active ? "השבתה" : "הפעלה מחדש"}
                   >
-                    {r.active ? <UserX className="h-3.5 w-3.5" /> : <UserCheck className="h-3.5 w-3.5" />}
+                    {r.active ? (
+                      <UserX className="h-3.5 w-3.5" />
+                    ) : (
+                      <UserCheck className="h-3.5 w-3.5" />
+                    )}
                   </button>
                 </div>
               ),
@@ -136,7 +196,11 @@ function UsersPage() {
         description="משתמש מושבת לא יוכל להתחבר לחשבון עד להפעלה מחדש."
         destructive={!pending?.active}
         onConfirm={() => {
-          if (pending) act.mutate({ userId: pending.id, action: pending.active ? "reactivate" : "deactivate" });
+          if (pending)
+            act.mutate({
+              userId: pending.id,
+              action: pending.active ? "reactivate" : "deactivate",
+            });
           setPending(null);
         }}
       />

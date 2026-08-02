@@ -11,8 +11,21 @@ import { rowToDestination, type Destination } from "./catalog";
 import { listDeals, type Deal } from "./deals";
 import { smartPrice } from "./smart-price";
 import type {
-  AdminAlert, AdminFlightRow, AdminOrder, AdminOverview, AdminPackageRow, AdminPermission,
-  AdminRole, AdminUserRow, AuditRow, DayPoint, JsonValue, NamedCount, Paged, SearchAnalytics, SettingRow,
+  AdminAlert,
+  AdminFlightRow,
+  AdminOrder,
+  AdminOverview,
+  AdminPackageRow,
+  AdminPermission,
+  AdminRole,
+  AdminUserRow,
+  AuditRow,
+  DayPoint,
+  JsonValue,
+  NamedCount,
+  Paged,
+  SearchAnalytics,
+  SettingRow,
 } from "./admin-types";
 
 /* ------------------------------------------------------------------ auth */
@@ -91,7 +104,11 @@ export async function logAudit(input: {
 /* -------------------------------------------------------------- helpers */
 
 const dayKey = (iso: string) => iso.slice(0, 10);
-const startOfDay = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
+const startOfDay = () => {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
 const daysAgo = (n: number) => new Date(Date.now() - n * 86400000);
 
 function tally(items: (string | null | undefined)[]): NamedCount[] {
@@ -115,13 +132,25 @@ export async function loadCatalog(): Promise<Destination[]> {
 }
 
 async function authUsers() {
-  const out: { id: string; email: string | null; phone: string | null; created_at: string; banned: boolean }[] = [];
+  const out: {
+    id: string;
+    email: string | null;
+    phone: string | null;
+    created_at: string;
+    banned: boolean;
+  }[] = [];
   for (let page = 1; page <= 10; page++) {
     const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 200 });
     if (error) throw new AdminError(error.message);
     for (const u of data.users) {
       const banned = Boolean((u as unknown as { banned_until?: string | null }).banned_until);
-      out.push({ id: u.id, email: u.email ?? null, phone: u.phone ?? null, created_at: u.created_at, banned });
+      out.push({
+        id: u.id,
+        email: u.email ?? null,
+        phone: u.phone ?? null,
+        created_at: u.created_at,
+        banned,
+      });
     }
     if (data.users.length < 200) break;
   }
@@ -129,16 +158,27 @@ async function authUsers() {
 }
 
 interface BookingRecord {
-  id: string; user_id: string; deal_id: string; destination_name: string;
-  people: number; nights: number; total_price: number | string; currency: string;
-  status: string; start_date: string; end_date: string; created_at: string;
+  id: string;
+  user_id: string;
+  deal_id: string;
+  destination_name: string;
+  people: number;
+  nights: number;
+  total_price: number | string;
+  currency: string;
+  status: string;
+  start_date: string;
+  end_date: string;
+  created_at: string;
   snapshot: unknown;
 }
 
 async function allBookings(): Promise<BookingRecord[]> {
   const { data, error } = await supabaseAdmin
     .from("bookings")
-    .select("id,user_id,deal_id,destination_name,people,nights,total_price,currency,status,start_date,end_date,created_at,snapshot")
+    .select(
+      "id,user_id,deal_id,destination_name,people,nights,total_price,currency,status,start_date,end_date,created_at,snapshot",
+    )
     .order("created_at", { ascending: false });
   if (error) throw new AdminError(error.message);
   return (data ?? []) as unknown as BookingRecord[];
@@ -156,11 +196,15 @@ async function nameMap(): Promise<Map<string, string>> {
   return m;
 }
 
-function toOrder(b: BookingRecord, names: Map<string, string>, emails: Map<string, string | null>): AdminOrder {
+function toOrder(
+  b: BookingRecord,
+  names: Map<string, string>,
+  emails: Map<string, string | null>,
+): AdminOrder {
   return {
     id: b.id,
     userId: b.user_id,
-    customer: names.get(b.user_id) ?? (emails.get(b.user_id)?.split("@")[0] ?? "—"),
+    customer: names.get(b.user_id) ?? emails.get(b.user_id)?.split("@")[0] ?? "—",
     email: emails.get(b.user_id) ?? null,
     destination: b.destination_name,
     dealId: b.deal_id,
@@ -183,8 +227,14 @@ export async function buildOverview(): Promise<AdminOverview> {
     allBookings(),
     authUsers(),
     nameMap(),
-    supabaseAdmin.from("deal_views").select("deal_id, destination_name, created_at").gte("created_at", daysAgo(30).toISOString()),
-    supabaseAdmin.from("search_history").select("id, user_id, created_at").gte("created_at", daysAgo(30).toISOString()),
+    supabaseAdmin
+      .from("deal_views")
+      .select("deal_id, destination_name, created_at")
+      .gte("created_at", daysAgo(30).toISOString()),
+    supabaseAdmin
+      .from("search_history")
+      .select("id, user_id, created_at")
+      .gte("created_at", daysAgo(30).toISOString()),
     supabaseAdmin.from("favorites").select("user_id"),
   ]);
 
@@ -204,7 +254,10 @@ export async function buildOverview(): Promise<AdminOverview> {
   for (const b of paid) {
     const key = dayKey(b.created_at);
     const p = byDayMap.get(key);
-    if (p) { p.revenue += Number(b.total_price); p.orders += 1; }
+    if (p) {
+      p.revenue += Number(b.total_price);
+      p.orders += 1;
+    }
   }
 
   const searches = searchRes.data ?? [];
@@ -243,7 +296,8 @@ export async function buildOverview(): Promise<AdminOverview> {
     ordersByUser.set(b.user_id, cur);
   }
   const favByUser = new Map<string, number>();
-  for (const f of favRes.data ?? []) if (f.user_id) favByUser.set(f.user_id, (favByUser.get(f.user_id) ?? 0) + 1);
+  for (const f of favRes.data ?? [])
+    if (f.user_id) favByUser.set(f.user_id, (favByUser.get(f.user_id) ?? 0) + 1);
 
   const roleRows = await supabaseAdmin.from("user_roles").select("user_id, role");
   const rolesByUser = new Map<string, AdminRole[]>();
@@ -258,7 +312,7 @@ export async function buildOverview(): Promise<AdminOverview> {
     .slice(0, 8)
     .map((u) => ({
       id: u.id,
-      name: names.get(u.id) ?? (u.email?.split("@")[0] ?? "—"),
+      name: names.get(u.id) ?? u.email?.split("@")[0] ?? "—",
       email: u.email,
       phone: u.phone,
       createdAt: u.created_at,
@@ -277,16 +331,24 @@ export async function buildOverview(): Promise<AdminOverview> {
     revenueMonth: sum(paid.filter((b) => b.created_at >= monthISO)),
     totalOrders: bookings.length,
     averageOrderValue: paid.length ? Math.round(totalRevenue / paid.length) : 0,
-    conversionRate: searches.length ? Number(((paid.filter((b) => b.created_at >= monthISO).length / searches.length) * 100).toFixed(1)) : 0,
+    conversionRate: searches.length
+      ? Number(
+          ((paid.filter((b) => b.created_at >= monthISO).length / searches.length) * 100).toFixed(
+            1,
+          ),
+        )
+      : 0,
     activeUsers: activeUserIds.size,
     newUsersToday: users.filter((u) => u.created_at >= todayISO).length,
     byDay: [...byDayMap.values()],
     topDestinations: [...revenueByDest.entries()]
       .map(([label, v]) => ({ label, value: v.orders, secondary: v.revenue }))
-      .sort((a, b) => b.value - a.value).slice(0, 8),
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 8),
     topPackages: [...revenueByDeal.entries()]
       .map(([id, v]) => ({ label: dealName.get(id) ?? id, value: v.orders, secondary: v.revenue }))
-      .sort((a, b) => b.value - a.value).slice(0, 8),
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 8),
     mostViewed: tally(views.map((v) => v.destination_name ?? v.deal_id)).slice(0, 8),
     latestOrders: bookings.slice(0, 10).map((b) => toOrder(b, names, emails)),
     latestUsers,
@@ -295,7 +357,12 @@ export async function buildOverview(): Promise<AdminOverview> {
 
 /* ------------------------------------------------------ search analytics */
 
-interface SearchRow { id: string; answers: Record<string, unknown> | null; destination_name: string | null; created_at: string }
+interface SearchRow {
+  id: string;
+  answers: Record<string, unknown> | null;
+  destination_name: string | null;
+  created_at: string;
+}
 
 export async function buildSearchAnalytics(): Promise<SearchAnalytics> {
   const { data, error } = await supabaseAdmin
@@ -328,10 +395,12 @@ export async function buildSearchAnalytics(): Promise<SearchAnalytics> {
   return {
     totalSearches: rows.length,
     topDestinations: tally(rows.map((r) => r.destination_name)).slice(0, 12),
-    noResults: tally(noResults.map((r) => {
-      const q = r.answers?.["destination"];
-      return typeof q === "string" && q.trim() ? q.trim() : "חיפוש ללא יעד מוגדר";
-    })).slice(0, 12),
+    noResults: tally(
+      noResults.map((r) => {
+        const q = r.answers?.["destination"];
+        return typeof q === "string" && q.trim() ? q.trim() : "חיפוש ללא יעד מוגדר";
+      }),
+    ).slice(0, 12),
     noResultsCount: noResults.length,
     popularMonths: tally(months).slice(0, 12),
     popularBudgets: tally(budgets).slice(0, 8),
@@ -346,7 +415,11 @@ export async function buildPackages(): Promise<AdminPackageRow[]> {
     loadCatalog(),
     supabaseAdmin.from("deal_views").select("deal_id"),
     allBookings(),
-    supabaseAdmin.from("system_settings").select("key, value").eq("key", "featured_deal_slugs").maybeSingle(),
+    supabaseAdmin
+      .from("system_settings")
+      .select("key, value")
+      .eq("key", "featured_deal_slugs")
+      .maybeSingle(),
   ]);
 
   const featured = new Set(((settings.data?.value as string[] | null) ?? []).map(String));
@@ -388,25 +461,43 @@ export async function buildPackages(): Promise<AdminPackageRow[]> {
 }
 
 export async function setDestinationActive(slugs: string[], active: boolean) {
-  const { error } = await supabaseAdmin.from("destinations").update({ is_active: active, has_offers: active }).in("slug", slugs);
+  const { error } = await supabaseAdmin
+    .from("destinations")
+    .update({ is_active: active, has_offers: active })
+    .in("slug", slugs);
   if (error) throw new AdminError(error.message);
 }
 
 export async function updateDestination(slug: string, patch: Record<string, unknown>) {
-  const { data: before } = await supabaseAdmin.from("destinations").select("*").eq("slug", slug).maybeSingle();
-  const { error } = await supabaseAdmin.from("destinations").update(patch as never).eq("slug", slug);
+  const { data: before } = await supabaseAdmin
+    .from("destinations")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
+  const { error } = await supabaseAdmin
+    .from("destinations")
+    .update(patch as never)
+    .eq("slug", slug);
   if (error) throw new AdminError(error.message);
   return before;
 }
 
 export async function duplicateDestination(slug: string) {
-  const { data, error } = await supabaseAdmin.from("destinations").select("*").eq("slug", slug).maybeSingle();
+  const { data, error } = await supabaseAdmin
+    .from("destinations")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
   if (error) throw new AdminError(error.message);
   if (!data) throw new AdminError("היעד לא נמצא");
   const copy = { ...(data as Record<string, unknown>) };
   let newSlug = `${slug}-copy`;
   for (let i = 2; ; i++) {
-    const { data: exists } = await supabaseAdmin.from("destinations").select("slug").eq("slug", newSlug).maybeSingle();
+    const { data: exists } = await supabaseAdmin
+      .from("destinations")
+      .select("slug")
+      .eq("slug", newSlug)
+      .maybeSingle();
     if (!exists) break;
     newSlug = `${slug}-copy-${i}`;
   }
@@ -437,7 +528,10 @@ export async function deleteDestination(slug: string) {
 export async function buildFlights(): Promise<AdminFlightRow[]> {
   const catalog = await loadCatalog();
   const disabled = await supabaseAdmin
-    .from("system_settings").select("value").eq("key", "disabled_flight_ids").maybeSingle();
+    .from("system_settings")
+    .select("value")
+    .eq("key", "disabled_flight_ids")
+    .maybeSingle();
   const off = new Set(((disabled.data?.value as string[] | null) ?? []).map(String));
 
   const rows: AdminFlightRow[] = [];
@@ -471,11 +565,20 @@ export async function buildFlights(): Promise<AdminFlightRow[]> {
 }
 
 export async function setFlightEnabled(id: string, enabled: boolean) {
-  const { data } = await supabaseAdmin.from("system_settings").select("value").eq("key", "disabled_flight_ids").maybeSingle();
+  const { data } = await supabaseAdmin
+    .from("system_settings")
+    .select("value")
+    .eq("key", "disabled_flight_ids")
+    .maybeSingle();
   const set = new Set(((data?.value as string[] | null) ?? []).map(String));
-  if (enabled) set.delete(id); else set.add(id);
-  const { error } = await supabaseAdmin.from("system_settings")
-    .upsert({ key: "disabled_flight_ids", value: [...set] as never, is_public: false, updated_at: new Date().toISOString() });
+  if (enabled) set.delete(id);
+  else set.add(id);
+  const { error } = await supabaseAdmin.from("system_settings").upsert({
+    key: "disabled_flight_ids",
+    value: [...set] as never,
+    is_public: false,
+    updated_at: new Date().toISOString(),
+  });
   if (error) throw new AdminError(error.message);
 }
 
@@ -483,7 +586,9 @@ export async function setFlightEnabled(id: string, enabled: boolean) {
 
 export async function buildUsers(): Promise<AdminUserRow[]> {
   const [users, names, bookings, favRes, roleRows] = await Promise.all([
-    authUsers(), nameMap(), allBookings(),
+    authUsers(),
+    nameMap(),
+    allBookings(),
     supabaseAdmin.from("favorites").select("user_id"),
     supabaseAdmin.from("user_roles").select("user_id, role"),
   ]);
@@ -492,11 +597,13 @@ export async function buildUsers(): Promise<AdminUserRow[]> {
   for (const b of bookings) {
     if (b.status === "cancelled" || b.status === "refunded") continue;
     const cur = ordersByUser.get(b.user_id) ?? { count: 0, spend: 0 };
-    cur.count += 1; cur.spend += Number(b.total_price);
+    cur.count += 1;
+    cur.spend += Number(b.total_price);
     ordersByUser.set(b.user_id, cur);
   }
   const favByUser = new Map<string, number>();
-  for (const f of favRes.data ?? []) if (f.user_id) favByUser.set(f.user_id, (favByUser.get(f.user_id) ?? 0) + 1);
+  for (const f of favRes.data ?? [])
+    if (f.user_id) favByUser.set(f.user_id, (favByUser.get(f.user_id) ?? 0) + 1);
   const rolesByUser = new Map<string, AdminRole[]>();
   for (const r of roleRows.data ?? []) {
     const l = rolesByUser.get(r.user_id) ?? [];
@@ -508,7 +615,7 @@ export async function buildUsers(): Promise<AdminUserRow[]> {
     .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at))
     .map((u) => ({
       id: u.id,
-      name: names.get(u.id) ?? (u.email?.split("@")[0] ?? "—"),
+      name: names.get(u.id) ?? u.email?.split("@")[0] ?? "—",
       email: u.email,
       phone: u.phone,
       createdAt: u.created_at,
@@ -532,7 +639,11 @@ export async function setUserRole(userId: string, role: AdminRole, enabled: bool
     const { error } = await supabaseAdmin.from("user_roles").insert({ user_id: userId, role });
     if (error && error.code !== "23505") throw new AdminError(error.message);
   } else {
-    const { error } = await supabaseAdmin.from("user_roles").delete().eq("user_id", userId).eq("role", role);
+    const { error } = await supabaseAdmin
+      .from("user_roles")
+      .delete()
+      .eq("user_id", userId)
+      .eq("role", role);
     if (error) throw new AdminError(error.message);
   }
 }
@@ -546,7 +657,11 @@ export async function buildOrders(): Promise<AdminOrder[]> {
 }
 
 export async function setOrderStatus(id: string, status: string) {
-  const { data: before } = await supabaseAdmin.from("bookings").select("status").eq("id", id).maybeSingle();
+  const { data: before } = await supabaseAdmin
+    .from("bookings")
+    .select("status")
+    .eq("id", id)
+    .maybeSingle();
   const { error } = await supabaseAdmin.from("bookings").update({ status }).eq("id", id);
   if (error) throw new AdminError(error.message);
   return before?.status ?? null;
@@ -556,17 +671,27 @@ export async function setOrderStatus(id: string, status: string) {
 
 export async function buildAlerts(): Promise<AdminAlert[]> {
   const { data, error } = await supabaseAdmin
-    .from("admin_alerts").select("*").order("created_at", { ascending: false }).limit(200);
+    .from("admin_alerts")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(200);
   if (error) throw new AdminError(error.message);
   return (data ?? []).map((a) => ({
-    id: a.id, type: a.type, severity: a.severity, message: a.message,
-    context: a.context as JsonValue, resolvedAt: a.resolved_at, createdAt: a.created_at,
+    id: a.id,
+    type: a.type,
+    severity: a.severity,
+    message: a.message,
+    context: a.context as JsonValue,
+    resolvedAt: a.resolved_at,
+    createdAt: a.created_at,
   }));
 }
 
 export async function resolveAlert(id: string) {
-  const { error } = await supabaseAdmin.from("admin_alerts")
-    .update({ resolved_at: new Date().toISOString() }).eq("id", id);
+  const { error } = await supabaseAdmin
+    .from("admin_alerts")
+    .update({ resolved_at: new Date().toISOString() })
+    .eq("id", id);
   if (error) throw new AdminError(error.message);
 }
 
@@ -575,13 +700,25 @@ export async function resolveAlert(id: string) {
 export async function buildSettings(): Promise<SettingRow[]> {
   const { data, error } = await supabaseAdmin.from("system_settings").select("*").order("key");
   if (error) throw new AdminError(error.message);
-  return (data ?? []).map((s) => ({ key: s.key, value: s.value as JsonValue, isPublic: s.is_public, updatedAt: s.updated_at }));
+  return (data ?? []).map((s) => ({
+    key: s.key,
+    value: s.value as JsonValue,
+    isPublic: s.is_public,
+    updatedAt: s.updated_at,
+  }));
 }
 
 export async function saveSetting(key: string, value: unknown, actorId: string) {
-  const { data: before } = await supabaseAdmin.from("system_settings").select("value").eq("key", key).maybeSingle();
+  const { data: before } = await supabaseAdmin
+    .from("system_settings")
+    .select("value")
+    .eq("key", key)
+    .maybeSingle();
   const { error } = await supabaseAdmin.from("system_settings").upsert({
-    key, value: value as never, updated_by: actorId, updated_at: new Date().toISOString(),
+    key,
+    value: value as never,
+    updated_by: actorId,
+    updated_at: new Date().toISOString(),
   });
   if (error) throw new AdminError(error.message);
   return before?.value ?? null;
@@ -590,8 +727,13 @@ export async function saveSetting(key: string, value: unknown, actorId: string) 
 /* ----------------------------------------------------------------- audit */
 
 export async function buildAudit(filters: {
-  action?: string; resource?: string; actor?: string; from?: string; to?: string;
-  page: number; pageSize: number;
+  action?: string;
+  resource?: string;
+  actor?: string;
+  from?: string;
+  to?: string;
+  page: number;
+  pageSize: number;
 }): Promise<Paged<AuditRow>> {
   let q = supabaseAdmin.from("admin_audit_log").select("*", { count: "exact" });
   if (filters.action) q = q.ilike("action", `%${filters.action}%`);
@@ -607,9 +749,15 @@ export async function buildAudit(filters: {
   return {
     total: count ?? 0,
     rows: (data ?? []).map((r) => ({
-      id: r.id, actorEmail: r.actor_email, action: r.action, resource: r.resource,
-      resourceId: r.resource_id, previousValue: r.previous_value as JsonValue, newValue: r.new_value as JsonValue,
-      ip: r.ip_address, createdAt: r.created_at,
+      id: r.id,
+      actorEmail: r.actor_email,
+      action: r.action,
+      resource: r.resource,
+      resourceId: r.resource_id,
+      previousValue: r.previous_value as JsonValue,
+      newValue: r.new_value as JsonValue,
+      ip: r.ip_address,
+      createdAt: r.created_at,
     })),
   };
 }
@@ -617,13 +765,24 @@ export async function buildAudit(filters: {
 /* ----------------------------------------------------------- permissions */
 
 export async function buildPermissionMatrix() {
-  const { data, error } = await supabaseAdmin.from("role_permissions").select("role, permission, allowed");
+  const { data, error } = await supabaseAdmin
+    .from("role_permissions")
+    .select("role, permission, allowed");
   if (error) throw new AdminError(error.message);
-  return (data ?? []).map((r) => ({ role: r.role as AdminRole, permission: r.permission as AdminPermission, allowed: r.allowed }));
+  return (data ?? []).map((r) => ({
+    role: r.role as AdminRole,
+    permission: r.permission as AdminPermission,
+    allowed: r.allowed,
+  }));
 }
 
-export async function setRolePermission(role: AdminRole, permission: AdminPermission, allowed: boolean) {
-  const { error } = await supabaseAdmin.from("role_permissions")
+export async function setRolePermission(
+  role: AdminRole,
+  permission: AdminPermission,
+  allowed: boolean,
+) {
+  const { error } = await supabaseAdmin
+    .from("role_permissions")
     .upsert({ role, permission, allowed }, { onConflict: "role,permission" });
   if (error) throw new AdminError(error.message);
 }

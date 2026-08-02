@@ -22,7 +22,9 @@ export async function listConversations(): Promise<ConversationRow[]> {
 }
 
 export async function createConversation(title: string): Promise<string> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error("not signed in");
   const { data, error } = await supabase
     .from("ai_conversations")
@@ -62,7 +64,9 @@ export async function loadMessages(conversationId: string): Promise<UIMessage[]>
 
 /** Persists one message. The DB generates the UUID id; the AI SDK id is kept separately. */
 export async function saveMessage(conversationId: string, message: UIMessage): Promise<void> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return;
   const { error } = await supabase.from("ai_messages").insert({
     conversation_id: conversationId,
@@ -72,5 +76,9 @@ export async function saveMessage(conversationId: string, message: UIMessage): P
     parts: message.parts as unknown as never,
   });
   if (error) console.error("[nitzi-ai] failed to save message", error.message);
-  else await supabase.from("ai_conversations").update({ updated_at: new Date().toISOString() }).eq("id", conversationId);
+  else
+    await supabase
+      .from("ai_conversations")
+      .update({ updated_at: new Date().toISOString() })
+      .eq("id", conversationId);
 }

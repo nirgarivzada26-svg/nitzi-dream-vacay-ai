@@ -12,14 +12,18 @@ import type { User } from "@supabase/supabase-js";
 const INTENT_KEY = "nitzi:auth-intent";
 
 export function setAuthIntent(path: string) {
-  try { sessionStorage.setItem(INTENT_KEY, path); } catch {}
+  try {
+    sessionStorage.setItem(INTENT_KEY, path);
+  } catch {}
 }
 export function consumeAuthIntent(): string | null {
   try {
     const v = sessionStorage.getItem(INTENT_KEY);
     if (v) sessionStorage.removeItem(INTENT_KEY);
     return v;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 export async function signOut() {
@@ -43,7 +47,10 @@ export function useAuth() {
       setUser(session?.user ?? null);
       setLoading(false);
     });
-    return () => { mounted = false; sub.subscription.unsubscribe(); };
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   return { user, loading, isAuthenticated: !!user };
@@ -52,6 +59,12 @@ export function useAuth() {
 // Nice display name (from profile metadata; falls back to email prefix).
 export function displayNameOf(u: User | null | undefined): string {
   if (!u) return "";
-  const meta = (u.user_metadata ?? {}) as { name?: string; full_name?: string; display_name?: string };
-  return meta.display_name || meta.name || meta.full_name || (u.email ? u.email.split("@")[0] : "משתמש");
+  const meta = (u.user_metadata ?? {}) as {
+    name?: string;
+    full_name?: string;
+    display_name?: string;
+  };
+  return (
+    meta.display_name || meta.name || meta.full_name || (u.email ? u.email.split("@")[0] : "משתמש")
+  );
 }

@@ -45,7 +45,9 @@ export function VerifiedPrice({
             {REFRESH_TO_VERIFY_LABEL}
           </button>
         ) : (
-          <p className="text-[11px] font-semibold text-muted-foreground">{reason ?? REFRESH_TO_VERIFY_LABEL}</p>
+          <p className="text-[11px] font-semibold text-muted-foreground">
+            {reason ?? REFRESH_TO_VERIFY_LABEL}
+          </p>
         )}
       </div>
     );
@@ -58,7 +60,9 @@ export function VerifiedPrice({
       <p className="text-[11px] font-bold text-muted-foreground">החל מ־</p>
       <p className="text-2xl font-black leading-none">{fmt(quote.perPerson as number)}</p>
       {quote.total !== null && (
-        <p className="text-[11px] font-semibold text-muted-foreground">לאדם · סה״כ {fmt(quote.total)}</p>
+        <p className="text-[11px] font-semibold text-muted-foreground">
+          לאדם · סה״כ {fmt(quote.total)}
+        </p>
       )}
       {stale ? (
         <button

@@ -2,7 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CheckCircle2 } from "lucide-react";
-import { AdminEmpty, AdminError, AdminLoading, SectionCard, dateTime } from "@/components/admin/AdminUI";
+import {
+  AdminEmpty,
+  AdminError,
+  AdminLoading,
+  SectionCard,
+  dateTime,
+} from "@/components/admin/AdminUI";
 import { adminAlerts, adminResolveAlert } from "@/lib/admin.functions";
 import type { AdminAlert } from "@/lib/admin-types";
 
@@ -18,7 +24,10 @@ const SEVERITY: Record<string, string> = {
 };
 
 const SEVERITY_LABEL: Record<string, string> = {
-  critical: "קריטי", error: "שגיאה", warning: "אזהרה", info: "מידע",
+  critical: "קריטי",
+  error: "שגיאה",
+  warning: "אזהרה",
+  info: "מידע",
 };
 
 function NotificationsPage() {
@@ -49,22 +58,35 @@ function NotificationsPage() {
     <div className="space-y-5">
       <h1 className="text-2xl font-black sm:text-3xl">מרכז התראות</h1>
 
-      <SectionCard title="התראות פתוחות" subtitle={`${open.length.toLocaleString("he-IL")} דורשות טיפול`}>
+      <SectionCard
+        title="התראות פתוחות"
+        subtitle={`${open.length.toLocaleString("he-IL")} דורשות טיפול`}
+      >
         {open.length === 0 ? (
           <AdminEmpty title="אין התראות פתוחות" hint="כל תקלות הסנכרון, התשלום וההזמנות מטופלות." />
         ) : (
           <ul className="space-y-2">
             {open.map((a) => (
-              <li key={a.id} className={`flex flex-wrap items-start justify-between gap-3 rounded-2xl border p-4 ${SEVERITY[a.severity] ?? SEVERITY.info}`}>
+              <li
+                key={a.id}
+                className={`flex flex-wrap items-start justify-between gap-3 rounded-2xl border p-4 ${SEVERITY[a.severity] ?? SEVERITY.info}`}
+              >
                 <div className="min-w-[220px] flex-1">
                   <div className="mb-1 flex flex-wrap items-center gap-2">
-                    <span className="rounded-full bg-background px-2 py-0.5 text-[11px] font-bold">{SEVERITY_LABEL[a.severity] ?? a.severity}</span>
+                    <span className="rounded-full bg-background px-2 py-0.5 text-[11px] font-bold">
+                      {SEVERITY_LABEL[a.severity] ?? a.severity}
+                    </span>
                     <span className="text-[11px] font-bold text-muted-foreground">{a.type}</span>
-                    <span className="text-[11px] text-muted-foreground">{dateTime(a.createdAt)}</span>
+                    <span className="text-[11px] text-muted-foreground">
+                      {dateTime(a.createdAt)}
+                    </span>
                   </div>
                   <p className="text-sm font-bold">{a.message}</p>
                   {a.context && typeof a.context === "object" ? (
-                    <pre dir="ltr" className="mt-2 max-h-32 overflow-auto rounded-lg bg-muted p-2 text-[11px]">
+                    <pre
+                      dir="ltr"
+                      className="mt-2 max-h-32 overflow-auto rounded-lg bg-muted p-2 text-[11px]"
+                    >
                       {JSON.stringify(a.context, null, 2)}
                     </pre>
                   ) : null}
@@ -81,15 +103,23 @@ function NotificationsPage() {
         )}
       </SectionCard>
 
-      <SectionCard title="היסטוריית התראות" subtitle={`${done.length.toLocaleString("he-IL")} טופלו`}>
+      <SectionCard
+        title="היסטוריית התראות"
+        subtitle={`${done.length.toLocaleString("he-IL")} טופלו`}
+      >
         {done.length === 0 ? (
           <AdminEmpty title="אין התראות שטופלו" />
         ) : (
           <ul className="divide-y divide-border">
             {done.slice(0, 50).map((a) => (
-              <li key={a.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm">
+              <li
+                key={a.id}
+                className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm"
+              >
                 <span className="font-bold">{a.message}</span>
-                <span className="text-[11px] text-muted-foreground">טופל · {dateTime(a.resolvedAt!)}</span>
+                <span className="text-[11px] text-muted-foreground">
+                  טופל · {dateTime(a.resolvedAt!)}
+                </span>
               </li>
             ))}
           </ul>

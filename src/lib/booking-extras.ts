@@ -16,8 +16,20 @@ export const EXTRAS: ExtraDef[] = [
   { id: "bag", label: "מזוודה 23 ק״ג", note: "לכיוון הלוך-חזור", price: 150, perPerson: true },
   { id: "trolley", label: "טרולי עלייה למטוס", note: "8 ק״ג", price: 90, perPerson: true },
   { id: "seat", label: "בחירת מושב", note: "מושבים צמודים בטיסה", price: 120, perPerson: true },
-  { id: "insurance", label: "ביטוח נסיעות", note: "כולל כיסוי רפואי וביטולים", price: 120, perPerson: true },
-  { id: "transfers", label: "העברות שדה תעופה–מלון", note: "כלול בחבילה", price: 0, perPerson: false },
+  {
+    id: "insurance",
+    label: "ביטוח נסיעות",
+    note: "כולל כיסוי רפואי וביטולים",
+    price: 120,
+    perPerson: true,
+  },
+  {
+    id: "transfers",
+    label: "העברות שדה תעופה–מלון",
+    note: "כלול בחבילה",
+    price: 0,
+    perPerson: false,
+  },
   { id: "meals", label: "שדרוג ארוחות", note: "חצי פנסיון במלון", price: 240, perPerson: true },
 ];
 
@@ -30,7 +42,10 @@ export interface ExtraLine {
 }
 
 /** Deterministic extras pricing. Same function runs on the client and the server. */
-export function computeExtras(selected: ExtraId[], people: number): { lines: ExtraLine[]; total: number } {
+export function computeExtras(
+  selected: ExtraId[],
+  people: number,
+): { lines: ExtraLine[]; total: number } {
   const set = new Set(selected);
   const lines = EXTRAS.filter((e) => set.has(e.id) && e.price > 0).map((e) => ({
     id: e.id,

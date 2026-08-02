@@ -5,7 +5,13 @@
 // step. Every offer it returns carries a VerifiedQuote produced by a real
 // verify() round-trip — the UI never fabricates prices or availability.
 
-import type { Flight, FlightProvider, HotelProvider, PackageProvider, SearchContext } from "./types";
+import type {
+  Flight,
+  FlightProvider,
+  HotelProvider,
+  PackageProvider,
+  SearchContext,
+} from "./types";
 import { mockFlightProvider, mockHotelProvider, mockPackageProvider } from "./mock";
 import { carriersForRoute, getAirline } from "./airlines";
 import { PROVIDER_ID, QUOTE_TTL_SECONDS } from "./config";
@@ -53,7 +59,8 @@ function toOffer(flight: Flight, ctx: SearchContext, idx: number): FlightOffer {
   const r = rng(`offer|${flight.id}|${idx}`);
   const carriers = carriersForRoute(ctx.destination.countryCode);
   // Route validity: never offer a carrier that does not operate this route.
-  const carrier = carriers.length > 0 ? carriers[Math.floor(r() * carriers.length) % carriers.length] : null;
+  const carrier =
+    carriers.length > 0 ? carriers[Math.floor(r() * carriers.length) % carriers.length] : null;
   if (!carrier) {
     return {
       id: flight.id,
@@ -77,10 +84,14 @@ function toOffer(flight: Flight, ctx: SearchContext, idx: number): FlightOffer {
     };
   }
 
-  const aircraft = carrier.aircraft[Math.floor(r() * carrier.aircraft.length) % carrier.aircraft.length];
+  const aircraft =
+    carrier.aircraft[Math.floor(r() * carrier.aircraft.length) % carrier.aircraft.length];
   const stops = flight.stops;
   const layoverMinutes = Array.from({ length: stops }, () => 55 + Math.floor(r() * 150));
-  const flyingMinutes = Math.max(60, flight.durationMinutes - layoverMinutes.reduce((a, b) => a + b, 0));
+  const flyingMinutes = Math.max(
+    60,
+    flight.durationMinutes - layoverMinutes.reduce((a, b) => a + b, 0),
+  );
   const legCount = stops + 1;
   const perLeg = Math.round(flyingMinutes / legCount);
 

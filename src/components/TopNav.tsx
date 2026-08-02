@@ -69,7 +69,9 @@ export function TopNav({ variant = "solid" }: { variant?: Variant }) {
               to="/account"
               search={{ tab: "bookings" }}
               className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-black ${
-                overlay ? "border border-white/40 bg-white/20 text-white backdrop-blur-md" : "border border-border bg-card text-foreground"
+                overlay
+                  ? "border border-white/40 bg-white/20 text-white backdrop-blur-md"
+                  : "border border-border bg-card text-foreground"
               }`}
             >
               <UserIcon className="h-3.5 w-3.5" /> {displayNameOf(user)}
@@ -86,7 +88,9 @@ export function TopNav({ variant = "solid" }: { variant?: Variant }) {
             onClick={() => setMenuOpen((v) => !v)}
             aria-label="תפריט"
             className={`grid h-10 w-10 place-items-center rounded-full lg:hidden ${
-              overlay ? "border border-white/40 bg-white/20 text-white backdrop-blur-md" : "border border-border bg-card text-foreground"
+              overlay
+                ? "border border-white/40 bg-white/20 text-white backdrop-blur-md"
+                : "border border-border bg-card text-foreground"
             }`}
           >
             {menuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
@@ -110,7 +114,10 @@ export function TopNav({ variant = "solid" }: { variant?: Variant }) {
               </Link>
             ))}
             <button
-              onClick={() => { setMenuOpen(false); goFavorites(); }}
+              onClick={() => {
+                setMenuOpen(false);
+                goFavorites();
+              }}
               className="flex items-center gap-2 rounded-2xl px-4 py-3 text-right text-sm font-black text-foreground"
             >
               <Heart className="h-4 w-4" /> מועדפים

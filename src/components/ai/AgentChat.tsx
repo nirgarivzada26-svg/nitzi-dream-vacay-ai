@@ -40,7 +40,12 @@ function isSearchResult(v: unknown): v is AgentSearchResult {
   return !!v && typeof v === "object" && "recommendations" in (v as Record<string, unknown>);
 }
 function isComparison(v: unknown): v is AgentComparison {
-  return !!v && typeof v === "object" && "rows" in (v as Record<string, unknown>) && "items" in (v as Record<string, unknown>);
+  return (
+    !!v &&
+    typeof v === "object" &&
+    "rows" in (v as Record<string, unknown>) &&
+    "items" in (v as Record<string, unknown>)
+  );
 }
 
 const TOOL_LABEL: Record<string, string> = {
@@ -73,7 +78,10 @@ export function AgentChat({
   const autoSent = useRef(false);
 
   useEffect(() => {
-    if (!user) { setProfile(null); return; }
+    if (!user) {
+      setProfile(null);
+      return;
+    }
     let alive = true;
     (async () => {
       try {
@@ -83,11 +91,17 @@ export function AgentChat({
         setProfile({
           favorites: Array.from(new Set(favs.map((f) => f.destination_name))).slice(0, 8),
           booked: Array.from(new Set(bookings.map((b) => b.destination_name))).slice(0, 8),
-          avgBudget: budgets.length ? Math.round(budgets.reduce((a, b) => a + b, 0) / budgets.length) : null,
+          avgBudget: budgets.length
+            ? Math.round(budgets.reduce((a, b) => a + b, 0) / budgets.length)
+            : null,
         });
-      } catch { /* personalization is optional */ }
+      } catch {
+        /* personalization is optional */
+      }
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [user]);
 
   const transport = useMemo(
@@ -116,8 +130,12 @@ export function AgentChat({
     requestAnimationFrame(() => textareaRef.current?.focus());
   }, []);
 
-  useEffect(() => { focusInput(); }, [chatId, focusInput]);
-  useEffect(() => { if (status === "ready") focusInput(); }, [status, focusInput]);
+  useEffect(() => {
+    focusInput();
+  }, [chatId, focusInput]);
+  useEffect(() => {
+    if (status === "ready") focusInput();
+  }, [status, focusInput]);
 
   useEffect(() => {
     if (autoSent.current || !autoSend) return;
@@ -168,7 +186,9 @@ export function AgentChat({
           {messages.map((message) => (
             <Message from={message.role} key={message.id}>
               <MessageContent
-                className={message.role === "assistant" ? "bg-transparent p-0 text-foreground" : undefined}
+                className={
+                  message.role === "assistant" ? "bg-transparent p-0 text-foreground" : undefined
+                }
               >
                 {message.parts.map((part, i) => {
                   const key = `${message.id}-${i}`;
@@ -179,7 +199,11 @@ export function AgentChat({
 
                   if (part.type.startsWith("tool-")) {
                     const p = part as unknown as {
-                      type: string; state: string; input?: unknown; output?: unknown; errorText?: string;
+                      type: string;
+                      state: string;
+                      input?: unknown;
+                      output?: unknown;
+                      errorText?: string;
                     };
                     const output = p.output;
                     return (
@@ -198,7 +222,10 @@ export function AgentChat({
                         {isSearchResult(output) && output.recommendations.length > 0 && (
                           <div className="grid gap-4 sm:grid-cols-2">
                             {output.recommendations.map((rec, idx) => (
-                              <RecommendationCard key={`${rec.dealId ?? rec.destinationSlug}-${idx}`} rec={rec} />
+                              <RecommendationCard
+                                key={`${rec.dealId ?? rec.destinationSlug}-${idx}`}
+                                rec={rec}
+                              />
                             ))}
                           </div>
                         )}

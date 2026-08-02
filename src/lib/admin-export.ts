@@ -20,7 +20,11 @@ export function exportCsv(rows: Row[], filename: string) {
   const headers = Object.keys(rows[0]);
   const body = rows.map((r) => headers.map((h) => esc(r[h])).join(",")).join("\n");
   // BOM keeps Hebrew readable in Excel.
-  download("\uFEFF" + headers.map(esc).join(",") + "\n" + body, `${filename}.csv`, "text/csv;charset=utf-8");
+  download(
+    "\uFEFF" + headers.map(esc).join(",") + "\n" + body,
+    `${filename}.csv`,
+    "text/csv;charset=utf-8",
+  );
 }
 
 export function exportExcel(rows: Row[], filename: string) {
@@ -39,7 +43,8 @@ export function exportPdf(rows: Row[], filename: string, title: string) {
   const headers = Object.keys(rows[0]);
   const win = window.open("", "_blank");
   if (!win) return;
-  win.document.write(`<html dir="rtl" lang="he"><head><meta charset="utf-8"><title>${filename}</title>
+  win.document
+    .write(`<html dir="rtl" lang="he"><head><meta charset="utf-8"><title>${filename}</title>
     <style>body{font-family:system-ui,sans-serif;padding:24px}h1{font-size:20px}
     table{width:100%;border-collapse:collapse;font-size:12px}
     th,td{border:1px solid #ddd;padding:6px;text-align:right}th{background:#f5f5f5}</style></head>

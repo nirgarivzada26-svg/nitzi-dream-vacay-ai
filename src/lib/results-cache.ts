@@ -22,7 +22,9 @@ const KEY = "nitzi:results-cache";
 
 export function setResultsCache(snap: Snapshot) {
   mem = snap;
-  try { sessionStorage.setItem(KEY, JSON.stringify(snap)); } catch {}
+  try {
+    sessionStorage.setItem(KEY, JSON.stringify(snap));
+  } catch {}
 }
 
 export function getResultsCache(): Snapshot | null {
@@ -32,7 +34,9 @@ export function getResultsCache(): Snapshot | null {
     if (!raw) return null;
     mem = JSON.parse(raw);
     return mem;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 export function findHotel(id: string) {

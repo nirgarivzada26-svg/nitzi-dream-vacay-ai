@@ -16,7 +16,10 @@ export const Route = createFileRoute("/ai/$conversationId")({
   head: () => ({
     meta: [
       { title: "שיחה עם NITZI AI" },
-      { name: "description", content: "המשך שיחה שמורה עם סוכן החופשות של NITZI וקבל המלצות מהקטלוג." },
+      {
+        name: "description",
+        content: "המשך שיחה שמורה עם סוכן החופשות של NITZI וקבל המלצות מהקטלוג.",
+      },
       { property: "og:title", content: "שיחה עם NITZI AI" },
       { property: "og:description", content: "המשך את השיחה שלך עם סוכן החופשות של NITZI." },
       { property: "og:type", content: "website" },
@@ -35,13 +38,22 @@ function AiThreadPage() {
 
   useEffect(() => {
     if (loading) return;
-    if (!user) { void navigate({ to: "/ai" }); return; }
+    if (!user) {
+      void navigate({ to: "/ai" });
+      return;
+    }
     let alive = true;
     setInitial(null);
     loadMessages(conversationId)
-      .then((m) => { if (alive) setInitial(m); })
-      .catch(() => { if (alive) setInitial([]); });
-    return () => { alive = false; };
+      .then((m) => {
+        if (alive) setInitial(m);
+      })
+      .catch(() => {
+        if (alive) setInitial([]);
+      });
+    return () => {
+      alive = false;
+    };
   }, [conversationId, user, loading, navigate]);
 
   return (

@@ -5,8 +5,14 @@ import { useMemo, useState, type ReactNode } from "react";
 import { AlertTriangle, ArrowUpDown, Inbox, Loader2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
 export function AdminLoading({ label = "טוען נתונים…" }: { label?: string }) {
@@ -41,14 +47,24 @@ export function AdminError({ error }: { error: unknown }) {
 }
 
 export function StatCard({
-  label, value, hint, icon: Icon, tone = "default",
+  label,
+  value,
+  hint,
+  icon: Icon,
+  tone = "default",
 }: {
-  label: string; value: string; hint?: string;
+  label: string;
+  value: string;
+  hint?: string;
   icon?: React.ComponentType<{ className?: string }>;
   tone?: "default" | "success" | "warning";
 }) {
   const toneCls =
-    tone === "success" ? "text-emerald-600" : tone === "warning" ? "text-amber-600" : "text-primary";
+    tone === "success"
+      ? "text-emerald-600"
+      : tone === "warning"
+        ? "text-amber-600"
+        : "text-primary";
   return (
     <div className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
       <div className="flex items-center justify-between gap-2">
@@ -62,8 +78,16 @@ export function StatCard({
 }
 
 export function SectionCard({
-  title, subtitle, action, children,
-}: { title: string; subtitle?: string; action?: ReactNode; children: ReactNode }) {
+  title,
+  subtitle,
+  action,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  action?: ReactNode;
+  children: ReactNode;
+}) {
   return (
     <section className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6">
       <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -102,8 +126,18 @@ interface DataTableProps<T> {
 }
 
 export function DataTable<T>({
-  rows, columns, rowKey, searchable, searchPlaceholder = "חיפוש…", pageSize = 12,
-  emptyTitle = "אין נתונים להצגה", emptyHint, selectable, selected = [], onSelectedChange, toolbar,
+  rows,
+  columns,
+  rowKey,
+  searchable,
+  searchPlaceholder = "חיפוש…",
+  pageSize = 12,
+  emptyTitle = "אין נתונים להצגה",
+  emptyHint,
+  selectable,
+  selected = [],
+  onSelectedChange,
+  toolbar,
 }: DataTableProps<T>) {
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<{ key: string; dir: "asc" | "desc" } | null>(null);
@@ -117,10 +151,12 @@ export function DataTable<T>({
       const col = columns.find((c) => c.key === sort.key);
       if (col?.sortValue) {
         out = [...out].sort((a, b) => {
-          const av = col.sortValue!(a), bv = col.sortValue!(b);
-          const cmp = typeof av === "number" && typeof bv === "number"
-            ? av - bv
-            : String(av).localeCompare(String(bv), "he");
+          const av = col.sortValue!(a),
+            bv = col.sortValue!(b);
+          const cmp =
+            typeof av === "number" && typeof bv === "number"
+              ? av - bv
+              : String(av).localeCompare(String(bv), "he");
           return sort.dir === "asc" ? cmp : -cmp;
         });
       }
@@ -147,7 +183,10 @@ export function DataTable<T>({
             <Search className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               value={q}
-              onChange={(e) => { setQ(e.target.value); setPage(1); }}
+              onChange={(e) => {
+                setQ(e.target.value);
+                setPage(1);
+              }}
               placeholder={searchPlaceholder}
               className="h-10 w-full rounded-xl border border-border bg-background pr-9 pl-3 text-sm outline-none focus:border-primary"
             />
@@ -171,7 +210,9 @@ export function DataTable<T>({
                         checked={allChecked}
                         onChange={() =>
                           onSelectedChange?.(
-                            allChecked ? selected.filter((s) => !allIds.includes(s)) : [...new Set([...selected, ...allIds])],
+                            allChecked
+                              ? selected.filter((s) => !allIds.includes(s))
+                              : [...new Set([...selected, ...allIds])],
                           )
                         }
                       />
@@ -184,7 +225,9 @@ export function DataTable<T>({
                           className="inline-flex items-center gap-1 hover:text-foreground"
                           onClick={() =>
                             setSort((s) =>
-                              s?.key === c.key ? { key: c.key, dir: s.dir === "asc" ? "desc" : "asc" } : { key: c.key, dir: "asc" },
+                              s?.key === c.key
+                                ? { key: c.key, dir: s.dir === "asc" ? "desc" : "asc" }
+                                : { key: c.key, dir: "asc" },
                             )
                           }
                         >
@@ -205,7 +248,11 @@ export function DataTable<T>({
                     <tr key={id} className="border-t border-border/70 hover:bg-muted/30">
                       {selectable ? (
                         <td className="p-3">
-                          <input type="checkbox" checked={selected.includes(id)} onChange={() => toggle(id)} />
+                          <input
+                            type="checkbox"
+                            checked={selected.includes(id)}
+                            onChange={() => toggle(id)}
+                          />
                         </td>
                       ) : null}
                       {columns.map((c) => (
@@ -248,7 +295,13 @@ export function DataTable<T>({
 }
 
 export function ConfirmDialog({
-  open, onOpenChange, title, description, confirmLabel = "אישור", destructive, onConfirm,
+  open,
+  onOpenChange,
+  title,
+  description,
+  confirmLabel = "אישור",
+  destructive,
+  onConfirm,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -268,7 +321,11 @@ export function ConfirmDialog({
         <AlertDialogFooter className="gap-2 sm:justify-start">
           <AlertDialogAction
             onClick={onConfirm}
-            className={destructive ? "bg-destructive text-destructive-foreground hover:bg-destructive/90" : undefined}
+            className={
+              destructive
+                ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                : undefined
+            }
           >
             {confirmLabel}
           </AlertDialogAction>
@@ -280,12 +337,15 @@ export function ConfirmDialog({
 }
 
 export const money = (n: number, currency = "ILS") =>
-  new Intl.NumberFormat("he-IL", { style: "currency", currency, maximumFractionDigits: 0 }).format(n || 0);
+  new Intl.NumberFormat("he-IL", { style: "currency", currency, maximumFractionDigits: 0 }).format(
+    n || 0,
+  );
 
 export const dateTime = (iso: string) =>
   new Date(iso).toLocaleString("he-IL", { dateStyle: "short", timeStyle: "short" });
 
-export const dateOnly = (iso: string) => new Date(iso).toLocaleDateString("he-IL", { dateStyle: "medium" });
+export const dateOnly = (iso: string) =>
+  new Date(iso).toLocaleDateString("he-IL", { dateStyle: "medium" });
 
 export function StatusChip({ status }: { status: string }) {
   const map: Record<string, { label: string; cls: string }> = {
@@ -295,5 +355,7 @@ export function StatusChip({ status }: { status: string }) {
     refunded: { label: "זוכתה", cls: "bg-slate-200 text-slate-800" },
   };
   const s = map[status] ?? { label: status, cls: "bg-muted text-muted-foreground" };
-  return <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${s.cls}`}>{s.label}</span>;
+  return (
+    <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${s.cls}`}>{s.label}</span>
+  );
 }

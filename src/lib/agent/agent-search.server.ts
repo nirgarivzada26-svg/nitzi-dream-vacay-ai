@@ -108,14 +108,17 @@ function reasonsFor(deal: Deal, f: AgentFilters): string[] {
   const budget = f.maxBudgetPerPerson;
   if (budget) {
     if (deal.price.perPerson <= budget) {
-      out.push(`בתוך התקציב: ₪${deal.price.perPerson.toLocaleString()} לאדם מתוך ₪${budget.toLocaleString()}`);
+      out.push(
+        `בתוך התקציב: ₪${deal.price.perPerson.toLocaleString()} לאדם מתוך ₪${budget.toLocaleString()}`,
+      );
     } else {
       out.push(`מעל התקציב ב-₪${(deal.price.perPerson - budget).toLocaleString()} לאדם`);
     }
   }
   const sp = smartPrice(deal);
   if (sp) out.push(sp.detail);
-  if (f.minStars && deal.hotel.stars >= f.minStars) out.push(`מלון ${deal.hotel.stars}★ — עומד בדרישה שלך`);
+  if (f.minStars && deal.hotel.stars >= f.minStars)
+    out.push(`מלון ${deal.hotel.stars}★ — עומד בדרישה שלך`);
   if (deal.outbound.stops === 0 && deal.inbound.stops === 0) out.push("טיסה ישירה הלוך ושוב");
   if (deal.board === "all-inclusive") out.push("הכל כלול");
   else out.push(`בסיס אירוח: ${boardLabels[deal.board]}`);
@@ -124,7 +127,8 @@ function reasonsFor(deal: Deal, f: AgentFilters): string[] {
   if (f.tripType && deal.destination.matches.includes(f.tripType)) {
     out.push(`${deal.destination.name} מתאים לחופשה מסוג זה לפי הקטלוג`);
   }
-  if (deal.hotel.guestRating >= 9) out.push(`דירוג אורחים ${deal.hotel.guestRating} (${deal.hotel.reviewsCount} ביקורות)`);
+  if (deal.hotel.guestRating >= 9)
+    out.push(`דירוג אורחים ${deal.hotel.guestRating} (${deal.hotel.reviewsCount} ביקורות)`);
   return out.slice(0, 5);
 }
 
@@ -156,7 +160,9 @@ function toRecommendation(deal: Deal, f: AgentFilters, score: number): AgentReco
     outbound: deal.outbound,
     inbound: deal.inbound,
     nitziScore: score,
-    smartPrice: sp ? { level: sp.level, label: sp.label, detail: sp.detail, emoji: sp.emoji } : null,
+    smartPrice: sp
+      ? { level: sp.level, label: sp.label, detail: sp.detail, emoji: sp.emoji }
+      : null,
     reasons: reasonsFor(deal, f),
     note: null,
   };
@@ -177,14 +183,12 @@ function passesFilters(deal: Deal, f: AgentFilters): boolean {
   if (musts.includes("all-inclusive") && deal.board !== "all-inclusive") return false;
   if (musts.includes("free-cancellation") && !deal.freeCancellation) return false;
   if (musts.includes("beach") && !d.matches.includes("beach")) return false;
-  if (musts.includes("pool") && !/בריכ/.test(`${deal.hotel.note} ${deal.includes.join(" ")}`)) return false;
+  if (musts.includes("pool") && !/בריכ/.test(`${deal.hotel.note} ${deal.includes.join(" ")}`))
+    return false;
   return true;
 }
 
-export async function searchTrips(
-  filters: AgentFilters,
-  limit = 5,
-): Promise<AgentSearchResult> {
+export async function searchTrips(filters: AgentFilters, limit = 5): Promise<AgentSearchResult> {
   const catalog = await getCatalog();
   const deals = listDeals(catalog, DEAL_VARIANTS);
   const matched = deals.filter((d) => passesFilters(d, filters));
@@ -192,7 +196,9 @@ export async function searchTrips(
   if (matched.length === 0) {
     const anyPlace =
       filters.destinations?.length || filters.countries?.length
-        ? catalog.filter((d) => matchesPlace(d, [...(filters.destinations ?? []), ...(filters.countries ?? [])]))
+        ? catalog.filter((d) =>
+            matchesPlace(d, [...(filters.destinations ?? []), ...(filters.countries ?? [])]),
+          )
         : [];
     const reason =
       anyPlace.length === 0 && (filters.destinations?.length || filters.countries?.length)
@@ -253,16 +259,19 @@ export async function buildTrip(
   }
 
   const prices = flightList.map((f) => f.price);
-  const bestHotel = rank(
-    hotelList.filter((h) => (filters.minStars ? h.stars >= filters.minStars : true)),
-    (h) => scoreHotel(h, answers),
-  )[0] ?? rank(hotelList, (h) => scoreHotel(h, answers))[0];
+  const bestHotel =
+    rank(
+      hotelList.filter((h) => (filters.minStars ? h.stars >= filters.minStars : true)),
+      (h) => scoreHotel(h, answers),
+    )[0] ?? rank(hotelList, (h) => scoreHotel(h, answers))[0];
   const flightPool = filters.directOnly ? flightList.filter((f) => f.stops === 0) : flightList;
-  const bestFlight = rank(flightPool.length ? flightPool : flightList, (f) => scoreFlight(f, answers, prices))[0];
+  const bestFlight = rank(flightPool.length ? flightPool : flightList, (f) =>
+    scoreFlight(f, answers, prices),
+  )[0];
 
   const nights = answers.days;
   const people = answers.people;
-  const perPerson = Math.round(bestHotel.pricePerNight * nights / people + bestFlight.price);
+  const perPerson = Math.round((bestHotel.pricePerNight * nights) / people + bestFlight.price);
   const start = new Date(bestFlight.departAt);
   const end = new Date(start.getTime() + nights * 86400000);
 
@@ -298,7 +307,9 @@ export async function buildTrip(
       durationMinutes: bestFlight.durationMinutes,
     },
     inbound: null,
-    nitziScore: Math.round((scoreHotel(bestHotel, answers) + scoreFlight(bestFlight, answers, prices)) / 2),
+    nitziScore: Math.round(
+      (scoreHotel(bestHotel, answers) + scoreFlight(bestFlight, answers, prices)) / 2,
+    ),
     smartPrice: null,
     reasons: [
       `מלון ${bestHotel.stars}★ בדירוג ${bestHotel.guestRating} — ₪${bestHotel.pricePerNight.toLocaleString()} ללילה`,
@@ -323,34 +334,76 @@ export async function compareTrips(dealIds: string[]): Promise<AgentComparison> 
     .slice(0, 3);
 
   if (deals.length === 0) {
-    return { items: [], rows: [], bestValueDealId: null, bestHotelDealId: null, cheapestDealId: null };
+    return {
+      items: [],
+      rows: [],
+      bestValueDealId: null,
+      bestHotelDealId: null,
+      cheapestDealId: null,
+    };
   }
 
   const scores = deals.map((d) =>
-    scorePackage(dealToPackage(d), answersFrom({
-      destinations: null, countries: null, tripType: null, style: null,
-      maxBudgetPerPerson: null, nights: d.dates.nights, people: d.people,
-      minStars: null, board: null, directOnly: null, musts: null, exclude: null,
-    }, d.destination)),
+    scorePackage(
+      dealToPackage(d),
+      answersFrom(
+        {
+          destinations: null,
+          countries: null,
+          tripType: null,
+          style: null,
+          maxBudgetPerPerson: null,
+          nights: d.dates.nights,
+          people: d.people,
+          minStars: null,
+          board: null,
+          directOnly: null,
+          musts: null,
+          exclude: null,
+        },
+        d.destination,
+      ),
+    ),
   );
 
   const rows = [
-    { label: "יעד", values: deals.map((d) => `${d.destination.emoji} ${d.destination.name}, ${d.destination.country}`) },
+    {
+      label: "יעד",
+      values: deals.map(
+        (d) => `${d.destination.emoji} ${d.destination.name}, ${d.destination.country}`,
+      ),
+    },
     { label: "מלון", values: deals.map((d) => `${d.hotel.name} (${d.hotel.stars}★)`) },
     { label: "דירוג אורחים", values: deals.map((d) => `${d.hotel.guestRating} / 10`) },
     { label: "לילות", values: deals.map((d) => `${d.dates.nights}`) },
     { label: "בסיס אירוח", values: deals.map((d) => boardLabels[d.board]) },
     { label: "מחיר לאדם", values: deals.map((d) => fmt(d.price.perPerson)) },
     { label: "סה״כ", values: deals.map((d) => fmt(d.price.total)) },
-    { label: "טיסה", values: deals.map((d) => `${d.outbound.airline} · ${d.outbound.stops === 0 ? "ישירה" : `${d.outbound.stops} עצירות`}`) },
-    { label: "ביטול", values: deals.map((d) => (d.freeCancellation ? "ביטול חינם" : "לפי מדיניות הספק")) },
-    { label: "מחיר חכם", values: deals.map((d) => { const sp = smartPrice(d); return sp ? `${sp.emoji} ${sp.label}` : "אין נתון"; }) },
+    {
+      label: "טיסה",
+      values: deals.map(
+        (d) =>
+          `${d.outbound.airline} · ${d.outbound.stops === 0 ? "ישירה" : `${d.outbound.stops} עצירות`}`,
+      ),
+    },
+    {
+      label: "ביטול",
+      values: deals.map((d) => (d.freeCancellation ? "ביטול חינם" : "לפי מדיניות הספק")),
+    },
+    {
+      label: "מחיר חכם",
+      values: deals.map((d) => {
+        const sp = smartPrice(d);
+        return sp ? `${sp.emoji} ${sp.label}` : "אין נתון";
+      }),
+    },
     { label: "NITZI Score", values: scores.map((s) => `${s}/100`) },
   ];
 
   const cheapest = deals.reduce((a, b) => (b.price.perPerson < a.price.perPerson ? b : a));
   const bestHotel = deals.reduce((a, b) =>
-    b.hotel.stars * 10 + b.hotel.guestRating > a.hotel.stars * 10 + a.hotel.guestRating ? b : a);
+    b.hotel.stars * 10 + b.hotel.guestRating > a.hotel.stars * 10 + a.hotel.guestRating ? b : a,
+  );
   const bestValueIdx = scores.indexOf(Math.max(...scores));
 
   return {
@@ -364,7 +417,16 @@ export async function compareTrips(dealIds: string[]): Promise<AgentComparison> 
 
 /** Compact catalog view so the model knows exactly what exists. */
 export async function listCatalog(): Promise<
-  { slug: string; name: string; country: string; region: string; matches: string[]; hasOffers: boolean; avgBudgetPerPerson: number; flightHours: number }[]
+  {
+    slug: string;
+    name: string;
+    country: string;
+    region: string;
+    matches: string[];
+    hasOffers: boolean;
+    avgBudgetPerPerson: number;
+    flightHours: number;
+  }[]
 > {
   const catalog = await getCatalog();
   return catalog.map((d) => ({

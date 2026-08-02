@@ -79,7 +79,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "NITZI — עוזר ה-AI לחופשות" },
-      { name: "description", content: "NITZI מתכננת עבורך את החופשה הבאה: יעדים, דילים, מלונות וטיסות עם AI." },
+      {
+        name: "description",
+        content: "NITZI מתכננת עבורך את החופשה הבאה: יעדים, דילים, מלונות וטיסות עם AI.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

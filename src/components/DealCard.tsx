@@ -4,7 +4,6 @@ import { boardLabels, type Deal } from "@/lib/deals";
 import { DestinationImage } from "@/components/DestinationImage";
 import { SmartPriceBadge } from "@/components/SmartPriceBadge";
 
-
 const fmt = (n: number) => `₪${Math.round(n).toLocaleString()}`;
 const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString("he-IL", { day: "2-digit", month: "short" });
@@ -20,7 +19,6 @@ export function DealCard({ deal, fluid = false }: { deal: Deal; fluid?: boolean 
         fluid ? "w-full" : "w-[280px] shrink-0 snap-start sm:w-[320px] lg:w-[360px]"
       }`}
     >
-
       <div className="relative h-[220px] w-full overflow-hidden sm:h-[240px]">
         <DestinationImage
           destination={d.destination}
@@ -49,11 +47,16 @@ export function DealCard({ deal, fluid = false }: { deal: Deal; fluid?: boolean 
           <SmartPriceBadge deal={d} />
 
           <span className="flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-muted-foreground">
-            <Star className="h-3 w-3 fill-amber-400 text-amber-400" /> {d.hotel.stars}★ · {d.hotel.guestRating}
+            <Star className="h-3 w-3 fill-amber-400 text-amber-400" /> {d.hotel.stars}★ ·{" "}
+            {d.hotel.guestRating}
           </span>
-          <span className="rounded-full bg-primary/10 px-2 py-1 text-primary">{boardLabels[d.board]}</span>
+          <span className="rounded-full bg-primary/10 px-2 py-1 text-primary">
+            {boardLabels[d.board]}
+          </span>
           {d.freeCancellation && (
-            <span className="rounded-full bg-emerald-100 px-2 py-1 text-emerald-800">ביטול חינם</span>
+            <span className="rounded-full bg-emerald-100 px-2 py-1 text-emerald-800">
+              ביטול חינם
+            </span>
           )}
         </div>
 
@@ -65,7 +68,8 @@ export function DealCard({ deal, fluid = false }: { deal: Deal; fluid?: boolean 
             <Clock className="h-3 w-3" /> {fmtDate(d.dates.start)}–{fmtDate(d.dates.end)}
           </span>
           <span className="flex items-center gap-1">
-            <Plane className="h-3 w-3" /> {d.outbound.stops === 0 ? "ישירה" : `${d.outbound.stops} עצירות`}
+            <Plane className="h-3 w-3" />{" "}
+            {d.outbound.stops === 0 ? "ישירה" : `${d.outbound.stops} עצירות`}
           </span>
         </div>
 

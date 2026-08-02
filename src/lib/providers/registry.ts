@@ -31,7 +31,11 @@ export function getProviders(): {
   packages: PackageProvider;
 } {
   if (DEMO_MODE) {
-    return { hotels: demoHotelProvider, flights: demoFlightProvider, packages: demoPackageProvider };
+    return {
+      hotels: demoHotelProvider,
+      flights: demoFlightProvider,
+      packages: demoPackageProvider,
+    };
   }
   return {
     hotels: liveProviders.hotels ?? (notConfigured("hotel") as unknown as HotelProvider),
@@ -50,7 +54,10 @@ export async function searchFlightOffers(
 }
 
 /** Re-verifies an offer with the provider right before it is displayed/booked. */
-export async function verifyFlightOffer(offerId: string, ctx: SearchContext): Promise<VerifiedQuote> {
+export async function verifyFlightOffer(
+  offerId: string,
+  ctx: SearchContext,
+): Promise<VerifiedQuote> {
   if (!DEMO_MODE) return unavailableQuote("unconfigured", "לא הוגדר ספק חי");
   return demoFlightProvider.verify(offerId, ctx);
 }

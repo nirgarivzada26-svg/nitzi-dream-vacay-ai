@@ -16,16 +16,26 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "NITZI — עוזר ה-AI שמתכנן לך את החופשה המושלמת" },
-      { name: "description", content: "חפש חופשה או תן ל-NITZI לבחור בשבילך. יעדים, מלונות, מסלולים ואטרקציות בהתאמה אישית." },
+      {
+        name: "description",
+        content:
+          "חפש חופשה או תן ל-NITZI לבחור בשבילך. יעדים, מלונות, מסלולים ואטרקציות בהתאמה אישית.",
+      },
       { property: "og:title", content: "NITZI — החופשה הבאה שלך מתחילה כאן" },
-      { property: "og:description", content: "חיפוש חופשות חכם + עוזר AI אישי שיודע מה מתאים בדיוק לך." },
+      {
+        property: "og:description",
+        content: "חיפוש חופשות חכם + עוזר AI אישי שיודע מה מתאים בדיוק לך.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Heebo:wght@700;800;900&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Heebo:wght@700;800;900&display=swap",
+      },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
@@ -52,7 +62,6 @@ function Home() {
 
           <TopNav variant="overlay" />
 
-
           <div className="relative z-10 mx-auto flex w-full max-w-[1600px] flex-col items-center px-5 pt-28 pb-16 text-center text-white sm:px-8 sm:pt-32 lg:pt-36">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold uppercase tracking-widest backdrop-blur-md">
               <Sparkles className="h-3 w-3" /> NITZI · Travel AI
@@ -69,11 +78,16 @@ function Home() {
               <SearchEngine size="lg" />
             </div>
 
-
             <div className="mt-6 hidden items-center gap-6 text-[11px] font-bold text-white/90 sm:flex">
-              <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> מחיר נבדק ואומת</span>
-              <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-amber-400" /> מסלולים בהתאמה אישית</span>
-              <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-sky-400" /> חופשה מלאה במקום אחד</span>
+              <span className="flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> מחיר נבדק ואומת
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" /> מסלולים בהתאמה אישית
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-sky-400" /> חופשה מלאה במקום אחד
+              </span>
             </div>
           </div>
         </div>
@@ -93,10 +107,13 @@ function Home() {
 
       <PopularDestinations />
 
-
       <Footer />
 
-      <SignInModal open={signInOpen} onClose={() => setSignInOpen(false)} onSignedIn={() => navigate({ to: "/account" })} />
+      <SignInModal
+        open={signInOpen}
+        onClose={() => setSignInOpen(false)}
+        onSignedIn={() => navigate({ to: "/account" })}
+      />
     </div>
   );
 }
@@ -129,10 +146,14 @@ function PopularDestinations() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-3 text-white">
-              <p className="text-[11px] font-bold text-white/85">{d.country} {d.emoji}</p>
+              <p className="text-[11px] font-bold text-white/85">
+                {d.country} {d.emoji}
+              </p>
               <p className="text-lg font-black leading-tight">{d.name}</p>
               <p className="mt-0.5 text-[11px] text-white/80">
-                {d.hasOffers ? `מ־₪${d.avgBudgetPerPerson.toLocaleString()} לאדם` : "אין דילים כרגע"}
+                {d.hasOffers
+                  ? `מ־₪${d.avgBudgetPerPerson.toLocaleString()} לאדם`
+                  : "אין דילים כרגע"}
               </p>
             </div>
           </Link>
