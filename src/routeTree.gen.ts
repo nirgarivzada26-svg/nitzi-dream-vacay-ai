@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SupportRouteImport } from './routes/support'
 import { Route as ResultRouteImport } from './routes/result'
 import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as PackagesRouteImport } from './routes/packages'
@@ -21,6 +22,7 @@ import { Route as AiIndexRouteImport } from './routes/ai.index'
 import { Route as PackageIdRouteImport } from './routes/package.$id'
 import { Route as HotelIdRouteImport } from './routes/hotel.$id'
 import { Route as FlightIdRouteImport } from './routes/flight.$id'
+import { Route as DestinationSlugRouteImport } from './routes/destination.$slug'
 import { Route as DealIdRouteImport } from './routes/deal.$id'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AiConversationIdRouteImport } from './routes/ai.$conversationId'
@@ -28,6 +30,7 @@ import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedCheckoutIdRouteImport } from './routes/_authenticated/checkout.$id'
+import { Route as AuthenticatedBookingIdRouteImport } from './routes/_authenticated/booking.$id'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin/reports'
@@ -39,6 +42,11 @@ import { Route as AuthenticatedAdminFlightsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResultRoute = ResultRouteImport.update({
   id: '/result',
   path: '/result',
@@ -98,6 +106,11 @@ const FlightIdRoute = FlightIdRouteImport.update({
   path: '/flight/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DestinationSlugRoute = DestinationSlugRouteImport.update({
+  id: '/destination/$slug',
+  path: '/destination/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DealIdRoute = DealIdRouteImport.update({
   id: '/deal/$id',
   path: '/deal/$id',
@@ -131,6 +144,11 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
 const AuthenticatedCheckoutIdRoute = AuthenticatedCheckoutIdRouteImport.update({
   id: '/checkout/$id',
   path: '/checkout/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBookingIdRoute = AuthenticatedBookingIdRouteImport.update({
+  id: '/booking/$id',
+  path: '/booking/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
@@ -200,11 +218,13 @@ export interface FileRoutesByFullPath {
   '/packages': typeof PackagesRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
+  '/support': typeof SupportRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/account': typeof AuthenticatedAccountRoute
   '/ai/$conversationId': typeof AiConversationIdRoute
   '/api/chat': typeof ApiChatRoute
   '/deal/$id': typeof DealIdRoute
+  '/destination/$slug': typeof DestinationSlugRoute
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
   '/package/$id': typeof PackageIdRoute
@@ -219,6 +239,7 @@ export interface FileRoutesByFullPath {
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/booking/$id': typeof AuthenticatedBookingIdRoute
   '/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -230,10 +251,12 @@ export interface FileRoutesByTo {
   '/packages': typeof PackagesRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
+  '/support': typeof SupportRoute
   '/account': typeof AuthenticatedAccountRoute
   '/ai/$conversationId': typeof AiConversationIdRoute
   '/api/chat': typeof ApiChatRoute
   '/deal/$id': typeof DealIdRoute
+  '/destination/$slug': typeof DestinationSlugRoute
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
   '/package/$id': typeof PackageIdRoute
@@ -248,6 +271,7 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/booking/$id': typeof AuthenticatedBookingIdRoute
   '/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
@@ -261,11 +285,13 @@ export interface FileRoutesById {
   '/packages': typeof PackagesRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
+  '/support': typeof SupportRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/ai/$conversationId': typeof AiConversationIdRoute
   '/api/chat': typeof ApiChatRoute
   '/deal/$id': typeof DealIdRoute
+  '/destination/$slug': typeof DestinationSlugRoute
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
   '/package/$id': typeof PackageIdRoute
@@ -280,6 +306,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
+  '/_authenticated/booking/$id': typeof AuthenticatedBookingIdRoute
   '/_authenticated/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -293,11 +320,13 @@ export interface FileRouteTypes {
     | '/packages'
     | '/quiz'
     | '/result'
+    | '/support'
     | '/admin'
     | '/account'
     | '/ai/$conversationId'
     | '/api/chat'
     | '/deal/$id'
+    | '/destination/$slug'
     | '/flight/$id'
     | '/hotel/$id'
     | '/package/$id'
@@ -312,6 +341,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/users'
+    | '/booking/$id'
     | '/checkout/$id'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -323,10 +353,12 @@ export interface FileRouteTypes {
     | '/packages'
     | '/quiz'
     | '/result'
+    | '/support'
     | '/account'
     | '/ai/$conversationId'
     | '/api/chat'
     | '/deal/$id'
+    | '/destination/$slug'
     | '/flight/$id'
     | '/hotel/$id'
     | '/package/$id'
@@ -341,6 +373,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/users'
+    | '/booking/$id'
     | '/checkout/$id'
     | '/admin'
   id:
@@ -353,11 +386,13 @@ export interface FileRouteTypes {
     | '/packages'
     | '/quiz'
     | '/result'
+    | '/support'
     | '/_authenticated/admin'
     | '/_authenticated/account'
     | '/ai/$conversationId'
     | '/api/chat'
     | '/deal/$id'
+    | '/destination/$slug'
     | '/flight/$id'
     | '/hotel/$id'
     | '/package/$id'
@@ -372,6 +407,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/reports'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/users'
+    | '/_authenticated/booking/$id'
     | '/_authenticated/checkout/$id'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
@@ -385,9 +421,11 @@ export interface RootRouteChildren {
   PackagesRoute: typeof PackagesRoute
   QuizRoute: typeof QuizRoute
   ResultRoute: typeof ResultRoute
+  SupportRoute: typeof SupportRoute
   AiConversationIdRoute: typeof AiConversationIdRoute
   ApiChatRoute: typeof ApiChatRoute
   DealIdRoute: typeof DealIdRoute
+  DestinationSlugRoute: typeof DestinationSlugRoute
   FlightIdRoute: typeof FlightIdRoute
   HotelIdRoute: typeof HotelIdRoute
   PackageIdRoute: typeof PackageIdRoute
@@ -396,6 +434,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/result': {
       id: '/result'
       path: '/result'
@@ -480,6 +525,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FlightIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/destination/$slug': {
+      id: '/destination/$slug'
+      path: '/destination/$slug'
+      fullPath: '/destination/$slug'
+      preLoaderRoute: typeof DestinationSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/deal/$id': {
       id: '/deal/$id'
       path: '/deal/$id'
@@ -527,6 +579,13 @@ declare module '@tanstack/react-router' {
       path: '/checkout/$id'
       fullPath: '/checkout/$id'
       preLoaderRoute: typeof AuthenticatedCheckoutIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/booking/$id': {
+      id: '/_authenticated/booking/$id'
+      path: '/booking/$id'
+      fullPath: '/booking/$id'
+      preLoaderRoute: typeof AuthenticatedBookingIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/users': {
@@ -639,12 +698,14 @@ const AuthenticatedAdminRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedBookingIdRoute: typeof AuthenticatedBookingIdRoute
   AuthenticatedCheckoutIdRoute: typeof AuthenticatedCheckoutIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+  AuthenticatedBookingIdRoute: AuthenticatedBookingIdRoute,
   AuthenticatedCheckoutIdRoute: AuthenticatedCheckoutIdRoute,
 }
 
@@ -660,9 +721,11 @@ const rootRouteChildren: RootRouteChildren = {
   PackagesRoute: PackagesRoute,
   QuizRoute: QuizRoute,
   ResultRoute: ResultRoute,
+  SupportRoute: SupportRoute,
   AiConversationIdRoute: AiConversationIdRoute,
   ApiChatRoute: ApiChatRoute,
   DealIdRoute: DealIdRoute,
+  DestinationSlugRoute: DestinationSlugRoute,
   FlightIdRoute: FlightIdRoute,
   HotelIdRoute: HotelIdRoute,
   PackageIdRoute: PackageIdRoute,

@@ -1,6 +1,17 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Bot, Heart, Home, Menu, Plane, Palmtree, User as UserIcon, X, LogIn } from "lucide-react";
+import {
+  Bot,
+  Heart,
+  Home,
+  LifeBuoy,
+  Menu,
+  Plane,
+  Palmtree,
+  User as UserIcon,
+  X,
+  LogIn,
+} from "lucide-react";
 import { NitziLogo } from "@/components/NitziLogo";
 import { SignInModal } from "@/components/SignInModal";
 import { displayNameOf, useAuth } from "@/lib/auth";
@@ -12,6 +23,7 @@ const ITEMS = [
   { to: "/flights", label: "טיסות", icon: Plane },
   { to: "/packages", label: "חבילות", icon: Palmtree },
   { to: "/ai", label: "NITZI AI", icon: Bot },
+  { to: "/support", label: "תמיכה", icon: LifeBuoy },
 ] as const;
 
 /** Global navigation. `overlay` renders on top of a hero image. */

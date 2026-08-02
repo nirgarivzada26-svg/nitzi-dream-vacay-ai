@@ -31,6 +31,7 @@ import { TripTimeline } from "@/components/TripTimeline";
 import { SimilarPicks } from "@/components/SimilarPicks";
 import { WhyNitziButton } from "@/components/WhyNitziButton";
 import { SmartPriceBadge } from "@/components/SmartPriceBadge";
+import { PriceAlertButton } from "@/components/PriceAlertButton";
 
 import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
 import { DestinationImage } from "@/components/DestinationImage";
@@ -571,6 +572,16 @@ function BookingCard({
       <p className="mt-2 text-center text-[10px] text-muted-foreground">
         לפני החיוב נבצע בדיקת מחיר נוספת ונציג כל שינוי לאישורך.
       </p>
+      <div className="mt-3">
+        <PriceAlertButton deal={deal} />
+      </div>
+      <Link
+        to="/destination/$slug"
+        params={{ slug: deal.destination.slug }}
+        className="mt-2 block rounded-2xl border border-border px-4 py-3 text-center text-sm font-black hover:border-primary/50"
+      >
+        מדריך היעד: {deal.destination.name}
+      </Link>
     </div>
   );
 }

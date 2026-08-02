@@ -224,8 +224,14 @@ function BookingsTab() {
       {q.data.map((b) => (
         <div key={b.id} className="rounded-3xl border border-border bg-card p-6 shadow-soft">
           <div className="flex items-center justify-between">
-            <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-black text-emerald-800">
-              {b.status === "confirmed" ? "מאושר" : b.status}
+            <span
+              className={`rounded-full px-2.5 py-1 text-[10px] font-black ${
+                b.status === "cancelled"
+                  ? "bg-red-100 text-red-800"
+                  : "bg-emerald-100 text-emerald-800"
+              }`}
+            >
+              {b.status === "confirmed" ? "מאושר" : b.status === "cancelled" ? "מבוטל" : b.status}
             </span>
             <span className="text-[10px] font-mono text-muted-foreground">
               #{b.id.slice(0, 8).toUpperCase()}
@@ -250,11 +256,11 @@ function BookingsTab() {
               </div>
             </div>
             <Link
-              to="/deal/$id"
-              params={{ id: b.deal_id }}
-              className="rounded-2xl border border-border bg-card px-3 py-1.5 text-[11px] font-bold"
+              to="/booking/$id"
+              params={{ id: b.id }}
+              className="rounded-2xl bg-gradient-sunset px-3 py-1.5 text-[11px] font-black text-white shadow-glow"
             >
-              פרטי הדיל
+              ניהול הזמנה
             </Link>
           </div>
         </div>
