@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResultRouteImport } from './routes/result'
 import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as FlightsRouteImport } from './routes/flights'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -30,6 +31,11 @@ const ResultRoute = ResultRouteImport.update({
 const QuizRoute = QuizRouteImport.update({
   id: '/quiz',
   path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FlightsRoute = FlightsRouteImport.update({
+  id: '/flights',
+  path: '/flights',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompareRoute = CompareRouteImport.update({
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
+  '/flights': typeof FlightsRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
   '/account': typeof AuthenticatedAccountRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
+  '/flights': typeof FlightsRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
   '/account': typeof AuthenticatedAccountRoute
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
+  '/flights': typeof FlightsRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
@@ -129,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/compare'
+    | '/flights'
     | '/quiz'
     | '/result'
     | '/account'
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/compare'
+    | '/flights'
     | '/quiz'
     | '/result'
     | '/account'
@@ -156,6 +167,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/compare'
+    | '/flights'
     | '/quiz'
     | '/result'
     | '/_authenticated/account'
@@ -171,6 +183,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CompareRoute: typeof CompareRoute
+  FlightsRoute: typeof FlightsRoute
   QuizRoute: typeof QuizRoute
   ResultRoute: typeof ResultRoute
   DealIdRoute: typeof DealIdRoute
@@ -193,6 +206,13 @@ declare module '@tanstack/react-router' {
       path: '/quiz'
       fullPath: '/quiz'
       preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/flights': {
+      id: '/flights'
+      path: '/flights'
+      fullPath: '/flights'
+      preLoaderRoute: typeof FlightsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compare': {
@@ -286,6 +306,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CompareRoute: CompareRoute,
+  FlightsRoute: FlightsRoute,
   QuizRoute: QuizRoute,
   ResultRoute: ResultRoute,
   DealIdRoute: DealIdRoute,
