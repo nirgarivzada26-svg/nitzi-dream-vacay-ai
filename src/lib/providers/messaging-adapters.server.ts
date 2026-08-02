@@ -20,16 +20,20 @@ export const lovableEmailAdapter: EmailProviderAdapter = {
   async send(message) {
     if (!configured(EMAIL_ENV)) return providerFail("lovable-email", notConfigured("lovable-email"));
     const { sendLovableEmail } = await import("@lovable.dev/email-js");
-    const res = (await sendLovableEmail({
-      apiKey: env("LOVABLE_API_KEY")!,
-      from: env("NITZI_EMAIL_FROM")!,
-      to: message.to,
-      subject: message.subject,
-      html: message.html,
-    })) as { sent?: boolean; id?: string; reason?: string };
+    const res = await sendLovableEmail(
+      {
+        from: env("NITZI_EMAIL_FROM")!,
+        to: message.to,
+        subject: message.subject,
+        html: message.html,
+        text: message.html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(),
+        label: message.template,
+      },
+      { apiKey: env("LOVABLE_API_KEY")! },
+    );
     const result: DeliveryResult = {
-      messageId: res.id ?? "",
-      status: res.sent === false ? "skipped" : "sent",
+      messageId: res.message_id ?? "",
+      status: res.success ? "sent" : "skipped",
       providerId: "lovable-email",
     };
     return providerOk("lovable-email", result);
