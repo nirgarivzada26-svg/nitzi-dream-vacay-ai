@@ -72,8 +72,11 @@ function fmtDur(min: number) {
     m = min % 60;
   return `${h}ש׳ ${m ? `${m}ד׳` : ""}`.trim();
 }
-function agoLabel(iso: string) {
-  const s = Math.max(1, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
+// `now` is null until the component has mounted, so the server render and the
+// first client render produce identical text (no hydration mismatch).
+function agoLabel(iso: string, now: number | null) {
+  if (now === null) return "עכשיו";
+  const s = Math.max(1, Math.floor((now - new Date(iso).getTime()) / 1000));
   if (s < 60) return `לפני ${s} שנ׳`;
   const m = Math.floor(s / 60);
   if (m < 60) return `לפני ${m} דק׳`;
@@ -91,9 +94,10 @@ function DealPage() {
   const [revalidation, setRevalidation] = useState<RevalidationResult | null>(null);
   const [signInOpen, setSignInOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<null | "save" | "book">(null);
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
+    setNow(Date.now());
     const t = setInterval(() => setNow(Date.now()), 30000);
     return () => clearInterval(t);
   }, []);
@@ -127,7 +131,7 @@ function DealPage() {
   }
 
   const dest = deal.destination;
-  const priceAgeMs = now - new Date(deal.price.verifiedAt).getTime();
+  const priceAgeMs = (now ?? new Date(deal.price.verifiedAt).getTime()) - new Date(deal.price.verifiedAt).getTime();
   const stale = priceAgeMs > deal.price.ttlSeconds * 1000;
 
   const refresh = async () => {
@@ -250,7 +254,7 @@ function DealPage() {
                   <span className="font-black">מחיר נבדק ואומת</span>
                 </div>
                 <span className="text-[11px] text-emerald-800">
-                  מקור: {deal.price.source} · עודכן {agoLabel(deal.price.verifiedAt)}
+                  מקור: {deal.price.source} · עודכן {agoLabel(deal.price.verifiedAt, now)}
                 </span>
                 <span
                   className={`ms-auto rounded-full px-2.5 py-1 text-[11px] font-bold ${availabilityChip.cls}`}
@@ -393,7 +397,7 @@ function DealPage() {
                 </li>
                 <li className="flex gap-2">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                  זמן העדכון האחרון: {agoLabel(deal.price.verifiedAt)}
+                  זמן העדכון האחרון: {agoLabel(deal.price.verifiedAt, now)}
                 </li>
                 <li className="flex gap-2">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
@@ -411,7 +415,7 @@ function DealPage() {
                     `מחיר לאדם ${fmtILS(deal.price.perPerson)} — כולל טיסה ומלון.`,
                     `${deal.dates.nights} לילות ב-${deal.hotel.name} (${deal.hotel.stars}★, דירוג ${deal.hotel.guestRating}/10).`,
                     `${deal.outbound.stops === 0 ? "טיסה ישירה" : `${deal.outbound.stops} עצירות`} עם ${deal.outbound.airline}.`,
-                    `המחיר אומת ${agoLabel(deal.price.verifiedAt)} מול ${deal.price.source} וייבדק שוב לפני חיוב.`,
+                    `המחיר אומת ${agoLabel(deal.price.verifiedAt, now)} מול ${deal.price.source} וייבדק שוב לפני חיוב.`,
                   ]}
                 />
               </div>
