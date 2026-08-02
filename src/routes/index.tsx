@@ -4,6 +4,7 @@ import heroImg from "@/assets/hero-main.jpg";
 import { NitziLogo } from "@/components/NitziLogo";
 import { SearchEngine } from "@/components/SearchEngine";
 import { DestinationCarousel } from "@/components/DestinationCarousel";
+import { DealRails } from "@/components/DealRails";
 import { SecretDealCard } from "@/components/SecretDealCard";
 import { SignInModal } from "@/components/SignInModal";
 import { Footer } from "@/components/Footer";
