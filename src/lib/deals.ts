@@ -7,7 +7,7 @@
 // a real supplier (Booking / Amadeus / Expedia), replace the body of these
 // functions — the return shape and Price-Revalidation contract are stable.
 
-import { destinations, type Destination } from "./nitzi-data";
+import type { Destination } from "./catalog";
 
 export type Availability = "available" | "limited" | "sold-out";
 
@@ -89,12 +89,14 @@ const AIRLINES = [
   { code: "AF", name: "אייר פראנס" },
 ];
 
-export function dealIdFor(destinationName: string) {
-  return encodeURIComponent(destinationName);
+export function dealIdFor(dest: Destination) {
+  return dest.slug;
 }
 
-function buildDeal(dest: Destination, opts?: { secret?: boolean; seed?: string }): Deal {
-  const seed = opts?.seed ?? `deal|${dest.name}`;
+/** Returns null when the destination has no supplier content to build an offer from. */
+function buildDeal(dest: Destination, opts?: { secret?: boolean; seed?: string }): Deal | null {
+  if (!dest.hasOffers || dest.hotels.length === 0) return null;
+  const seed = opts?.seed ?? `deal|${dest.slug}`;
   const r = rng(seed);
   const nights = 4 + Math.floor(r() * 4); // 4..7
   const people = 2;
@@ -130,7 +132,7 @@ function buildDeal(dest: Destination, opts?: { secret?: boolean; seed?: string }
   const freeCancellation = r() > 0.3;
 
   return {
-    id: dealIdFor(dest.name),
+    id: dealIdFor(dest),
     destination: dest,
     title: `${nights} לילות ב${dest.name} · ${hotel.name}`,
     board,
@@ -185,9 +187,7 @@ function buildDeal(dest: Destination, opts?: { secret?: boolean; seed?: string }
       "פיקדון וחיובים אישיים במלון",
     ],
     cancellation: "ביטול חינם עד 21 ימים לפני היציאה. לאחר מכן חיוב לפי מדיניות הספק.",
-    gallery: [
-      { src: dest.image, alt: `${dest.name} — נוף ראשי` },
-    ],
+    gallery: dest.image ? [{ src: dest.image, alt: `${dest.name} — נוף ראשי` }] : [],
     attractions: dest.attractions,
     restaurants: dest.restaurants,
     secret: opts?.secret,
@@ -225,39 +225,43 @@ export async function revalidateDeal(deal: Deal): Promise<RevalidationResult> {
   return { status: "sold-out", deal: { ...deal, price: { ...deal.price, availability: "sold-out", verifiedAt: new Date().toISOString() } } };
 }
 
-/** All deals. `variants` > 1 produces several distinct offers per destination
- *  (different hotel / dates / board), each with its own stable id. */
-export function listDeals(variants = 1): Deal[] {
+/** All bookable deals from the catalog. `variants` > 1 produces several
+ *  distinct offers per destination (different hotel / dates / board). */
+export function listDeals(catalog: Destination[], variants = 1): Deal[] {
   const out: Deal[] = [];
-  for (const d of destinations) {
+  for (const d of catalog) {
     for (let v = 0; v < variants; v++) {
-      const deal = buildDeal(d, { seed: v === 0 ? `deal|${d.name}` : `deal|${d.name}|v${v}` });
-      out.push(v === 0 ? deal : { ...deal, id: `${dealIdFor(d.name)}~v${v}` });
+      const deal = buildDeal(d, { seed: v === 0 ? `deal|${d.slug}` : `deal|${d.slug}|v${v}` });
+      if (!deal) break;
+      out.push(v === 0 ? deal : { ...deal, id: `${d.slug}~v${v}` });
     }
   }
   return out;
 }
 
-export function getDeal(id: string): Deal | null {
+export function getDeal(id: string, catalog: Destination[]): Deal | null {
   const raw = decodeURIComponent(id);
-  const [namePart, variantPart] = raw.split("~v");
-  const dest = destinations.find((d) => d.name === namePart);
+  const [slugPart, variantPart] = raw.split("~v");
+  const dest = catalog.find((d) => d.slug === slugPart);
   if (!dest) return null;
   const v = variantPart ? Number(variantPart) : 0;
-  const deal = buildDeal(dest, { seed: v ? `deal|${dest.name}|v${v}` : `deal|${dest.name}` });
-  return v ? { ...deal, id: `${dealIdFor(dest.name)}~v${v}` } : deal;
+  const deal = buildDeal(dest, { seed: v ? `deal|${dest.slug}|v${v}` : `deal|${dest.slug}` });
+  if (!deal) return null;
+  return v ? { ...deal, id: `${dest.slug}~v${v}` } : deal;
 }
 
 // Secret deal rotates every 6 hours. Deterministic per slot so all viewers see
 // the same secret deal until the next rotation.
 const SECRET_ROTATION_HOURS = 6;
-export function getSecretDeal(): { deal: Deal; nextRotationAt: Date } {
+export function getSecretDeal(
+  catalog: Destination[],
+): { deal: Deal; nextRotationAt: Date } | null {
+  const bookable = catalog.filter((d) => d.hasOffers && d.hotels.length > 0);
+  if (bookable.length === 0) return null;
   const slotMs = SECRET_ROTATION_HOURS * 3600 * 1000;
   const slot = Math.floor(Date.now() / slotMs);
-  const dest = destinations[slot % destinations.length];
-  const nextRotationAt = new Date((slot + 1) * slotMs);
-  return {
-    deal: buildDeal(dest, { secret: true, seed: `secret|${dest.name}|${slot}` }),
-    nextRotationAt,
-  };
+  const dest = bookable[slot % bookable.length];
+  const deal = buildDeal(dest, { secret: true, seed: `secret|${dest.slug}|${slot}` });
+  if (!deal) return null;
+  return { deal, nextRotationAt: new Date((slot + 1) * slotMs) };
 }
