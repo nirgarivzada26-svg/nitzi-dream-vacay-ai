@@ -246,25 +246,25 @@ export function AgentChat({
       <div className="border-t border-border/60 bg-background/90 px-4 py-3 backdrop-blur sm:px-6">
         <div className="mx-auto w-full max-w-3xl">
           <PromptInput
-            onSubmit={(_message, event) => {
-              event.preventDefault();
-              submit(input);
+            onSubmit={(message) => {
+              submit(message.text ?? "");
             }}
           >
             <PromptInputTextarea
               ref={textareaRef}
               dir="rtl"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
               placeholder="לאן בא לך? אפשר לכתוב בחופשיות…"
             />
             <PromptInputFooter className="justify-end">
               <span className="ms-auto flex items-center gap-1 text-[11px] font-bold text-muted-foreground">
                 <Wand2 className="h-3 w-3" /> ממליץ רק על חבילות אמיתיות מהקטלוג
               </span>
-              <PromptInputSubmit status={status} disabled={!input.trim() && !busy} />
+              <PromptInputSubmit status={status} disabled={busy} />
             </PromptInputFooter>
           </PromptInput>
+        </div>
+      </div>
+
         </div>
       </div>
     </div>
