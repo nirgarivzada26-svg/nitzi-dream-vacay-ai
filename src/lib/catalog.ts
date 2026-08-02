@@ -65,7 +65,7 @@ export interface DestinationRow {
   matches: string[] | null;
   is_popular: boolean;
   has_offers: boolean;
-  hotels: unknown;
+  hotels: DestinationHotel[] | null;
   attractions: string[] | null;
   restaurants: string[] | null;
   itinerary: string[] | null;
@@ -107,7 +107,7 @@ const TRIP_TYPES: TripType[] = [
   "beach", "adventure", "romantic", "family", "friends", "nightlife", "nature",
 ];
 
-function toHotels(value: unknown): DestinationHotel[] {
+function toHotels(value: DestinationHotel[] | null): DestinationHotel[] {
   if (!Array.isArray(value)) return [];
   return value.flatMap((h) => {
     if (!h || typeof h !== "object") return [];
