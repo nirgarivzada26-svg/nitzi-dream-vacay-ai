@@ -5,7 +5,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Activity, CheckCircle2, PlugZap, TimerReset, XCircle } from "lucide-react";
-import { AdminEmpty, AdminError, AdminLoading, SectionCard, StatCard } from "@/components/admin/AdminUI";
+import {
+  AdminEmpty,
+  AdminError,
+  AdminLoading,
+  SectionCard,
+  StatCard,
+} from "@/components/admin/AdminUI";
 import { getProviderDashboard } from "@/lib/providers.functions";
 import { PROVIDER_KIND_LABELS, type ProviderKind } from "@/lib/providers/contracts";
 
@@ -13,7 +19,10 @@ export const Route = createFileRoute("/_authenticated/admin/providers")({
   head: () => ({
     meta: [
       { title: "בריאות ספקים — ניהול NITZI" },
-      { name: "description", content: "מצב חיבור, זמני תגובה וכשלים של ספקי הטיסות, המלונות, הסליקה וההודעות." },
+      {
+        name: "description",
+        content: "מצב חיבור, זמני תגובה וכשלים של ספקי הטיסות, המלונות, הסליקה וההודעות.",
+      },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -50,7 +59,9 @@ function ProvidersPage() {
         <StatCard
           label="מצב מערכת"
           value={data.liveMode ? "ספקים חיים" : "מצב דמו"}
-          hint={data.liveMode ? "הזמנות נשלחות לספקים אמיתיים" : "NITZI Demo Provider מספק את הנתונים"}
+          hint={
+            data.liveMode ? "הזמנות נשלחות לספקים אמיתיים" : "NITZI Demo Provider מספק את הנתונים"
+          }
           icon={PlugZap}
           tone={data.liveMode ? "success" : "warning"}
         />
@@ -112,7 +123,9 @@ function ProvidersPage() {
                   <div className="flex shrink-0 items-center gap-4 text-[11px] text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <TimerReset className="h-3.5 w-3.5" />
-                      {metric ? `${metric.avgLatencyMs}ms · p95 ${metric.p95LatencyMs}ms` : "אין מדידות"}
+                      {metric
+                        ? `${metric.avgLatencyMs}ms · p95 ${metric.p95LatencyMs}ms`
+                        : "אין מדידות"}
                     </span>
                     <span>{metric ? `${metric.calls} קריאות` : "—"}</span>
                     <span className={metric && metric.failureRate > 0.1 ? "text-destructive" : ""}>
@@ -139,7 +152,9 @@ function ProvidersPage() {
                 <span className="font-bold text-foreground" dir="ltr">
                   {row.operation}
                 </span>
-                <span className="truncate text-[11px] text-muted-foreground">{row.lastMessage}</span>
+                <span className="truncate text-[11px] text-muted-foreground">
+                  {row.lastMessage}
+                </span>
                 <span className="shrink-0 text-xs font-bold text-destructive">{row.failures}</span>
               </div>
             ))}

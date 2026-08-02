@@ -15,10 +15,10 @@ const STRIPE_STATUS: Record<string, { payment: string; booking?: string }> = {
 };
 
 function stripeObjectId(payload: Record<string, unknown>): string | null {
-  const data = payload['data'] as { object?: Record<string, unknown> } | undefined;
+  const data = payload["data"] as { object?: Record<string, unknown> } | undefined;
   const obj = data?.object;
   if (!obj) return null;
-  return String(obj['payment_intent'] ?? obj['id'] ?? "") || null;
+  return String(obj["payment_intent"] ?? obj["id"] ?? "") || null;
 }
 
 export async function applyPaymentWebhook(

@@ -3,11 +3,7 @@
 // Email goes through Lovable's managed email API; SMS through Twilio. Every
 // send is written to notification_log by the notification service.
 
-import type {
-  DeliveryResult,
-  EmailProviderAdapter,
-  SmsProviderAdapter,
-} from "./contracts";
+import type { DeliveryResult, EmailProviderAdapter, SmsProviderAdapter } from "./contracts";
 import { notConfigured, providerFail, providerOk } from "./contracts";
 import { configured, env, httpJson, missing } from "./credentials.server";
 
@@ -18,7 +14,8 @@ export const lovableEmailAdapter: EmailProviderAdapter = {
   descriptor: { id: "lovable-email", kind: "email", label: "NITZI Email", requiredEnv: EMAIL_ENV },
   isConfigured: () => configured(EMAIL_ENV),
   async send(message) {
-    if (!configured(EMAIL_ENV)) return providerFail("lovable-email", notConfigured("lovable-email"));
+    if (!configured(EMAIL_ENV))
+      return providerFail("lovable-email", notConfigured("lovable-email"));
     const { sendLovableEmail } = await import("@lovable.dev/email-js");
     const res = await sendLovableEmail(
       {
@@ -26,7 +23,10 @@ export const lovableEmailAdapter: EmailProviderAdapter = {
         to: message.to,
         subject: message.subject,
         html: message.html,
-        text: message.html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(),
+        text: message.html
+          .replace(/<[^>]+>/g, " ")
+          .replace(/\s+/g, " ")
+          .trim(),
         label: message.template,
       },
       { apiKey: env("LOVABLE_API_KEY")! },
@@ -41,7 +41,12 @@ export const lovableEmailAdapter: EmailProviderAdapter = {
 };
 
 export const twilioSmsAdapter: SmsProviderAdapter = {
-  descriptor: { id: "twilio", kind: "sms", label: "Twilio SMS / WhatsApp", requiredEnv: TWILIO_ENV },
+  descriptor: {
+    id: "twilio",
+    kind: "sms",
+    label: "Twilio SMS / WhatsApp",
+    requiredEnv: TWILIO_ENV,
+  },
   isConfigured: () => configured(TWILIO_ENV),
   async send(message) {
     if (!configured(TWILIO_ENV)) return providerFail("twilio", notConfigured("twilio"));
@@ -75,7 +80,9 @@ export const twilioSmsAdapter: SmsProviderAdapter = {
   },
 };
 
-export const EMAIL_ADAPTERS: Record<string, EmailProviderAdapter> = { "lovable-email": lovableEmailAdapter };
+export const EMAIL_ADAPTERS: Record<string, EmailProviderAdapter> = {
+  "lovable-email": lovableEmailAdapter,
+};
 export const SMS_ADAPTERS: Record<string, SmsProviderAdapter> = { twilio: twilioSmsAdapter };
 
 export function messagingAdapterStatuses() {

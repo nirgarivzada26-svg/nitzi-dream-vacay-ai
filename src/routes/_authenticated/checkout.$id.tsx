@@ -533,10 +533,8 @@ function CheckoutPage() {
                     </div>
                     <p className="mt-1 text-[12px]">
                       קודם:{" "}
-                      <span className="line-through">
-                        {fmtILS(reval?.previousTotal ?? 0)}
-                      </span>{" "}
-                      · חדש: <span className="font-black">{fmtILS(deal.price.total)}</span>
+                      <span className="line-through">{fmtILS(reval?.previousTotal ?? 0)}</span> ·
+                      חדש: <span className="font-black">{fmtILS(deal.price.total)}</span>
                     </p>
                   </div>
                 ) : (

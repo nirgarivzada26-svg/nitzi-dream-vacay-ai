@@ -1,6 +1,11 @@
 // Live hotel adapters — server only. Same contract for every supplier.
 
-import type { HotelOffer, HotelProviderAdapter, HotelSearchRequest, ProviderResult } from "./contracts";
+import type {
+  HotelOffer,
+  HotelProviderAdapter,
+  HotelSearchRequest,
+  ProviderResult,
+} from "./contracts";
 import { notConfigured, providerFail, providerOk } from "./contracts";
 import type { VerifiedQuote } from "./verification";
 import { unavailableQuote } from "./verification";
@@ -99,14 +104,20 @@ export const hotelbedsAdapter: HotelProviderAdapter = {
       }),
     });
     if (res.status === 401)
-      return providerFail("hotelbeds", { code: "unauthorized", message: "Hotelbeds auth failed", retryable: true });
+      return providerFail("hotelbeds", {
+        code: "unauthorized",
+        message: "Hotelbeds auth failed",
+        retryable: true,
+      });
     if (res.status >= 400)
       return providerFail("hotelbeds", {
         code: "upstream_error",
         message: `Hotelbeds ${res.status}`,
         retryable: true,
       });
-    const hotels = ((res.body as { hotels?: { hotels?: HotelbedsHotel[] } } | null)?.hotels?.hotels ?? [])
+    const hotels = (
+      (res.body as { hotels?: { hotels?: HotelbedsHotel[] } } | null)?.hotels?.hotels ?? []
+    )
       .slice(0, req.limit ?? 12)
       .map((h): HotelOffer | null => {
         const rate = h.rooms?.[0]?.rates?.[0];
@@ -142,7 +153,11 @@ export const hotelbedsAdapter: HotelProviderAdapter = {
     if (!res.ok) return res as ProviderResult<HotelOffer>;
     const match = res.data.find((h) => h.hotel.id === hotelId);
     if (!match)
-      return providerFail("hotelbeds", { code: "not_found", message: "המלון אינו זמין", retryable: false });
+      return providerFail("hotelbeds", {
+        code: "not_found",
+        message: "המלון אינו זמין",
+        retryable: false,
+      });
     return providerOk("hotelbeds", match);
   },
   async checkAvailability(hotelId, req) {

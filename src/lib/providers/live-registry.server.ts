@@ -19,7 +19,11 @@ import type { FlightOffer, VerifiedQuote } from "./verification";
 import { FLIGHT_ADAPTERS, flightAdapterStatuses } from "./flight-adapters.server";
 import { HOTEL_ADAPTERS, hotelAdapterStatuses } from "./hotel-adapters.server";
 import { PAYMENT_ADAPTERS, paymentAdapterStatuses } from "./payment-adapters.server";
-import { EMAIL_ADAPTERS, SMS_ADAPTERS, messagingAdapterStatuses } from "./messaging-adapters.server";
+import {
+  EMAIL_ADAPTERS,
+  SMS_ADAPTERS,
+  messagingAdapterStatuses,
+} from "./messaging-adapters.server";
 import { liveModeEnabled, providerOrder } from "./credentials.server";
 import { runWithFailover, type ChainMember } from "./failover.server";
 
@@ -38,7 +42,10 @@ function chain<A extends { isConfigured(): boolean }>(
 }
 
 export function flightChain(): ChainMember<FlightProviderAdapter>[] {
-  return chain(FLIGHT_ADAPTERS, providerOrder("NITZI_FLIGHT_PROVIDERS", ["amadeus", "travelport", "sabre"]));
+  return chain(
+    FLIGHT_ADAPTERS,
+    providerOrder("NITZI_FLIGHT_PROVIDERS", ["amadeus", "travelport", "sabre"]),
+  );
 }
 
 export function hotelChain(): ChainMember<HotelProviderAdapter>[] {

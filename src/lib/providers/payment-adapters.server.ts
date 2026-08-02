@@ -43,12 +43,15 @@ async function stripeCall(
   });
 }
 
-function stripeResult(raw: Record<string, unknown>, fallback: PaymentResult["status"]): PaymentResult {
-  const status = STRIPE_STATUS[String(raw['status'] ?? "")] ?? fallback;
-  const amount = Number(raw['amount'] ?? raw['amount_received'] ?? 0) / 100;
+function stripeResult(
+  raw: Record<string, unknown>,
+  fallback: PaymentResult["status"],
+): PaymentResult {
+  const status = STRIPE_STATUS[String(raw["status"] ?? "")] ?? fallback;
+  const amount = Number(raw["amount"] ?? raw["amount_received"] ?? 0) / 100;
   return {
     status,
-    reference: String(raw['id'] ?? ""),
+    reference: String(raw["id"] ?? ""),
     amount,
     currency: "ILS",
     providerId: "stripe",
@@ -100,7 +103,11 @@ export const stripePaymentAdapter: PaymentProviderAdapter = {
       `${req.idempotencyKey}:capture`,
     );
     if (res.status >= 400)
-      return providerFail("stripe", { code: "upstream_error", message: `Stripe ${res.status}`, retryable: false });
+      return providerFail("stripe", {
+        code: "upstream_error",
+        message: `Stripe ${res.status}`,
+        retryable: false,
+      });
     return providerOk("stripe", stripeResult(res.body as Record<string, unknown>, "captured"));
   },
   async refund(req) {
@@ -111,12 +118,16 @@ export const stripePaymentAdapter: PaymentProviderAdapter = {
       `${req.idempotencyKey}:refund`,
     );
     if (res.status >= 400)
-      return providerFail("stripe", { code: "upstream_error", message: `Stripe ${res.status}`, retryable: false });
+      return providerFail("stripe", {
+        code: "upstream_error",
+        message: `Stripe ${res.status}`,
+        retryable: false,
+      });
     const raw = res.body as Record<string, unknown>;
     return providerOk("stripe", {
       status: "refunded",
-      reference: String(raw['id'] ?? ""),
-      amount: Number(raw['amount'] ?? 0) / 100,
+      reference: String(raw["id"] ?? ""),
+      amount: Number(raw["amount"] ?? 0) / 100,
       currency: "ILS",
       providerId: "stripe",
       raw,
@@ -130,7 +141,11 @@ export const stripePaymentAdapter: PaymentProviderAdapter = {
       `${req.idempotencyKey}:cancel`,
     );
     if (res.status >= 400)
-      return providerFail("stripe", { code: "upstream_error", message: `Stripe ${res.status}`, retryable: false });
+      return providerFail("stripe", {
+        code: "upstream_error",
+        message: `Stripe ${res.status}`,
+        retryable: false,
+      });
     return providerOk("stripe", stripeResult(res.body as Record<string, unknown>, "cancelled"));
   },
   async verifyWebhook(rawBody, headers) {
@@ -142,8 +157,8 @@ export const stripePaymentAdapter: PaymentProviderAdapter = {
         return [k?.trim() ?? "", v ?? ""];
       }),
     );
-    const timestamp = parts['t'];
-    const signature = parts['v1'];
+    const timestamp = parts["t"];
+    const signature = parts["v1"];
     if (!secret || !timestamp || !signature)
       return { verified: false, eventType: "", externalId: "", payload: {}, reason: "חתימה חסרה" };
 
@@ -154,7 +169,11 @@ export const stripePaymentAdapter: PaymentProviderAdapter = {
       false,
       ["sign"],
     );
-    const mac = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${timestamp}.${rawBody}`));
+    const mac = await crypto.subtle.sign(
+      "HMAC",
+      key,
+      new TextEncoder().encode(`${timestamp}.${rawBody}`),
+    );
     const expected = Array.from(new Uint8Array(mac))
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
@@ -169,8 +188,8 @@ export const stripePaymentAdapter: PaymentProviderAdapter = {
     const payload = JSON.parse(rawBody) as Record<string, unknown>;
     return {
       verified: true,
-      eventType: String(payload['type'] ?? ""),
-      externalId: String(payload['id'] ?? ""),
+      eventType: String(payload["type"] ?? ""),
+      externalId: String(payload["id"] ?? ""),
       payload,
     };
   },
@@ -197,7 +216,13 @@ export const hypPaymentAdapter: PaymentProviderAdapter = {
     return providerFail("hyp", notConfigured("hyp"));
   },
   async verifyWebhook() {
-    return { verified: false, eventType: "", externalId: "", payload: {}, reason: "Hyp אינו מוגדר" };
+    return {
+      verified: false,
+      eventType: "",
+      externalId: "",
+      payload: {},
+      reason: "Hyp אינו מוגדר",
+    };
   },
 };
 

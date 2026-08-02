@@ -33,9 +33,8 @@ export async function runWithFailover<A, T>(
 
   let last: ProviderResult<T> | null = null;
   for (const member of usable) {
-    const result = await instrument<T>(
-      { kind, providerId: member.id, operation, context },
-      () => call(member.adapter),
+    const result = await instrument<T>({ kind, providerId: member.id, operation, context }, () =>
+      call(member.adapter),
     );
     if (result.ok) return result;
     last = result;
@@ -43,6 +42,10 @@ export async function runWithFailover<A, T>(
   }
   return (
     last ??
-    providerFail<T>("none", { code: "upstream_error", message: "כל הספקים נכשלו", retryable: false })
+    providerFail<T>("none", {
+      code: "upstream_error",
+      message: "כל הספקים נכשלו",
+      retryable: false,
+    })
   );
 }

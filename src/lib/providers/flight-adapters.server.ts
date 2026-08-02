@@ -18,7 +18,11 @@ import { configured, env, httpJson, missing } from "./credentials.server";
 import { QUOTE_TTL_SECONDS } from "./config";
 
 const AMADEUS_ENV = ["AMADEUS_CLIENT_ID", "AMADEUS_CLIENT_SECRET"];
-const TRAVELPORT_ENV = ["TRAVELPORT_CLIENT_ID", "TRAVELPORT_CLIENT_SECRET", "TRAVELPORT_ACCESS_GROUP"];
+const TRAVELPORT_ENV = [
+  "TRAVELPORT_CLIENT_ID",
+  "TRAVELPORT_CLIENT_SECRET",
+  "TRAVELPORT_ACCESS_GROUP",
+];
 const SABRE_ENV = ["SABRE_CLIENT_ID", "SABRE_CLIENT_SECRET", "SABRE_PCC"];
 
 function freshQuote(perPerson: number, people: number, source: string): VerifiedQuote {
@@ -77,10 +81,11 @@ function isoMinutes(duration: string | undefined): number {
 }
 
 function amadeusToOffer(raw: Record<string, unknown>, people: number): FlightOffer | null {
-  const itineraries = (raw['itineraries'] as { segments: AmadeusSegment[]; duration?: string }[]) ?? [];
+  const itineraries =
+    (raw["itineraries"] as { segments: AmadeusSegment[]; duration?: string }[]) ?? [];
   const first = itineraries[0];
   if (!first || first.segments.length === 0) return null;
-  const price = raw['price'] as { grandTotal?: string; total?: string } | undefined;
+  const price = raw["price"] as { grandTotal?: string; total?: string } | undefined;
   const perPerson = Number(price?.grandTotal ?? price?.total ?? 0);
   if (!Number.isFinite(perPerson) || perPerson <= 0) return null;
 
@@ -100,20 +105,27 @@ function amadeusToOffer(raw: Record<string, unknown>, people: number): FlightOff
     durationMinutes: isoMinutes(s.duration),
   }));
 
-  const travelerPricing = (raw['travelerPricings'] as
-    | { fareDetailsBySegment?: { includedCheckedBags?: { quantity?: number; weight?: number } }[] }[]
-    | undefined)?.[0];
+  const travelerPricing = (
+    raw["travelerPricings"] as
+      | {
+          fareDetailsBySegment?: { includedCheckedBags?: { quantity?: number; weight?: number } }[];
+        }[]
+      | undefined
+  )?.[0];
   const bag = travelerPricing?.fareDetailsBySegment?.[0]?.includedCheckedBags;
 
   return {
-    id: String(raw['id'] ?? segments[0]?.flightNumber ?? "amadeus-offer"),
+    id: String(raw["id"] ?? segments[0]?.flightNumber ?? "amadeus-offer"),
     segments,
     stops: segments.length - 1,
     layoverMinutes: segments.slice(1).map((s, i) => {
       const prev = segments[i];
-      return prev ? Math.max(0, (new Date(s.departAt).getTime() - new Date(prev.arriveAt).getTime()) / 60000) : 0;
+      return prev
+        ? Math.max(0, (new Date(s.departAt).getTime() - new Date(prev.arriveAt).getTime()) / 60000)
+        : 0;
     }),
-    durationMinutes: isoMinutes(first.duration) || segments.reduce((a, s) => a + s.durationMinutes, 0),
+    durationMinutes:
+      isoMinutes(first.duration) || segments.reduce((a, s) => a + s.durationMinutes, 0),
     cabin: "economy",
     baggage: {
       carryOnIncluded: true,
@@ -156,10 +168,18 @@ export const amadeusFlightAdapter: FlightProviderAdapter = {
     });
     if (res.status === 401) {
       amadeusToken = null;
-      return providerFail("amadeus", { code: "unauthorized", message: "Amadeus token rejected", retryable: true });
+      return providerFail("amadeus", {
+        code: "unauthorized",
+        message: "Amadeus token rejected",
+        retryable: true,
+      });
     }
     if (res.status === 429)
-      return providerFail("amadeus", { code: "rate_limited", message: "Amadeus rate limit", retryable: true });
+      return providerFail("amadeus", {
+        code: "rate_limited",
+        message: "Amadeus rate limit",
+        retryable: true,
+      });
     if (res.status >= 400)
       return providerFail("amadeus", {
         code: "upstream_error",
@@ -176,7 +196,11 @@ export const amadeusFlightAdapter: FlightProviderAdapter = {
     if (!res.ok) return res as ProviderResult<FlightOffer>;
     const match = res.data.find((o) => o.id === offerId);
     if (!match)
-      return providerFail("amadeus", { code: "not_found", message: "ההצעה כבר לא קיימת", retryable: false });
+      return providerFail("amadeus", {
+        code: "not_found",
+        message: "ההצעה כבר לא קיימת",
+        retryable: false,
+      });
     return providerOk("amadeus", match);
   },
   async checkAvailability(offerId, req) {
@@ -210,7 +234,14 @@ export const amadeusFlightAdapter: FlightProviderAdapter = {
                 : [],
             },
             documents: p.passport
-              ? [{ documentType: "PASSPORT", number: p.passport, expiryDate: p.passportExpiry, holder: true }]
+              ? [
+                  {
+                    documentType: "PASSPORT",
+                    number: p.passport,
+                    expiryDate: p.passportExpiry,
+                    holder: true,
+                  },
+                ]
               : [],
           })),
         },
@@ -222,10 +253,16 @@ export const amadeusFlightAdapter: FlightProviderAdapter = {
         message: `Amadeus booking ${res.status}`,
         retryable: false,
       });
-    const data = (res.body as { data?: { id?: string; associatedRecords?: { reference?: string }[] } })?.data;
+    const data = (
+      res.body as { data?: { id?: string; associatedRecords?: { reference?: string }[] } }
+    )?.data;
     const reference = data?.associatedRecords?.[0]?.reference ?? data?.id ?? "";
     if (!reference)
-      return providerFail("amadeus", { code: "upstream_error", message: "לא התקבל מספר הזמנה", retryable: false });
+      return providerFail("amadeus", {
+        code: "upstream_error",
+        message: "לא התקבל מספר הזמנה",
+        retryable: false,
+      });
     const reservation: Reservation = {
       reference,
       status: "confirmed",

@@ -123,7 +123,10 @@ export interface FlightProviderAdapter {
   searchFlights(req: FlightSearchRequest): Promise<ProviderResult<FlightOffer[]>>;
   getFlight(offerId: string, req: FlightSearchRequest): Promise<ProviderResult<FlightOffer>>;
   checkAvailability(offerId: string, req: FlightSearchRequest): Promise<ProviderResult<boolean>>;
-  revalidatePrice(offerId: string, req: FlightSearchRequest): Promise<ProviderResult<VerifiedQuote>>;
+  revalidatePrice(
+    offerId: string,
+    req: FlightSearchRequest,
+  ): Promise<ProviderResult<VerifiedQuote>>;
   createReservation(req: ReservationRequest): Promise<ProviderResult<Reservation>>;
 }
 
