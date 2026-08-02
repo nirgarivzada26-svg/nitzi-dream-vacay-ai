@@ -225,15 +225,27 @@ export async function revalidateDeal(deal: Deal): Promise<RevalidationResult> {
   return { status: "sold-out", deal: { ...deal, price: { ...deal.price, availability: "sold-out", verifiedAt: new Date().toISOString() } } };
 }
 
-export function listDeals(): Deal[] {
-  return destinations.map((d) => buildDeal(d));
+/** All deals. `variants` > 1 produces several distinct offers per destination
+ *  (different hotel / dates / board), each with its own stable id. */
+export function listDeals(variants = 1): Deal[] {
+  const out: Deal[] = [];
+  for (const d of destinations) {
+    for (let v = 0; v < variants; v++) {
+      const deal = buildDeal(d, { seed: v === 0 ? `deal|${d.name}` : `deal|${d.name}|v${v}` });
+      out.push(v === 0 ? deal : { ...deal, id: `${dealIdFor(d.name)}~v${v}` });
+    }
+  }
+  return out;
 }
 
 export function getDeal(id: string): Deal | null {
-  const decoded = decodeURIComponent(id);
-  const dest = destinations.find((d) => d.name === decoded);
+  const raw = decodeURIComponent(id);
+  const [namePart, variantPart] = raw.split("~v");
+  const dest = destinations.find((d) => d.name === namePart);
   if (!dest) return null;
-  return buildDeal(dest);
+  const v = variantPart ? Number(variantPart) : 0;
+  const deal = buildDeal(dest, { seed: v ? `deal|${dest.name}|v${v}` : `deal|${dest.name}` });
+  return v ? { ...deal, id: `${dealIdFor(dest.name)}~v${v}` } : deal;
 }
 
 // Secret deal rotates every 6 hours. Deterministic per slot so all viewers see
