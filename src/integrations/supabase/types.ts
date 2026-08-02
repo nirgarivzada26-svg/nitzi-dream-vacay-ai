@@ -168,6 +168,8 @@ export type Database = {
       }
       bookings: {
         Row: {
+          cancel_reason: string | null
+          cancelled_at: string | null
           created_at: string
           currency: string
           deal_id: string
@@ -178,6 +180,7 @@ export type Database = {
           nights: number
           people: number
           price_per_person: number
+          refund_status: string | null
           snapshot: Json
           start_date: string
           status: string
@@ -185,6 +188,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          cancel_reason?: string | null
+          cancelled_at?: string | null
           created_at?: string
           currency?: string
           deal_id: string
@@ -195,6 +200,7 @@ export type Database = {
           nights: number
           people: number
           price_per_person: number
+          refund_status?: string | null
           snapshot: Json
           start_date: string
           status?: string
@@ -202,6 +208,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          cancel_reason?: string | null
+          cancelled_at?: string | null
           created_at?: string
           currency?: string
           deal_id?: string
@@ -212,6 +220,7 @@ export type Database = {
           nights?: number
           people?: number
           price_per_person?: number
+          refund_status?: string | null
           snapshot?: Json
           start_date?: string
           status?: string
@@ -373,6 +382,39 @@ export type Database = {
         }
         Relationships: []
       }
+      price_alerts: {
+        Row: {
+          active: boolean
+          baseline_price: number
+          created_at: string
+          deal_id: string
+          destination_name: string
+          id: string
+          target_price: number
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          baseline_price: number
+          created_at?: string
+          deal_id: string
+          destination_name: string
+          id?: string
+          target_price: number
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          baseline_price?: number
+          created_at?: string
+          deal_id?: string
+          destination_name?: string
+          id?: string
+          target_price?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -471,6 +513,50 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      support_requests: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          email: string
+          id: string
+          message: string
+          status: string
+          topic: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          status?: string
+          topic: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          status?: string
+          topic?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_requests_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       system_settings: {
         Row: {
