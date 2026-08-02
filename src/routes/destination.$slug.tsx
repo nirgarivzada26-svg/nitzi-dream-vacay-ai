@@ -2,7 +2,7 @@
 // from the managed catalog (`public.destinations`). Sections without verified
 // data are labelled "currently unavailable" rather than filled with invention.
 
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   BadgeCheck,
   CalendarDays,
@@ -26,9 +26,9 @@ import { getDeal } from "@/lib/deals";
 export const Route = createFileRoute("/destination/$slug")({
   loader: async ({ context, params }) => {
     const catalog = await context.queryClient.ensureQueryData(destinationsQueryOptions);
-    // Resolve here so an unknown slug renders notFoundComponent without the
-    // component ever throwing during render.
-    if (!findDestination(catalog, decodeURIComponent(params.slug))) throw notFound();
+    // Resolved here so an unknown slug is a normal render (empty state), not a
+    // thrown error during render.
+    return { known: !!findDestination(catalog, decodeURIComponent(params.slug)) };
   },
   head: ({ params }) => {
     const name = decodeURIComponent(params.slug);
@@ -63,19 +63,7 @@ export const Route = createFileRoute("/destination/$slug")({
       </div>
     </div>
   ),
-  notFoundComponent: () => (
-    <div dir="rtl" className="grid min-h-screen place-items-center px-6 text-center">
-      <div>
-        <h1 className="text-2xl font-black">היעד לא נמצא במאגר</h1>
-        <Link
-          to="/packages"
-          className="mt-4 inline-block rounded-2xl bg-gradient-sunset px-4 py-2 text-sm font-black text-white"
-        >
-          לכל היעדים
-        </Link>
-      </div>
-    </div>
-  ),
+  notFoundComponent: () => <UnknownDestination />,
   component: DestinationPage,
 });
 
@@ -137,11 +125,30 @@ function ListSection({
   );
 }
 
+function UnknownDestination() {
+  return (
+    <div dir="rtl" className="grid min-h-screen place-items-center px-6 text-center">
+      <div>
+        <h1 className="text-2xl font-black">היעד לא נמצא במאגר</h1>
+        <p className="mt-2 text-sm font-semibold text-muted-foreground">
+          אנחנו מציגים רק יעדים עם נתונים מאומתים.
+        </p>
+        <Link
+          to="/packages"
+          className="mt-4 inline-block rounded-2xl bg-gradient-sunset px-4 py-2 text-sm font-black text-white"
+        >
+          לכל היעדים
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 function DestinationPage() {
   const { slug } = Route.useParams();
   const catalog = useDestinations();
   const dest = findDestination(catalog, decodeURIComponent(slug));
-  if (!dest) return null;
+  if (!dest) return <UnknownDestination />;
 
   const deal = dest.hasOffers ? getDeal(dest.slug, catalog) : null;
   const nearby = catalog
