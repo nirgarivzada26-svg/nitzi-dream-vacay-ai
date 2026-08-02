@@ -200,7 +200,7 @@ export const Route = createFileRoute("/api/chat")({
                   source: "ai",
                   message,
                   route: "/api/chat",
-                  userId: identity.userId ?? null,
+                  userId: null,
                 }),
               );
               return "אירעה שגיאה בסוכן. נסה שוב.";
