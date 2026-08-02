@@ -30,7 +30,7 @@ export function SearchEngine({ size = "md" }: { size?: "md" | "lg" }) {
         "nitzi:seed",
         JSON.stringify({ destination, people, budget, purpose }),
       );
-    } catch {}
+    } catch { /* non-critical */ }
     navigate({ to: "/ai" });
   };
 
@@ -47,7 +47,7 @@ export function SearchEngine({ size = "md" }: { size?: "md" | "lg" }) {
           style: null,
         }),
       );
-    } catch {}
+    } catch { /* non-critical */ }
     navigate({ to: "/result" });
   };
 

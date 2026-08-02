@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_authenticated")({
     if (error || !data.user) {
       try {
         setAuthIntent(location.href);
-      } catch {}
+      } catch { /* non-critical */ }
       throw redirect({ to: "/auth", search: { redirect: location.href } });
     }
     return { user: data.user };

@@ -32,7 +32,7 @@ export function SignInModal({
     if (!notifyDeals) return;
     try {
       await updateNotifPrefs({ deals: true, email: true });
-    } catch {}
+    } catch { /* non-critical */ }
   };
 
   const finish = async () => {

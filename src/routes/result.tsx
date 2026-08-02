@@ -57,7 +57,7 @@ function Result() {
     try {
       const raw = sessionStorage.getItem("nitzi:answers");
       if (raw) setAnswers(JSON.parse(raw));
-    } catch {}
+    } catch { /* non-critical */ }
     setReady(true);
   }, []);
 
@@ -166,11 +166,11 @@ function ResultView({ answers, dest }: { answers: QuizAnswers; dest: Destination
     if (navigator.share) {
       try {
         await navigator.share({ title: "NITZI", text, url: window.location.href });
-      } catch {}
+      } catch { /* non-critical */ }
     } else {
       try {
         await navigator.clipboard.writeText(text);
-      } catch {}
+      } catch { /* non-critical */ }
     }
   };
 
