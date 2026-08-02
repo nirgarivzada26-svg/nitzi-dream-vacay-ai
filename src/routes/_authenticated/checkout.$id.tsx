@@ -4,16 +4,19 @@
 // explicit approval. No real charge is made in the MVP.
 
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft, BadgeCheck, CheckCircle2, CreditCard, Download, Mail, RefreshCw,
   ShieldCheck, Timer, User, Wallet, XCircle,
 } from "lucide-react";
 import { getDeal, revalidateDeal, type Deal, type RevalidationResult } from "@/lib/deals";
-import { createBooking } from "@/lib/user-data";
+import { placeBooking } from "@/lib/bookings.functions";
+import { EXTRAS, computeExtras, type ExtraId } from "@/lib/booking-extras";
 import { NitziLogo } from "@/components/NitziLogo";
 import { SmartPriceBadge } from "@/components/SmartPriceBadge";
 import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
+
 
 export const Route = createFileRoute("/_authenticated/checkout/$id")({
   head: ({ params }) => ({
