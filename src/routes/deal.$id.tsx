@@ -437,7 +437,12 @@ function DealPage() {
             </div>
           </aside>
         </div>
+
+        <div className="mt-14 pb-24 lg:pb-8">
+          <RelatedDeals deal={deal} catalog={catalog} />
+        </div>
       </div>
+
 
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 p-3 shadow-glow backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-[1600px] items-center gap-3 px-2">
