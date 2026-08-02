@@ -403,6 +403,10 @@ function BookingCard({ deal, onBook, availabilityChip, refreshing, authed }: {
         <div className="text-4xl font-black text-foreground">{fmtILS(deal.price.perPerson)}</div>
         <div className="text-xs text-muted-foreground">סה״כ {fmtILS(deal.price.total)} · {deal.people} נוסעים</div>
       </div>
+      <div className="mt-3">
+        <SmartPriceBadge deal={deal} full />
+      </div>
+
       <ul className="mt-3 space-y-1.5 text-xs text-foreground">
         <li className="flex gap-2"><Calendar className="h-3.5 w-3.5 text-primary" /> {fmtDate(deal.dates.start)} → {fmtDate(deal.dates.end)}</li>
         <li className="flex gap-2"><Plane className="h-3.5 w-3.5 text-primary" /> {deal.outbound.airline} · {deal.outbound.stops === 0 ? "ישירה" : `${deal.outbound.stops} עצירות`}</li>
