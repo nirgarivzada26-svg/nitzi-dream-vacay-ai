@@ -3,6 +3,7 @@
 // When real suppliers are connected, `listDeals()` changes and the rails follow.
 
 import { listDeals, type Deal } from "./deals";
+import type { Destination } from "./catalog";
 
 export type DealRailId =
   | "hot"
@@ -27,12 +28,12 @@ const daysUntil = (iso: string) => (new Date(iso).getTime() - Date.now()) / 8640
 const uniqueByDestination = (deals: Deal[]) => {
   const seen = new Set<string>();
   return deals.filter((d) =>
-    seen.has(d.destination.name) ? false : (seen.add(d.destination.name), true),
+    seen.has(d.destination.slug) ? false : (seen.add(d.destination.slug), true),
   );
 };
 
-export function buildDealRails(): DealRail[] {
-  const all = listDeals(3);
+export function buildDealRails(catalog: Destination[]): DealRail[] {
+  const all = listDeals(catalog, 3);
 
   const byDiscount = [...all].sort((a, b) => b.discountPct - a.discountPct);
   const byValue = [...all].sort(
@@ -41,7 +42,7 @@ export function buildDealRails(): DealRail[] {
       (a.hotel.guestRating * 100 - a.price.perPerson / 50),
   );
 
-  const rails: DealRail[] = [
+  return [
     {
       id: "hot",
       title: "דילים חמים",
@@ -54,41 +55,47 @@ export function buildDealRails(): DealRail[] {
       title: "הרגע האחרון",
       subtitle: "יציאה בשבועות הקרובים",
       emoji: "⏳",
-      deals: [...all]
-        .filter((d) => daysUntil(d.dates.start) <= 24)
-        .sort((a, b) => +new Date(a.dates.start) - +new Date(b.dates.start))
-        .slice(0, 10),
+      deals: uniqueByDestination(
+        [...all]
+          .filter((d) => daysUntil(d.dates.start) <= 24)
+          .sort((a, b) => +new Date(a.dates.start) - +new Date(b.dates.start)),
+      ).slice(0, 10),
     },
     {
       id: "couples",
       title: "חופשות זוגיות",
       subtitle: "שקיעות, שקט ורומנטיקה",
       emoji: "💞",
-      deals: all.filter((d) => d.destination.matches.includes("romantic")).slice(0, 10),
+      deals: uniqueByDestination(
+        all.filter((d) => d.destination.matches.includes("romantic")),
+      ).slice(0, 10),
     },
     {
       id: "families",
       title: "משפחות",
       subtitle: "כיף לכל הגילאים, בלי כאב ראש",
       emoji: "👨‍👩‍👧",
-      deals: all.filter((d) => d.destination.matches.includes("family")).slice(0, 10),
+      deals: uniqueByDestination(
+        all.filter((d) => d.destination.matches.includes("family")),
+      ).slice(0, 10),
     },
     {
       id: "allinclusive",
       title: "הכל כלול",
       subtitle: "מגיעים, ולא מוציאים עוד שקל",
       emoji: "🍹",
-      deals: all.filter((d) => d.board === "all-inclusive").slice(0, 10),
+      deals: uniqueByDestination(all.filter((d) => d.board === "all-inclusive")).slice(0, 10),
     },
     {
       id: "luxury",
       title: "יוקרה",
       subtitle: "5 כוכבים, ספא ונוף שאי אפשר לשכוח",
       emoji: "✨",
-      deals: all
-        .filter((d) => d.hotel.stars >= 5 || d.price.perPerson >= 7000)
-        .sort((a, b) => b.price.perPerson - a.price.perPerson)
-        .slice(0, 10),
+      deals: uniqueByDestination(
+        all
+          .filter((d) => d.hotel.stars >= 5 || d.price.perPerson >= 7000)
+          .sort((a, b) => b.price.perPerson - a.price.perPerson),
+      ).slice(0, 10),
     },
     {
       id: "nitzi",
@@ -98,6 +105,4 @@ export function buildDealRails(): DealRail[] {
       deals: uniqueByDestination(byValue).slice(0, 10),
     },
   ];
-
-  return rails;
 }

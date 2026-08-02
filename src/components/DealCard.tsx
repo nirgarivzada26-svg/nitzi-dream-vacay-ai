@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { BadgeCheck, Clock, Moon, Plane, Star } from "lucide-react";
 import { boardLabels, type Deal } from "@/lib/deals";
+import { DestinationImage } from "@/components/DestinationImage";
 
 const fmt = (n: number) => `₪${Math.round(n).toLocaleString()}`;
 const fmtDate = (iso: string) =>
@@ -11,16 +12,13 @@ export function DealCard({ deal }: { deal: Deal }) {
   return (
     <Link
       to="/deal/$id"
-      params={{ id: encodeURIComponent(d.id) }}
+      params={{ id: d.id }}
       draggable={false}
       className="group relative w-[280px] shrink-0 snap-start overflow-hidden rounded-3xl border border-border/60 bg-card text-right shadow-soft transition hover:shadow-glow active:scale-[0.99] sm:w-[320px] lg:w-[360px]"
     >
       <div className="relative h-[220px] w-full overflow-hidden sm:h-[240px]">
-        <img
-          src={d.destination.image}
-          alt={`${d.destination.name}, ${d.destination.country}`}
-          loading="lazy"
-          draggable={false}
+        <DestinationImage
+          destination={d.destination}
           className="h-full w-full object-cover transition duration-700 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />

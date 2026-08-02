@@ -10,6 +10,7 @@ import {
 import { getDeal, revalidateDeal, type Deal, type RevalidationResult } from "@/lib/deals";
 import { createBooking } from "@/lib/user-data";
 import { NitziLogo } from "@/components/NitziLogo";
+import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
 
 export const Route = createFileRoute("/_authenticated/checkout/$id")({
   head: ({ params }) => ({
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/_authenticated/checkout/$id")({
       { name: "robots", content: "noindex" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
   component: CheckoutPage,
 });
 
@@ -29,7 +31,8 @@ function fmtILS(n: number) { return `₪${Math.round(n).toLocaleString()}`; }
 function CheckoutPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
-  const [deal, setDeal] = useState<Deal | null>(() => getDeal(id));
+  const catalog = useDestinations();
+  const [deal, setDeal] = useState<Deal | null>(() => getDeal(id, catalog));
   const [reval, setReval] = useState<RevalidationResult | null>(null);
   const [busy, setBusy] = useState(true);
   const [placed, setPlaced] = useState<{ id: string } | null>(null);

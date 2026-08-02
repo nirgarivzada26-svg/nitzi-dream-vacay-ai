@@ -4,13 +4,13 @@ import { NitziLogo } from "@/components/NitziLogo";
 import { ArrowLeft, Send, Sparkles } from "lucide-react";
 import {
   defaultAnswers,
-  popularDestinations,
   styles,
   tripTypes,
   type QuizAnswers,
   type TripStyle,
   type TripType,
 } from "@/lib/nitzi-data";
+import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
 
 export const Route = createFileRoute("/quiz")({
   head: () => ({
@@ -21,6 +21,7 @@ export const Route = createFileRoute("/quiz")({
       { property: "og:description", content: "שיחה קצרה עם ה-AI שבונה את החופשה שלך." },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
   component: Quiz,
 });
 
@@ -292,6 +293,7 @@ function StyleGrid({ value, onChange }: { value: TripStyle | null; onChange: (v:
 }
 
 function DestinationPicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const popular = useDestinations().filter((d) => d.isPopular).slice(0, 10);
   return (
     <div className="space-y-2">
       <input
@@ -309,15 +311,15 @@ function DestinationPicker({ value, onChange }: { value: string; onChange: (v: s
         ✨ תפתיע/י אותי — NITZI יבחר יעד מושלם
       </button>
       <div className="flex flex-wrap gap-1.5 pt-1">
-        {popularDestinations.map((d) => (
+        {popular.map((d) => (
           <button
-            key={d}
-            onClick={() => onChange(d)}
+            key={d.slug}
+            onClick={() => onChange(d.slug)}
             className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
-              value === d ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground hover:border-primary/50"
+              value === d.slug ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground hover:border-primary/50"
             }`}
           >
-            {d}
+            {d.emoji} {d.name}
           </button>
         ))}
       </div>

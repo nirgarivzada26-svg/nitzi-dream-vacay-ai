@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Flame, Lock, Sparkles, Timer } from "lucide-react";
 import { getSecretDeal } from "@/lib/deals";
+import { useDestinations } from "@/lib/use-catalog";
+import { DestinationImage } from "@/components/DestinationImage";
 import { setAuthIntent, useAuth } from "@/lib/auth";
 import { SignInModal } from "@/components/SignInModal";
 
@@ -15,7 +17,8 @@ function formatCountdown(ms: number) {
 
 export function SecretDealCard() {
   const navigate = useNavigate();
-  const { deal, nextRotationAt } = useMemo(() => getSecretDeal(), []);
+  const catalog = useDestinations();
+  const secret = useMemo(() => getSecretDeal(catalog), [catalog]);
   const { isAuthenticated } = useAuth();
   const [signInOpen, setSignInOpen] = useState(false);
   const [now, setNow] = useState(Date.now());
@@ -25,20 +28,25 @@ export function SecretDealCard() {
     return () => clearInterval(t);
   }, []);
 
-  const openDeal = () => navigate({ to: "/deal/$id", params: { id: deal.id } });
+  const openDeal = () => secret && navigate({ to: "/deal/$id", params: { id: secret.deal.id } });
 
   const handleClick = () => {
+    if (!secret) return;
     if (isAuthenticated) openDeal();
-    else { setAuthIntent(`/deal/${deal.id}`); setSignInOpen(true); }
+    else { setAuthIntent(`/deal/${secret.deal.id}`); setSignInOpen(true); }
   };
+
+  // No supplier offer available right now — we say so rather than fake a deal.
+  if (!secret) return null;
+
+  const { deal, nextRotationAt } = secret;
 
   return (
     <section className="px-5">
       <div className="relative overflow-hidden rounded-[2rem] border border-primary/30 bg-card shadow-glow animate-fade-up">
         <div className="relative h-[240px] w-full sm:h-[300px] lg:h-[380px]">
-          <img
-            src={deal.destination.image}
-            alt={deal.destination.name}
+          <DestinationImage
+            destination={deal.destination}
             className={`h-full w-full object-cover transition ${isAuthenticated ? "" : "blur-md scale-110"}`}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/30" />

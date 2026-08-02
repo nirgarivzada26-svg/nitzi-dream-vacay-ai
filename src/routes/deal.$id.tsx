@@ -13,6 +13,8 @@ import { addFavorite, isDealFavorited, removeFavorite } from "@/lib/user-data";
 import { TripTimeline } from "@/components/TripTimeline";
 import { SimilarPicks } from "@/components/SimilarPicks";
 import { WhyNitziButton } from "@/components/WhyNitziButton";
+import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
+import { DestinationImage } from "@/components/DestinationImage";
 
 
 export const Route = createFileRoute("/deal/$id")({
@@ -26,6 +28,7 @@ export const Route = createFileRoute("/deal/$id")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
   component: DealPage,
 });
 
@@ -54,7 +57,8 @@ function DealPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { isAuthenticated } = useAuth();
-  const [deal, setDeal] = useState<Deal | null>(() => getDeal(id));
+  const catalog = useDestinations();
+  const [deal, setDeal] = useState<Deal | null>(() => getDeal(id, catalog));
   const [refreshing, setRefreshing] = useState(false);
   const [revalidation, setRevalidation] = useState<RevalidationResult | null>(null);
   const [signInOpen, setSignInOpen] = useState(false);
@@ -166,7 +170,7 @@ function DealPage() {
         <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
           <div className="space-y-5">
             <section className="relative overflow-hidden rounded-[2rem] shadow-glow animate-fade-up">
-              <img src={dest.image} alt={dest.name} className="h-[320px] w-full object-cover sm:h-[420px] lg:h-[480px]" />
+              <DestinationImage destination={dest} className="h-[320px] w-full object-cover sm:h-[420px] lg:h-[480px]" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
               {deal.secret && (
                 <span className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-gradient-sunset px-3 py-1.5 text-[11px] font-black text-white shadow-glow">
@@ -313,7 +317,7 @@ function DealPage() {
               </div>
             </Section>
 
-            <SimilarPicks excludeName={dest.name} title="אולי תאהב גם..." />
+            <SimilarPicks catalog={catalog} excludeSlug={dest.slug} title="אולי תאהב גם..." />
           </div>
 
 

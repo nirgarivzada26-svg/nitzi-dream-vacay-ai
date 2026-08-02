@@ -7,7 +7,9 @@ import { findHotel, getResultsCache } from "@/lib/results-cache";
 import { budgetFit } from "@/lib/ranking";
 import { amenityLabel, explainHotel } from "@/lib/explain";
 import { isCompared, toggleCompare, useCompare } from "@/lib/compare-store";
-import { pickDestination } from "@/lib/nitzi-data";
+import { pickDestination } from "@/lib/catalog";
+import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
+import { DestinationImage } from "@/components/DestinationImage";
 
 export const Route = createFileRoute("/hotel/$id")({
   head: ({ params }) => ({
@@ -18,6 +20,7 @@ export const Route = createFileRoute("/hotel/$id")({
       { property: "og:description", content: "גלריה, שירותים, מיקום, מחיר ותנאי ביטול." },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
   component: HotelDetailPage,
 });
 
@@ -26,12 +29,13 @@ function fmtILS(n: number) { return `₪${Math.round(n).toLocaleString()}`; }
 function HotelDetailPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const catalog = useDestinations();
   const hotel = findHotel(id);
   const cache = getResultsCache();
   useCompare(); // subscribe
 
-  if (!hotel || !cache) return <NotFound onBack={() => navigate({ to: "/" })} />;
-  const dest = pickDestination(cache.answers);
+  const dest = cache ? pickDestination(catalog, cache.answers) : null;
+  if (!hotel || !cache || !dest) return <NotFound onBack={() => navigate({ to: "/" })} />;
   const fit = budgetFit(hotel, cache.answers);
   const nights = cache.answers.days;
   const totalStay = hotel.pricePerNight * nights;
@@ -64,7 +68,7 @@ function HotelDetailPage() {
         <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
           <div className="space-y-5">
             <section className="relative overflow-hidden rounded-[2rem] shadow-glow">
-              <img src={dest.image} alt={hotel.name} className="h-[320px] w-full object-cover sm:h-[440px] lg:h-[500px]" />
+              <DestinationImage destination={dest} className="h-[320px] w-full object-cover sm:h-[440px] lg:h-[500px]" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
               {hotel.score >= 88 && (
                 <span className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-gradient-sunset px-3 py-1.5 text-[11px] font-black text-white shadow-glow">
@@ -143,7 +147,7 @@ function HotelDetailPage() {
               <p className="text-sm text-foreground">ביטול חינם עד 7 ימים לפני צ'ק-אין. לאחר מכן — חיוב של לילה ראשון.</p>
             </Section>
 
-            <SimilarPicks excludeName={dest.name} title="מלונות דומים שאולי תאהב" />
+            <SimilarPicks catalog={catalog} excludeSlug={dest.slug} title="מלונות דומים שאולי תאהב" />
 
             <Section title="מסעדות מומלצות באזור" icon={<Utensils className="h-4 w-4" />}>
               <ul className="space-y-2 text-sm">
