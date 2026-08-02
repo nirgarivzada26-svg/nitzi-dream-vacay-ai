@@ -98,11 +98,30 @@ function CheckoutPage() {
     let alive = true;
     (async () => {
       if (!deal) return;
-      const res = await revalidateDeal(deal);
-      if (!alive) return;
-      setDeal(res.deal);
-      setReval(res);
-      setChecking(false);
+      try {
+        const res = await revalidateCheckout({ data: { dealId: deal.id } });
+        if (!alive) return;
+        setReval(res);
+        if (res.perPerson !== null && res.total !== null) {
+          setDeal((d) =>
+            d
+              ? {
+                  ...d,
+                  price: {
+                    ...d.price,
+                    perPerson: res.perPerson!,
+                    total: res.total!,
+                    verifiedAt: res.verifiedAt ?? d.price.verifiedAt,
+                  },
+                }
+              : d,
+          );
+        }
+      } catch {
+        if (alive) setReval(null);
+      } finally {
+        if (alive) setChecking(false);
+      }
     })();
     return () => {
       alive = false;
