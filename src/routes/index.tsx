@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import heroImg from "@/assets/hero-main.jpg";
-import { NitziLogo } from "@/components/NitziLogo";
+import { TopNav } from "@/components/TopNav";
 import { SearchEngine } from "@/components/SearchEngine";
 import { DealRails } from "@/components/DealRails";
 import { SecretDealCard } from "@/components/SecretDealCard";
@@ -10,8 +10,7 @@ import { Footer } from "@/components/Footer";
 import { DemoDataNotice } from "@/components/DemoDataNotice";
 import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
 import { DestinationImage } from "@/components/DestinationImage";
-import { displayNameOf, useAuth } from "@/lib/auth";
-import { LogIn, Sparkles, User as UserIcon } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -35,7 +34,6 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [signInOpen, setSignInOpen] = useState(false);
 
   return (
@@ -52,32 +50,8 @@ function Home() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-background" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 
-          <div className="absolute inset-x-0 top-0 z-10">
-            <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-5 pt-6 sm:px-8">
-              <NitziLogo />
-              <div className="flex items-center gap-2">
-                <div className="hidden items-center gap-1 rounded-full border border-white/30 bg-white/15 px-3 py-1.5 text-[11px] font-bold text-white backdrop-blur-md sm:flex">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> AI פעיל
-                </div>
-                {user ? (
-                  <Link
-                    to="/account"
-                    className="flex items-center gap-1.5 rounded-full border border-white/40 bg-white/20 px-3 py-1.5 text-[11px] font-black text-white backdrop-blur-md"
-                    aria-label="החשבון שלי"
-                  >
-                    <UserIcon className="h-3.5 w-3.5" /> {displayNameOf(user)}
-                  </Link>
-                ) : (
-                  <button
-                    onClick={() => setSignInOpen(true)}
-                    className="flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[11px] font-black text-foreground shadow-glow"
-                  >
-                    <LogIn className="h-3.5 w-3.5" /> התחבר
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
+          <TopNav variant="overlay" />
+
 
           <div className="relative z-10 mx-auto flex w-full max-w-[1600px] flex-col items-center px-5 pt-28 pb-16 text-center text-white sm:px-8 sm:pt-32 lg:pt-36">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold uppercase tracking-widest backdrop-blur-md">

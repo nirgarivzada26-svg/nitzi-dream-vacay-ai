@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResultRouteImport } from './routes/result'
 import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as PackagesRouteImport } from './routes/packages'
+import { Route as FlightsRouteImport } from './routes/flights'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -30,6 +32,16 @@ const ResultRoute = ResultRouteImport.update({
 const QuizRoute = QuizRouteImport.update({
   id: '/quiz',
   path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PackagesRoute = PackagesRouteImport.update({
+  id: '/packages',
+  path: '/packages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FlightsRoute = FlightsRouteImport.update({
+  id: '/flights',
+  path: '/flights',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompareRoute = CompareRouteImport.update({
@@ -86,6 +98,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
+  '/flights': typeof FlightsRoute
+  '/packages': typeof PackagesRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
   '/account': typeof AuthenticatedAccountRoute
@@ -99,6 +113,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
+  '/flights': typeof FlightsRoute
+  '/packages': typeof PackagesRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
   '/account': typeof AuthenticatedAccountRoute
@@ -114,6 +130,8 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/compare': typeof CompareRoute
+  '/flights': typeof FlightsRoute
+  '/packages': typeof PackagesRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
@@ -129,6 +147,8 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/compare'
+    | '/flights'
+    | '/packages'
     | '/quiz'
     | '/result'
     | '/account'
@@ -142,6 +162,8 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/compare'
+    | '/flights'
+    | '/packages'
     | '/quiz'
     | '/result'
     | '/account'
@@ -156,6 +178,8 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/compare'
+    | '/flights'
+    | '/packages'
     | '/quiz'
     | '/result'
     | '/_authenticated/account'
@@ -171,6 +195,8 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CompareRoute: typeof CompareRoute
+  FlightsRoute: typeof FlightsRoute
+  PackagesRoute: typeof PackagesRoute
   QuizRoute: typeof QuizRoute
   ResultRoute: typeof ResultRoute
   DealIdRoute: typeof DealIdRoute
@@ -193,6 +219,20 @@ declare module '@tanstack/react-router' {
       path: '/quiz'
       fullPath: '/quiz'
       preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/packages': {
+      id: '/packages'
+      path: '/packages'
+      fullPath: '/packages'
+      preLoaderRoute: typeof PackagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/flights': {
+      id: '/flights'
+      path: '/flights'
+      fullPath: '/flights'
+      preLoaderRoute: typeof FlightsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compare': {
@@ -286,6 +326,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CompareRoute: CompareRoute,
+  FlightsRoute: FlightsRoute,
+  PackagesRoute: PackagesRoute,
   QuizRoute: QuizRoute,
   ResultRoute: ResultRoute,
   DealIdRoute: DealIdRoute,
@@ -296,13 +338,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

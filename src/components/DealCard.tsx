@@ -7,15 +7,18 @@ const fmt = (n: number) => `₪${Math.round(n).toLocaleString()}`;
 const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString("he-IL", { day: "2-digit", month: "short" });
 
-export function DealCard({ deal }: { deal: Deal }) {
+export function DealCard({ deal, fluid = false }: { deal: Deal; fluid?: boolean }) {
   const d = deal;
   return (
     <Link
       to="/deal/$id"
       params={{ id: d.id }}
       draggable={false}
-      className="group relative w-[280px] shrink-0 snap-start overflow-hidden rounded-3xl border border-border/60 bg-card text-right shadow-soft transition hover:shadow-glow active:scale-[0.99] sm:w-[320px] lg:w-[360px]"
+      className={`group relative overflow-hidden rounded-3xl border border-border/60 bg-card text-right shadow-soft transition hover:shadow-glow active:scale-[0.99] ${
+        fluid ? "w-full" : "w-[280px] shrink-0 snap-start sm:w-[320px] lg:w-[360px]"
+      }`}
     >
+
       <div className="relative h-[220px] w-full overflow-hidden sm:h-[240px]">
         <DestinationImage
           destination={d.destination}
