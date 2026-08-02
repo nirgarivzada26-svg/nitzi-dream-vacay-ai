@@ -9,6 +9,7 @@ import {
   ArrowLeft, Bell, BookmarkCheck, Calendar, Heart, History, LogOut, MapPin, Settings, Sparkles, Trash2, User as UserIcon,
 } from "lucide-react";
 import { NitziLogo } from "@/components/NitziLogo";
+import { DestinationImage } from "@/components/DestinationImage";
 import { displayNameOf, signOut, useAuth } from "@/lib/auth";
 import {
   clearSearchHistory, deleteSavedTrip, getNotifPrefs, getProfile, listBookings,
