@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SupportRouteImport } from './routes/support'
 import { Route as ResultRouteImport } from './routes/result'
 import { Route as QuizRouteImport } from './routes/quiz'
 import { Route as PackagesRouteImport } from './routes/packages'
@@ -39,6 +40,11 @@ import { Route as AuthenticatedAdminFlightsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResultRoute = ResultRouteImport.update({
   id: '/result',
   path: '/result',
@@ -200,6 +206,7 @@ export interface FileRoutesByFullPath {
   '/packages': typeof PackagesRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
+  '/support': typeof SupportRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/account': typeof AuthenticatedAccountRoute
   '/ai/$conversationId': typeof AiConversationIdRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/packages': typeof PackagesRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
+  '/support': typeof SupportRoute
   '/account': typeof AuthenticatedAccountRoute
   '/ai/$conversationId': typeof AiConversationIdRoute
   '/api/chat': typeof ApiChatRoute
@@ -261,6 +269,7 @@ export interface FileRoutesById {
   '/packages': typeof PackagesRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
+  '/support': typeof SupportRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/ai/$conversationId': typeof AiConversationIdRoute
@@ -293,6 +302,7 @@ export interface FileRouteTypes {
     | '/packages'
     | '/quiz'
     | '/result'
+    | '/support'
     | '/admin'
     | '/account'
     | '/ai/$conversationId'
@@ -323,6 +333,7 @@ export interface FileRouteTypes {
     | '/packages'
     | '/quiz'
     | '/result'
+    | '/support'
     | '/account'
     | '/ai/$conversationId'
     | '/api/chat'
@@ -353,6 +364,7 @@ export interface FileRouteTypes {
     | '/packages'
     | '/quiz'
     | '/result'
+    | '/support'
     | '/_authenticated/admin'
     | '/_authenticated/account'
     | '/ai/$conversationId'
@@ -385,6 +397,7 @@ export interface RootRouteChildren {
   PackagesRoute: typeof PackagesRoute
   QuizRoute: typeof QuizRoute
   ResultRoute: typeof ResultRoute
+  SupportRoute: typeof SupportRoute
   AiConversationIdRoute: typeof AiConversationIdRoute
   ApiChatRoute: typeof ApiChatRoute
   DealIdRoute: typeof DealIdRoute
@@ -396,6 +409,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/result': {
       id: '/result'
       path: '/result'
@@ -660,6 +680,7 @@ const rootRouteChildren: RootRouteChildren = {
   PackagesRoute: PackagesRoute,
   QuizRoute: QuizRoute,
   ResultRoute: ResultRoute,
+  SupportRoute: SupportRoute,
   AiConversationIdRoute: AiConversationIdRoute,
   ApiChatRoute: ApiChatRoute,
   DealIdRoute: DealIdRoute,
