@@ -65,6 +65,78 @@ export type Database = {
         }
         Relationships: []
       }
+      destinations: {
+        Row: {
+          attractions: string[]
+          avg_budget_per_person: number
+          country: string
+          country_code: string
+          created_at: string
+          flag: string
+          flight_hours: number
+          has_offers: boolean
+          hotels: Json
+          is_active: boolean
+          is_popular: boolean
+          itinerary: string[]
+          matches: string[]
+          name: string
+          region: string
+          restaurants: string[]
+          slug: string
+          sort_order: number
+          tagline: string
+          updated_at: string
+          weather: string
+        }
+        Insert: {
+          attractions?: string[]
+          avg_budget_per_person: number
+          country: string
+          country_code: string
+          created_at?: string
+          flag: string
+          flight_hours: number
+          has_offers?: boolean
+          hotels?: Json
+          is_active?: boolean
+          is_popular?: boolean
+          itinerary?: string[]
+          matches?: string[]
+          name: string
+          region: string
+          restaurants?: string[]
+          slug: string
+          sort_order?: number
+          tagline: string
+          updated_at?: string
+          weather?: string
+        }
+        Update: {
+          attractions?: string[]
+          avg_budget_per_person?: number
+          country?: string
+          country_code?: string
+          created_at?: string
+          flag?: string
+          flight_hours?: number
+          has_offers?: boolean
+          hotels?: Json
+          is_active?: boolean
+          is_popular?: boolean
+          itinerary?: string[]
+          matches?: string[]
+          name?: string
+          region?: string
+          restaurants?: string[]
+          slug?: string
+          sort_order?: number
+          tagline?: string
+          updated_at?: string
+          weather?: string
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string
