@@ -158,9 +158,10 @@ function CheckoutPage() {
   }
 
   const changed = reval?.status === "changed";
-  const soldOut = reval?.status === "sold-out" || reval?.status === "unavailable"
-    ? true
-    : false || reval?.status === "sold-out" || deal.price.availability === "sold-out";
+  const soldOut =
+    reval?.status === "sold-out" ||
+    reval?.status === "unavailable" ||
+    deal.price.availability === "sold-out";
 
   const passengersValid =
     passengers.every(
