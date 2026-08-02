@@ -739,15 +739,19 @@ async function securityChecks(): Promise<LaunchCheck[]> {
           ),
     ),
     await run("security.secrets", "אחסון סודות", () => {
-      const inCode = ["STRIPE_SECRET_KEY", "TWILIO_AUTH_TOKEN", "AMADEUS_CLIENT_SECRET"].filter(
-        (k) => {
-          const v = env(k);
-          return v ? false : false === true;
-        },
+      // A secret is only safe while it stays server-side: anything exposed to
+      // the browser carries a VITE_ prefix, so a provider key there is a leak.
+      const exposed = Object.keys(process.env)
+        .filter((k) => k.startsWith("VITE_"))
+        .filter((k) => /(SECRET|TOKEN|PASSWORD|PRIVATE|API_KEY)/i.test(k));
+      const serverSide = ["STRIPE_SECRET_KEY", "TWILIO_AUTH_TOKEN", "AMADEUS_CLIENT_SECRET"].filter(
+        (k) => Boolean(env(k)),
       );
-      return inCode.length === 0
-        ? ok("כל הסודות נקראים מסביבת השרת בזמן ריצה; אין מפתחות בקוד או בצד הלקוח")
-        : fail("נמצאו סודות בקוד", "העבר את הסודות למאגר הסודות");
+      return exposed.length === 0
+        ? ok(
+            `אין סודות חשופים ללקוח; ${serverSide.length} מפתחות ספק נקראים מסביבת השרת בזמן ריצה`,
+          )
+        : fail(`סודות חשופים ללקוח: ${exposed.join(", ")}`, "העבר אותם לסודות שרת ללא קידומת VITE_");
     }),
     await run("security.ratelimit", "הגבלת קצב", () =>
       rateLimit.ok
