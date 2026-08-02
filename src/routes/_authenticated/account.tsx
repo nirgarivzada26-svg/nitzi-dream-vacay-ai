@@ -166,7 +166,7 @@ function TripsTab() {
   if (q.isLoading) return <SkeletonList />;
   if (!q.data?.length)
     return <EmptyState title="עדיין לא שמרת אף חופשה" hint="בעמוד התוצאות תוכל לשמור מסלול שלם וחזרת אליו מכאן."
-      cta={<Link to="/quiz" className="rounded-2xl bg-gradient-sunset px-4 py-2 text-sm font-black text-white shadow-glow">תכנן חופשה</Link>} />;
+      cta={<Link to="/ai" className="rounded-2xl bg-gradient-sunset px-4 py-2 text-sm font-black text-white shadow-glow">תכנן חופשה</Link>} />;
   return (
     <ul className="grid gap-3">
       {q.data.map((t) => (

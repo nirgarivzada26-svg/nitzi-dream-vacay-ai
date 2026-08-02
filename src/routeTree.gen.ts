@@ -17,10 +17,13 @@ import { Route as CompareRouteImport } from './routes/compare'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AiIndexRouteImport } from './routes/ai.index'
 import { Route as PackageIdRouteImport } from './routes/package.$id'
 import { Route as HotelIdRouteImport } from './routes/hotel.$id'
 import { Route as FlightIdRouteImport } from './routes/flight.$id'
 import { Route as DealIdRouteImport } from './routes/deal.$id'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AiConversationIdRouteImport } from './routes/ai.$conversationId'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
@@ -75,6 +78,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiIndexRoute = AiIndexRouteImport.update({
+  id: '/ai/',
+  path: '/ai/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PackageIdRoute = PackageIdRouteImport.update({
   id: '/package/$id',
   path: '/package/$id',
@@ -93,6 +101,16 @@ const FlightIdRoute = FlightIdRouteImport.update({
 const DealIdRoute = DealIdRouteImport.update({
   id: '/deal/$id',
   path: '/deal/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiConversationIdRoute = AiConversationIdRouteImport.update({
+  id: '/ai/$conversationId',
+  path: '/ai/$conversationId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
@@ -184,10 +202,13 @@ export interface FileRoutesByFullPath {
   '/result': typeof ResultRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/account': typeof AuthenticatedAccountRoute
+  '/ai/$conversationId': typeof AiConversationIdRoute
+  '/api/chat': typeof ApiChatRoute
   '/deal/$id': typeof DealIdRoute
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
   '/package/$id': typeof PackageIdRoute
+  '/ai/': typeof AiIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/flights': typeof AuthenticatedAdminFlightsRoute
@@ -210,10 +231,13 @@ export interface FileRoutesByTo {
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
   '/account': typeof AuthenticatedAccountRoute
+  '/ai/$conversationId': typeof AiConversationIdRoute
+  '/api/chat': typeof ApiChatRoute
   '/deal/$id': typeof DealIdRoute
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
   '/package/$id': typeof PackageIdRoute
+  '/ai': typeof AiIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/flights': typeof AuthenticatedAdminFlightsRoute
@@ -239,10 +263,13 @@ export interface FileRoutesById {
   '/result': typeof ResultRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
   '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/ai/$conversationId': typeof AiConversationIdRoute
+  '/api/chat': typeof ApiChatRoute
   '/deal/$id': typeof DealIdRoute
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
   '/package/$id': typeof PackageIdRoute
+  '/ai/': typeof AiIndexRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/flights': typeof AuthenticatedAdminFlightsRoute
@@ -268,10 +295,13 @@ export interface FileRouteTypes {
     | '/result'
     | '/admin'
     | '/account'
+    | '/ai/$conversationId'
+    | '/api/chat'
     | '/deal/$id'
     | '/flight/$id'
     | '/hotel/$id'
     | '/package/$id'
+    | '/ai/'
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/flights'
@@ -294,10 +324,13 @@ export interface FileRouteTypes {
     | '/quiz'
     | '/result'
     | '/account'
+    | '/ai/$conversationId'
+    | '/api/chat'
     | '/deal/$id'
     | '/flight/$id'
     | '/hotel/$id'
     | '/package/$id'
+    | '/ai'
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/flights'
@@ -322,10 +355,13 @@ export interface FileRouteTypes {
     | '/result'
     | '/_authenticated/admin'
     | '/_authenticated/account'
+    | '/ai/$conversationId'
+    | '/api/chat'
     | '/deal/$id'
     | '/flight/$id'
     | '/hotel/$id'
     | '/package/$id'
+    | '/ai/'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/flights'
@@ -349,10 +385,13 @@ export interface RootRouteChildren {
   PackagesRoute: typeof PackagesRoute
   QuizRoute: typeof QuizRoute
   ResultRoute: typeof ResultRoute
+  AiConversationIdRoute: typeof AiConversationIdRoute
+  ApiChatRoute: typeof ApiChatRoute
   DealIdRoute: typeof DealIdRoute
   FlightIdRoute: typeof FlightIdRoute
   HotelIdRoute: typeof HotelIdRoute
   PackageIdRoute: typeof PackageIdRoute
+  AiIndexRoute: typeof AiIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -413,6 +452,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai/': {
+      id: '/ai/'
+      path: '/ai'
+      fullPath: '/ai/'
+      preLoaderRoute: typeof AiIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/package/$id': {
       id: '/package/$id'
       path: '/package/$id'
@@ -439,6 +485,20 @@ declare module '@tanstack/react-router' {
       path: '/deal/$id'
       fullPath: '/deal/$id'
       preLoaderRoute: typeof DealIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai/$conversationId': {
+      id: '/ai/$conversationId'
+      path: '/ai/$conversationId'
+      fullPath: '/ai/$conversationId'
+      preLoaderRoute: typeof AiConversationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/account': {
@@ -600,10 +660,13 @@ const rootRouteChildren: RootRouteChildren = {
   PackagesRoute: PackagesRoute,
   QuizRoute: QuizRoute,
   ResultRoute: ResultRoute,
+  AiConversationIdRoute: AiConversationIdRoute,
+  ApiChatRoute: ApiChatRoute,
   DealIdRoute: DealIdRoute,
   FlightIdRoute: FlightIdRoute,
   HotelIdRoute: HotelIdRoute,
   PackageIdRoute: PackageIdRoute,
+  AiIndexRoute: AiIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
