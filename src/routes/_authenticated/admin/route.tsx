@@ -8,7 +8,7 @@ import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-r
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   BarChart3, Bell, ClipboardList, FileBarChart, LayoutDashboard, Menu, Package,
-  Plane, Search, Settings, ShieldCheck, ScrollText, Users, X, ArrowLeft,
+  Plane, Settings, ShieldCheck, ScrollText, Users, X, ArrowLeft,
 } from "lucide-react";
 import { toast } from "sonner";
 import { NitziLogo } from "@/components/NitziLogo";
@@ -152,5 +152,3 @@ function AdminLayout() {
     </div>
   );
 }
-
-export { Search as AdminSearchIcon };

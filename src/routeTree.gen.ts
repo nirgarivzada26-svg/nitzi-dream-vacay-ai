@@ -22,6 +22,7 @@ import { Route as HotelIdRouteImport } from './routes/hotel.$id'
 import { Route as FlightIdRouteImport } from './routes/flight.$id'
 import { Route as DealIdRouteImport } from './routes/deal.$id'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedCheckoutIdRouteImport } from './routes/_authenticated/checkout.$id'
 
 const ResultRoute = ResultRouteImport.update({
@@ -88,6 +89,11 @@ const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
   path: '/account',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCheckoutIdRoute = AuthenticatedCheckoutIdRouteImport.update({
   id: '/checkout/$id',
   path: '/checkout/$id',
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/packages': typeof PackagesRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
+  '/admin': typeof AuthenticatedAdminRouteRoute
   '/account': typeof AuthenticatedAccountRoute
   '/deal/$id': typeof DealIdRoute
   '/flight/$id': typeof FlightIdRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/packages': typeof PackagesRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
+  '/admin': typeof AuthenticatedAdminRouteRoute
   '/account': typeof AuthenticatedAccountRoute
   '/deal/$id': typeof DealIdRoute
   '/flight/$id': typeof FlightIdRoute
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/packages': typeof PackagesRoute
   '/quiz': typeof QuizRoute
   '/result': typeof ResultRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRoute
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/deal/$id': typeof DealIdRoute
   '/flight/$id': typeof FlightIdRoute
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/packages'
     | '/quiz'
     | '/result'
+    | '/admin'
     | '/account'
     | '/deal/$id'
     | '/flight/$id'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/packages'
     | '/quiz'
     | '/result'
+    | '/admin'
     | '/account'
     | '/deal/$id'
     | '/flight/$id'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/packages'
     | '/quiz'
     | '/result'
+    | '/_authenticated/admin'
     | '/_authenticated/account'
     | '/deal/$id'
     | '/flight/$id'
@@ -298,6 +310,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAccountRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/checkout/$id': {
       id: '/_authenticated/checkout/$id'
       path: '/checkout/$id'
@@ -309,11 +328,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRoute
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedCheckoutIdRoute: typeof AuthenticatedCheckoutIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRoute,
   AuthenticatedAccountRoute: AuthenticatedAccountRoute,
   AuthenticatedCheckoutIdRoute: AuthenticatedCheckoutIdRoute,
 }
