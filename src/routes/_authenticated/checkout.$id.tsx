@@ -10,7 +10,7 @@ import {
 import { getDeal, revalidateDeal, type Deal, type RevalidationResult } from "@/lib/deals";
 import { createBooking } from "@/lib/user-data";
 import { NitziLogo } from "@/components/NitziLogo";
-import { useDestinations } from "@/lib/use-catalog";
+import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
 
 export const Route = createFileRoute("/_authenticated/checkout/$id")({
   head: ({ params }) => ({
@@ -22,6 +22,7 @@ export const Route = createFileRoute("/_authenticated/checkout/$id")({
       { name: "robots", content: "noindex" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
   component: CheckoutPage,
 });
 
