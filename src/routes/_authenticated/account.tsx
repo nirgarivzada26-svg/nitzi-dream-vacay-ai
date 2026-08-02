@@ -198,7 +198,7 @@ function FavoritesTab() {
         return (
           <div key={f.id} className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
             <div className="relative h-48 w-full">
-              <img src={snap.destination.image} alt={snap.destination.name} className="h-full w-full object-cover" />
+              <DestinationImage destination={snap.destination} className="h-full w-full object-cover" />
               <button onClick={async () => { await removeFavorite(f.deal_id); qc.invalidateQueries({ queryKey: ["favorites"] }); }}
                 className="absolute top-2 left-2 grid h-8 w-8 place-items-center rounded-full bg-white/90 text-rose-500">
                 <Heart className="h-4 w-4 fill-current" />
