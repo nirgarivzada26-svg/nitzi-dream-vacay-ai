@@ -2,6 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { BadgeCheck, Clock, Moon, Plane, Star } from "lucide-react";
 import { boardLabels, type Deal } from "@/lib/deals";
 import { DestinationImage } from "@/components/DestinationImage";
+import { SmartPriceBadge } from "@/components/SmartPriceBadge";
+
 
 const fmt = (n: number) => `₪${Math.round(n).toLocaleString()}`;
 const fmtDate = (iso: string) =>
