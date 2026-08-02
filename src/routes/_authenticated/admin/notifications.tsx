@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { BellOff, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { AdminEmpty, AdminError, AdminLoading, SectionCard, dateTime } from "@/components/admin/AdminUI";
 import { adminAlerts, adminResolveAlert } from "@/lib/admin.functions";
 import type { AdminAlert } from "@/lib/admin-types";
@@ -83,7 +83,7 @@ function NotificationsPage() {
 
       <SectionCard title="היסטוריית התראות" subtitle={`${done.length.toLocaleString("he-IL")} טופלו`}>
         {done.length === 0 ? (
-          <AdminEmpty title="אין התראות שטופלו" icon={BellOff} />
+          <AdminEmpty title="אין התראות שטופלו" />
         ) : (
           <ul className="divide-y divide-border">
             {done.slice(0, 50).map((a) => (
