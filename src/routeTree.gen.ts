@@ -45,6 +45,7 @@ import { Route as AuthenticatedAdminFlightsRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as ApiPublicWebhooksProviderRouteImport } from './routes/api/public/webhooks/$provider'
+import { Route as ApiPublicMonitoringPulseRouteImport } from './routes/api/public/monitoring/pulse'
 
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
@@ -236,6 +237,12 @@ const ApiPublicWebhooksProviderRoute =
     path: '/api/public/webhooks/$provider',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicMonitoringPulseRoute =
+  ApiPublicMonitoringPulseRouteImport.update({
+    id: '/api/public/monitoring/pulse',
+    path: '/api/public/monitoring/pulse',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -272,6 +279,7 @@ export interface FileRoutesByFullPath {
   '/booking/$id': typeof AuthenticatedBookingIdRoute
   '/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/monitoring/pulse': typeof ApiPublicMonitoringPulseRoute
   '/api/public/webhooks/$provider': typeof ApiPublicWebhooksProviderRoute
 }
 export interface FileRoutesByTo {
@@ -308,6 +316,7 @@ export interface FileRoutesByTo {
   '/booking/$id': typeof AuthenticatedBookingIdRoute
   '/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api/public/monitoring/pulse': typeof ApiPublicMonitoringPulseRoute
   '/api/public/webhooks/$provider': typeof ApiPublicWebhooksProviderRoute
 }
 export interface FileRoutesById {
@@ -347,6 +356,7 @@ export interface FileRoutesById {
   '/_authenticated/booking/$id': typeof AuthenticatedBookingIdRoute
   '/_authenticated/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/api/public/monitoring/pulse': typeof ApiPublicMonitoringPulseRoute
   '/api/public/webhooks/$provider': typeof ApiPublicWebhooksProviderRoute
 }
 export interface FileRouteTypes {
@@ -386,6 +396,7 @@ export interface FileRouteTypes {
     | '/booking/$id'
     | '/checkout/$id'
     | '/admin/'
+    | '/api/public/monitoring/pulse'
     | '/api/public/webhooks/$provider'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -422,6 +433,7 @@ export interface FileRouteTypes {
     | '/booking/$id'
     | '/checkout/$id'
     | '/admin'
+    | '/api/public/monitoring/pulse'
     | '/api/public/webhooks/$provider'
   id:
     | '__root__'
@@ -460,6 +472,7 @@ export interface FileRouteTypes {
     | '/_authenticated/booking/$id'
     | '/_authenticated/checkout/$id'
     | '/_authenticated/admin/'
+    | '/api/public/monitoring/pulse'
     | '/api/public/webhooks/$provider'
   fileRoutesById: FileRoutesById
 }
@@ -482,6 +495,7 @@ export interface RootRouteChildren {
   LegalDocRoute: typeof LegalDocRoute
   PackageIdRoute: typeof PackageIdRoute
   AiIndexRoute: typeof AiIndexRoute
+  ApiPublicMonitoringPulseRoute: typeof ApiPublicMonitoringPulseRoute
   ApiPublicWebhooksProviderRoute: typeof ApiPublicWebhooksProviderRoute
 }
 
@@ -739,6 +753,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWebhooksProviderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/monitoring/pulse': {
+      id: '/api/public/monitoring/pulse'
+      path: '/api/public/monitoring/pulse'
+      fullPath: '/api/public/monitoring/pulse'
+      preLoaderRoute: typeof ApiPublicMonitoringPulseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -816,6 +837,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalDocRoute: LegalDocRoute,
   PackageIdRoute: PackageIdRoute,
   AiIndexRoute: AiIndexRoute,
+  ApiPublicMonitoringPulseRoute: ApiPublicMonitoringPulseRoute,
   ApiPublicWebhooksProviderRoute: ApiPublicWebhooksProviderRoute,
 }
 export const routeTree = rootRouteImport
