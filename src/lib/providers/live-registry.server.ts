@@ -26,6 +26,24 @@ import {
 } from "./messaging-adapters.server";
 import { liveModeEnabled, providerOrder } from "./credentials.server";
 import { runWithFailover, type ChainMember } from "./failover.server";
+import { launchGateOpen } from "@/lib/launch/launch-gate.server";
+import { providerFail } from "./contracts";
+import type { ProviderResult } from "./contracts";
+
+/**
+ * Sprint 9 gate: live suppliers are only reachable after a full-pass launch
+ * checklist was recorded. Until then callers get "not configured" and the
+ * demo provider keeps serving — never invented inventory.
+ */
+async function gateBlocked<T>(): Promise<ProviderResult<T> | null> {
+  if (!liveModeEnabled()) return null;
+  if (await launchGateOpen()) return null;
+  return providerFail<T>("launch-gate", {
+    code: "not_configured",
+    message: "LIVE_MODE חסום — צ׳קליסט ההשקה טרם עבר במלואו",
+    retryable: false,
+  });
+}
 
 function chain<A extends { isConfigured(): boolean }>(
   adapters: Record<string, A>,
@@ -67,6 +85,8 @@ export function smsChain() {
 /* ------------------------------------------------------------ operations */
 
 export async function searchLiveFlights(req: FlightSearchRequest) {
+  const blocked = await gateBlocked<FlightOffer[]>();
+  if (blocked) return blocked;
   const res = await runWithFailover(
     "flight",
     "searchFlights",
@@ -80,6 +100,8 @@ export async function searchLiveFlights(req: FlightSearchRequest) {
 }
 
 export async function revalidateLiveFlight(offerId: string, req: FlightSearchRequest) {
+  const blocked = await gateBlocked<VerifiedQuote>();
+  if (blocked) return blocked;
   return runWithFailover<FlightProviderAdapter, VerifiedQuote>(
     "flight",
     "revalidatePrice",
@@ -90,6 +112,8 @@ export async function revalidateLiveFlight(offerId: string, req: FlightSearchReq
 }
 
 export async function searchLiveHotels(req: HotelSearchRequest) {
+  const blocked = await gateBlocked<HotelOffer[]>();
+  if (blocked) return blocked;
   const res = await runWithFailover(
     "hotel",
     "searchHotels",
@@ -102,6 +126,8 @@ export async function searchLiveHotels(req: HotelSearchRequest) {
 }
 
 export async function revalidateLiveHotel(hotelId: string, req: HotelSearchRequest) {
+  const blocked = await gateBlocked<VerifiedQuote>();
+  if (blocked) return blocked;
   return runWithFailover<HotelProviderAdapter, VerifiedQuote>(
     "hotel",
     "revalidatePrice",
