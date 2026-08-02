@@ -6,22 +6,35 @@ interface Props {
   reasons: string[]; // bullet reasons
   score?: number; // 0-100 match
   extra?: React.ReactNode; // optional richer content
+  /** Optional custom trigger (e.g. an icon button on a card). */
+  trigger?: (open: () => void) => React.ReactNode;
 }
 
-export function WhyNitziButton({ title = "למה NITZI בחר בזה?", reasons, score, extra }: Props) {
+export function WhyNitziButton({
+  title = "למה NITZI בחר בזה?",
+  reasons,
+  score,
+  extra,
+  trigger,
+}: Props) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          setOpen(true);
-        }}
-        className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-[11px] font-black text-primary transition hover:bg-primary/20"
-      >
-        <Wand2 className="h-3.5 w-3.5" /> למה NITZI בחר?
-      </button>
+      {trigger ? (
+        trigger(() => setOpen(true))
+      ) : (
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setOpen(true);
+          }}
+          className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-[11px] font-black text-primary transition hover:bg-primary/20"
+        >
+          <Wand2 className="h-3.5 w-3.5" /> למה NITZI בחר?
+        </button>
+      )}
+
 
       {open && (
         <div
