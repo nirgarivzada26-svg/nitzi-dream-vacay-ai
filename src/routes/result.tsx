@@ -211,6 +211,9 @@ function Result() {
           </div>
           <p className="mt-2 text-[11px] text-muted-foreground">מפה אינטראקטיבית תתווסף בגרסה הבאה</p>
         </Card>
+        </div>
+
+
 
         {/* NITZI's Picks — top curated by AI */}
         <section className="mx-5 overflow-hidden rounded-3xl border border-primary/30 bg-gradient-to-b from-primary/10 via-card/90 to-card/80 p-5 shadow-glow backdrop-blur animate-fade-up">
