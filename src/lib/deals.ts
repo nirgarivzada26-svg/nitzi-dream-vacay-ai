@@ -122,10 +122,21 @@ function buildDeal(dest: Destination, opts?: { secret?: boolean; seed?: string }
   const hotel = dest.hotels[Math.floor(r() * dest.hotels.length)];
   const stars = 4 + Math.floor(r() * 2);
 
+  const board: BoardBasis = pick(r, [
+    "breakfast", "breakfast", "half-board", "all-inclusive", "all-inclusive", "room-only",
+  ] as BoardBasis[]);
+  const listPricePerPerson = Math.round((perPerson * (1.12 + r() * 0.26)) / 10) * 10;
+  const discountPct = Math.max(0, Math.round((1 - perPerson / listPricePerPerson) * 100));
+  const freeCancellation = r() > 0.3;
+
   return {
     id: dealIdFor(dest.name),
     destination: dest,
     title: `${nights} לילות ב${dest.name} · ${hotel.name}`,
+    board,
+    listPricePerPerson,
+    discountPct,
+    freeCancellation,
     hotel: {
       name: hotel.name,
       note: hotel.note,
