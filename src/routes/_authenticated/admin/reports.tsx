@@ -16,13 +16,16 @@ function ReportsPage() {
   const packages = useQuery({ queryKey: ["admin", "packages"], queryFn: () => adminPackages() as Promise<AdminPackageRow[]>, retry: false });
   const analytics = useQuery({ queryKey: ["admin", "analytics"], queryFn: () => adminSearchAnalytics() as Promise<SearchAnalytics>, retry: false });
 
-  const anyLoading = orders.isPending || users.isPending || packages.isPending || analytics.isPending;
   const firstError = orders.error ?? users.error ?? packages.error ?? analytics.error;
-
-  if (anyLoading) return <AdminLoading />;
   if (firstError) return <AdminError error={firstError} />;
 
-  const revenue = orders.data
+  const ordersData = ordersData;
+  const usersData = usersData;
+  const packagesData = packagesData;
+  const analyticsData = analyticsData;
+  if (!ordersData || !usersData || !packagesData || !analyticsData) return <AdminLoading />;
+
+  const revenue = ordersData
     .filter((o) => o.status === "confirmed")
     .reduce((s, o) => s + o.total, 0);
 
@@ -30,8 +33,8 @@ function ReportsPage() {
     {
       id: "orders",
       title: "דוח הזמנות",
-      subtitle: `${orders.data.length.toLocaleString("he-IL")} הזמנות · הכנסות מאושרות ${money(revenue)}`,
-      rows: orders.data.map((o) => ({
+      subtitle: `${ordersData.length.toLocaleString("he-IL")} הזמנות · הכנסות מאושרות ${money(revenue)}`,
+      rows: ordersData.map((o) => ({
         "מס' הזמנה": o.id, לקוח: o.customer, אימייל: o.email ?? "", יעד: o.destination,
         נוסעים: o.people, לילות: o.nights, סכום: o.total, מטבע: o.currency,
         סטטוס: o.status, "אמצעי תשלום": o.paymentMethod ?? "", תאריך: o.createdAt,
@@ -42,7 +45,7 @@ function ReportsPage() {
       title: "דוח הכנסות לפי יעד",
       subtitle: "סכימת הזמנות מאושרות",
       rows: Object.entries(
-        orders.data.filter((o) => o.status === "confirmed").reduce<Record<string, { count: number; total: number }>>((acc, o) => {
+        ordersData.filter((o) => o.status === "confirmed").reduce<Record<string, { count: number; total: number }>>((acc, o) => {
           const cur = acc[o.destination] ?? { count: 0, total: 0 };
           acc[o.destination] = { count: cur.count + 1, total: cur.total + o.total };
           return acc;
@@ -54,8 +57,8 @@ function ReportsPage() {
     {
       id: "users",
       title: "דוח משתמשים",
-      subtitle: `${users.data.length.toLocaleString("he-IL")} משתמשים רשומים`,
-      rows: users.data.map((u) => ({
+      subtitle: `${usersData.length.toLocaleString("he-IL")} משתמשים רשומים`,
+      rows: usersData.map((u) => ({
         שם: u.name, אימייל: u.email ?? "", טלפון: u.phone ?? "", הרשמה: u.createdAt,
         הזמנות: u.orders, מועדפים: u.favorites, "סה\"כ רכישות": u.spend, פעיל: u.active ? "כן" : "לא",
       })),
@@ -64,7 +67,7 @@ function ReportsPage() {
       id: "packages",
       title: "דוח ביצועי חבילות",
       subtitle: "צפיות, הזמנות ושיעור המרה",
-      rows: packages.data.map((p) => ({
+      rows: packagesData.map((p) => ({
         חבילה: p.name, יעד: p.destination, מחיר: p.price, צפיות: p.views,
         הזמנות: p.orders, "המרה %": p.conversionRate, "מחיר חכם": p.smartPrice, פעילה: p.active ? "כן" : "לא",
       })),
@@ -72,8 +75,8 @@ function ReportsPage() {
     {
       id: "searches",
       title: "דוח חיפושים",
-      subtitle: `${analytics.data.totalSearches.toLocaleString("he-IL")} חיפושים · ${analytics.data.noResultsCount.toLocaleString("he-IL")} ללא תוצאה`,
-      rows: analytics.data.topDestinations.map((d) => ({ יעד: d.label, חיפושים: d.value })),
+      subtitle: `${analyticsData.totalSearches.toLocaleString("he-IL")} חיפושים · ${analyticsData.noResultsCount.toLocaleString("he-IL")} ללא תוצאה`,
+      rows: analyticsData.topDestinations.map((d) => ({ יעד: d.label, חיפושים: d.value })),
     },
   ];
 
