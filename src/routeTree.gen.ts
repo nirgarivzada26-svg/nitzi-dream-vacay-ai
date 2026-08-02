@@ -20,6 +20,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AiIndexRouteImport } from './routes/ai.index'
 import { Route as PackageIdRouteImport } from './routes/package.$id'
+import { Route as LegalDocRouteImport } from './routes/legal.$doc'
 import { Route as HotelIdRouteImport } from './routes/hotel.$id'
 import { Route as FlightIdRouteImport } from './routes/flight.$id'
 import { Route as DestinationSlugRouteImport } from './routes/destination.$slug'
@@ -97,6 +98,11 @@ const AiIndexRoute = AiIndexRouteImport.update({
 const PackageIdRoute = PackageIdRouteImport.update({
   id: '/package/$id',
   path: '/package/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalDocRoute = LegalDocRouteImport.update({
+  id: '/legal/$doc',
+  path: '/legal/$doc',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HotelIdRoute = HotelIdRouteImport.update({
@@ -248,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/destination/$slug': typeof DestinationSlugRoute
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
+  '/legal/$doc': typeof LegalDocRoute
   '/package/$id': typeof PackageIdRoute
   '/ai/': typeof AiIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -283,6 +290,7 @@ export interface FileRoutesByTo {
   '/destination/$slug': typeof DestinationSlugRoute
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
+  '/legal/$doc': typeof LegalDocRoute
   '/package/$id': typeof PackageIdRoute
   '/ai': typeof AiIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -321,6 +329,7 @@ export interface FileRoutesById {
   '/destination/$slug': typeof DestinationSlugRoute
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
+  '/legal/$doc': typeof LegalDocRoute
   '/package/$id': typeof PackageIdRoute
   '/ai/': typeof AiIndexRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
@@ -359,6 +368,7 @@ export interface FileRouteTypes {
     | '/destination/$slug'
     | '/flight/$id'
     | '/hotel/$id'
+    | '/legal/$doc'
     | '/package/$id'
     | '/ai/'
     | '/admin/analytics'
@@ -394,6 +404,7 @@ export interface FileRouteTypes {
     | '/destination/$slug'
     | '/flight/$id'
     | '/hotel/$id'
+    | '/legal/$doc'
     | '/package/$id'
     | '/ai'
     | '/admin/analytics'
@@ -431,6 +442,7 @@ export interface FileRouteTypes {
     | '/destination/$slug'
     | '/flight/$id'
     | '/hotel/$id'
+    | '/legal/$doc'
     | '/package/$id'
     | '/ai/'
     | '/_authenticated/admin/analytics'
@@ -467,6 +479,7 @@ export interface RootRouteChildren {
   DestinationSlugRoute: typeof DestinationSlugRoute
   FlightIdRoute: typeof FlightIdRoute
   HotelIdRoute: typeof HotelIdRoute
+  LegalDocRoute: typeof LegalDocRoute
   PackageIdRoute: typeof PackageIdRoute
   AiIndexRoute: typeof AiIndexRoute
   ApiPublicWebhooksProviderRoute: typeof ApiPublicWebhooksProviderRoute
@@ -549,6 +562,13 @@ declare module '@tanstack/react-router' {
       path: '/package/$id'
       fullPath: '/package/$id'
       preLoaderRoute: typeof PackageIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/$doc': {
+      id: '/legal/$doc'
+      path: '/legal/$doc'
+      fullPath: '/legal/$doc'
+      preLoaderRoute: typeof LegalDocRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hotel/$id': {
@@ -793,6 +813,7 @@ const rootRouteChildren: RootRouteChildren = {
   DestinationSlugRoute: DestinationSlugRoute,
   FlightIdRoute: FlightIdRoute,
   HotelIdRoute: HotelIdRoute,
+  LegalDocRoute: LegalDocRoute,
   PackageIdRoute: PackageIdRoute,
   AiIndexRoute: AiIndexRoute,
   ApiPublicWebhooksProviderRoute: ApiPublicWebhooksProviderRoute,
