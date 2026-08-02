@@ -20,7 +20,8 @@ import {
   Wallet,
   XCircle,
 } from "lucide-react";
-import { getDeal, revalidateDeal, type Deal, type RevalidationResult } from "@/lib/deals";
+import { getDeal, type Deal } from "@/lib/deals";
+import { revalidateCheckout, type CheckoutRevalidation } from "@/lib/checkout.functions";
 import { placeBooking } from "@/lib/bookings.functions";
 import { EXTRAS, computeExtras, type ExtraId } from "@/lib/booking-extras";
 import { NitziLogo } from "@/components/NitziLogo";
@@ -69,7 +70,7 @@ function CheckoutPage() {
   const catalog = useDestinations();
 
   const [deal, setDeal] = useState<Deal | null>(() => getDeal(id, catalog));
-  const [reval, setReval] = useState<RevalidationResult | null>(null);
+  const [reval, setReval] = useState<CheckoutRevalidation | null>(null);
   const [checking, setChecking] = useState(true);
   const [step, setStep] = useState(0);
   const [busy, setBusy] = useState(false);
@@ -157,7 +158,9 @@ function CheckoutPage() {
   }
 
   const changed = reval?.status === "changed";
-  const soldOut = reval?.status === "sold-out" || deal.price.availability === "sold-out";
+  const soldOut = reval?.status === "sold-out" || reval?.status === "unavailable"
+    ? true
+    : false || reval?.status === "sold-out" || deal.price.availability === "sold-out";
 
   const passengersValid =
     passengers.every(
@@ -530,7 +533,7 @@ function CheckoutPage() {
                     <p className="mt-1 text-[12px]">
                       קודם:{" "}
                       <span className="line-through">
-                        {fmtILS(reval!.status === "changed" ? reval.oldPrice : 0)}
+                        {fmtILS(reval?.previousTotal ?? 0)}
                       </span>{" "}
                       · חדש: <span className="font-black">{fmtILS(deal.price.total)}</span>
                     </p>
