@@ -18,6 +18,7 @@ import {
   PlugZap,
   Settings,
   ShieldCheck,
+  Rocket,
   ScrollText,
   Users,
   X,
@@ -59,6 +60,7 @@ const NAV: {
   { to: "/admin/audit", label: "יומן פעולות", icon: ScrollText, perm: "audit" },
   { to: "/admin/settings", label: "הגדרות", icon: Settings, perm: "settings" },
   { to: "/admin/providers", label: "בריאות ספקים", icon: PlugZap, perm: "settings" },
+  { to: "/admin/launch", label: "צ׳קליסט השקה", icon: Rocket, perm: "settings" },
   { to: "/admin/permissions", label: "הרשאות", icon: ShieldCheck, perm: "permissions" },
 ];
 

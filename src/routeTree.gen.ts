@@ -39,6 +39,7 @@ import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_aut
 import { Route as AuthenticatedAdminPackagesRouteImport } from './routes/_authenticated/admin/packages'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin/orders'
 import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin/notifications'
+import { Route as AuthenticatedAdminLaunchRouteImport } from './routes/_authenticated/admin/launch'
 import { Route as AuthenticatedAdminFlightsRouteImport } from './routes/_authenticated/admin/flights'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
@@ -200,6 +201,12 @@ const AuthenticatedAdminNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminLaunchRoute =
+  AuthenticatedAdminLaunchRouteImport.update({
+    id: '/launch',
+    path: '/launch',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminFlightsRoute =
   AuthenticatedAdminFlightsRouteImport.update({
     id: '/flights',
@@ -246,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/flights': typeof AuthenticatedAdminFlightsRoute
+  '/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/packages': typeof AuthenticatedAdminPackagesRoute
@@ -280,6 +288,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/flights': typeof AuthenticatedAdminFlightsRoute
+  '/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/packages': typeof AuthenticatedAdminPackagesRoute
@@ -317,6 +326,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/flights': typeof AuthenticatedAdminFlightsRoute
+  '/_authenticated/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/_authenticated/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin/packages': typeof AuthenticatedAdminPackagesRoute
@@ -354,6 +364,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/flights'
+    | '/admin/launch'
     | '/admin/notifications'
     | '/admin/orders'
     | '/admin/packages'
@@ -388,6 +399,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/flights'
+    | '/admin/launch'
     | '/admin/notifications'
     | '/admin/orders'
     | '/admin/packages'
@@ -424,6 +436,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/flights'
+    | '/_authenticated/admin/launch'
     | '/_authenticated/admin/notifications'
     | '/_authenticated/admin/orders'
     | '/_authenticated/admin/packages'
@@ -671,6 +684,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminNotificationsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/launch': {
+      id: '/_authenticated/admin/launch'
+      path: '/launch'
+      fullPath: '/admin/launch'
+      preLoaderRoute: typeof AuthenticatedAdminLaunchRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/flights': {
       id: '/_authenticated/admin/flights'
       path: '/flights'
@@ -706,6 +726,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminFlightsRoute: typeof AuthenticatedAdminFlightsRoute
+  AuthenticatedAdminLaunchRoute: typeof AuthenticatedAdminLaunchRoute
   AuthenticatedAdminNotificationsRoute: typeof AuthenticatedAdminNotificationsRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
   AuthenticatedAdminPackagesRoute: typeof AuthenticatedAdminPackagesRoute
@@ -722,6 +743,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
     AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
     AuthenticatedAdminFlightsRoute: AuthenticatedAdminFlightsRoute,
+    AuthenticatedAdminLaunchRoute: AuthenticatedAdminLaunchRoute,
     AuthenticatedAdminNotificationsRoute: AuthenticatedAdminNotificationsRoute,
     AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
     AuthenticatedAdminPackagesRoute: AuthenticatedAdminPackagesRoute,
