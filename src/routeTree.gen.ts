@@ -22,6 +22,7 @@ import { Route as AiIndexRouteImport } from './routes/ai.index'
 import { Route as PackageIdRouteImport } from './routes/package.$id'
 import { Route as HotelIdRouteImport } from './routes/hotel.$id'
 import { Route as FlightIdRouteImport } from './routes/flight.$id'
+import { Route as DestinationSlugRouteImport } from './routes/destination.$slug'
 import { Route as DealIdRouteImport } from './routes/deal.$id'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AiConversationIdRouteImport } from './routes/ai.$conversationId'
@@ -102,6 +103,11 @@ const HotelIdRoute = HotelIdRouteImport.update({
 const FlightIdRoute = FlightIdRouteImport.update({
   id: '/flight/$id',
   path: '/flight/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DestinationSlugRoute = DestinationSlugRouteImport.update({
+  id: '/destination/$slug',
+  path: '/destination/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DealIdRoute = DealIdRouteImport.update({
@@ -212,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/ai/$conversationId': typeof AiConversationIdRoute
   '/api/chat': typeof ApiChatRoute
   '/deal/$id': typeof DealIdRoute
+  '/destination/$slug': typeof DestinationSlugRoute
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
   '/package/$id': typeof PackageIdRoute
@@ -242,6 +249,7 @@ export interface FileRoutesByTo {
   '/ai/$conversationId': typeof AiConversationIdRoute
   '/api/chat': typeof ApiChatRoute
   '/deal/$id': typeof DealIdRoute
+  '/destination/$slug': typeof DestinationSlugRoute
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
   '/package/$id': typeof PackageIdRoute
@@ -275,6 +283,7 @@ export interface FileRoutesById {
   '/ai/$conversationId': typeof AiConversationIdRoute
   '/api/chat': typeof ApiChatRoute
   '/deal/$id': typeof DealIdRoute
+  '/destination/$slug': typeof DestinationSlugRoute
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
   '/package/$id': typeof PackageIdRoute
@@ -308,6 +317,7 @@ export interface FileRouteTypes {
     | '/ai/$conversationId'
     | '/api/chat'
     | '/deal/$id'
+    | '/destination/$slug'
     | '/flight/$id'
     | '/hotel/$id'
     | '/package/$id'
@@ -338,6 +348,7 @@ export interface FileRouteTypes {
     | '/ai/$conversationId'
     | '/api/chat'
     | '/deal/$id'
+    | '/destination/$slug'
     | '/flight/$id'
     | '/hotel/$id'
     | '/package/$id'
@@ -370,6 +381,7 @@ export interface FileRouteTypes {
     | '/ai/$conversationId'
     | '/api/chat'
     | '/deal/$id'
+    | '/destination/$slug'
     | '/flight/$id'
     | '/hotel/$id'
     | '/package/$id'
@@ -401,6 +413,7 @@ export interface RootRouteChildren {
   AiConversationIdRoute: typeof AiConversationIdRoute
   ApiChatRoute: typeof ApiChatRoute
   DealIdRoute: typeof DealIdRoute
+  DestinationSlugRoute: typeof DestinationSlugRoute
   FlightIdRoute: typeof FlightIdRoute
   HotelIdRoute: typeof HotelIdRoute
   PackageIdRoute: typeof PackageIdRoute
@@ -498,6 +511,13 @@ declare module '@tanstack/react-router' {
       path: '/flight/$id'
       fullPath: '/flight/$id'
       preLoaderRoute: typeof FlightIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/destination/$slug': {
+      id: '/destination/$slug'
+      path: '/destination/$slug'
+      fullPath: '/destination/$slug'
+      preLoaderRoute: typeof DestinationSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/deal/$id': {
@@ -684,6 +704,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiConversationIdRoute: AiConversationIdRoute,
   ApiChatRoute: ApiChatRoute,
   DealIdRoute: DealIdRoute,
+  DestinationSlugRoute: DestinationSlugRoute,
   FlightIdRoute: FlightIdRoute,
   HotelIdRoute: HotelIdRoute,
   PackageIdRoute: PackageIdRoute,
