@@ -61,6 +61,7 @@ const NAV: {
   { to: "/admin/settings", label: "הגדרות", icon: Settings, perm: "settings" },
   { to: "/admin/providers", label: "בריאות ספקים", icon: PlugZap, perm: "settings" },
   { to: "/admin/launch", label: "צ׳קליסט השקה", icon: Rocket, perm: "settings" },
+  { to: "/admin/commercial", label: "צ׳קליסט מסחרי", icon: ShieldCheck, perm: "settings" },
   { to: "/admin/permissions", label: "הרשאות", icon: ShieldCheck, perm: "permissions" },
 ];
 

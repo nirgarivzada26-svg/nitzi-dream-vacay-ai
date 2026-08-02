@@ -42,6 +42,7 @@ import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin/notifications'
 import { Route as AuthenticatedAdminLaunchRouteImport } from './routes/_authenticated/admin/launch'
 import { Route as AuthenticatedAdminFlightsRouteImport } from './routes/_authenticated/admin/flights'
+import { Route as AuthenticatedAdminCommercialRouteImport } from './routes/_authenticated/admin/commercial'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as ApiPublicWebhooksProviderRouteImport } from './routes/api/public/webhooks/$provider'
@@ -220,6 +221,12 @@ const AuthenticatedAdminFlightsRoute =
     path: '/flights',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminCommercialRoute =
+  AuthenticatedAdminCommercialRouteImport.update({
+    id: '/commercial',
+    path: '/commercial',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -266,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/ai/': typeof AiIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/commercial': typeof AuthenticatedAdminCommercialRoute
   '/admin/flights': typeof AuthenticatedAdminFlightsRoute
   '/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
@@ -303,6 +311,7 @@ export interface FileRoutesByTo {
   '/ai': typeof AiIndexRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/commercial': typeof AuthenticatedAdminCommercialRoute
   '/admin/flights': typeof AuthenticatedAdminFlightsRoute
   '/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
@@ -343,6 +352,7 @@ export interface FileRoutesById {
   '/ai/': typeof AiIndexRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/_authenticated/admin/commercial': typeof AuthenticatedAdminCommercialRoute
   '/_authenticated/admin/flights': typeof AuthenticatedAdminFlightsRoute
   '/_authenticated/admin/launch': typeof AuthenticatedAdminLaunchRoute
   '/_authenticated/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
@@ -383,6 +393,7 @@ export interface FileRouteTypes {
     | '/ai/'
     | '/admin/analytics'
     | '/admin/audit'
+    | '/admin/commercial'
     | '/admin/flights'
     | '/admin/launch'
     | '/admin/notifications'
@@ -420,6 +431,7 @@ export interface FileRouteTypes {
     | '/ai'
     | '/admin/analytics'
     | '/admin/audit'
+    | '/admin/commercial'
     | '/admin/flights'
     | '/admin/launch'
     | '/admin/notifications'
@@ -459,6 +471,7 @@ export interface FileRouteTypes {
     | '/ai/'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/audit'
+    | '/_authenticated/admin/commercial'
     | '/_authenticated/admin/flights'
     | '/_authenticated/admin/launch'
     | '/_authenticated/admin/notifications'
@@ -732,6 +745,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminFlightsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/commercial': {
+      id: '/_authenticated/admin/commercial'
+      path: '/commercial'
+      fullPath: '/admin/commercial'
+      preLoaderRoute: typeof AuthenticatedAdminCommercialRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/audit': {
       id: '/_authenticated/admin/audit'
       path: '/audit'
@@ -766,6 +786,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
+  AuthenticatedAdminCommercialRoute: typeof AuthenticatedAdminCommercialRoute
   AuthenticatedAdminFlightsRoute: typeof AuthenticatedAdminFlightsRoute
   AuthenticatedAdminLaunchRoute: typeof AuthenticatedAdminLaunchRoute
   AuthenticatedAdminNotificationsRoute: typeof AuthenticatedAdminNotificationsRoute
@@ -783,6 +804,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
   {
     AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
     AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
+    AuthenticatedAdminCommercialRoute: AuthenticatedAdminCommercialRoute,
     AuthenticatedAdminFlightsRoute: AuthenticatedAdminFlightsRoute,
     AuthenticatedAdminLaunchRoute: AuthenticatedAdminLaunchRoute,
     AuthenticatedAdminNotificationsRoute: AuthenticatedAdminNotificationsRoute,
