@@ -110,9 +110,8 @@ const TRIP_TYPES: TripType[] = [
 function toHotels(value: DestinationHotel[] | null): DestinationHotel[] {
   if (!Array.isArray(value)) return [];
   return value.flatMap((h) => {
-    if (!h || typeof h !== "object") return [];
-    const rec = h as Record<string, unknown>;
-    if (typeof rec.name !== "string") return [];
+    const rec = h as unknown as Record<string, unknown>;
+    if (!rec || typeof rec.name !== "string") return [];
     return [{ name: rec.name, note: typeof rec.note === "string" ? rec.note : "" }];
   });
 }
