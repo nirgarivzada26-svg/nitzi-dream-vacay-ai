@@ -1,5 +1,8 @@
 // Shared types for the admin dashboard. Client-safe (no server imports).
 
+/** JSON-serializable value (server functions may only return serializable data). */
+export type JsonValue = string | number | boolean | null | JsonValue[] | { [k: string]: JsonValue };
+
 export const ADMIN_ROLES = [
   "super_admin",
   "admin",
@@ -167,7 +170,7 @@ export interface AdminAlert {
   type: string;
   severity: string;
   message: string;
-  context: unknown;
+  context: JsonValue;
   resolvedAt: string | null;
   createdAt: string;
 }
@@ -178,15 +181,15 @@ export interface AuditRow {
   action: string;
   resource: string;
   resourceId: string | null;
-  previousValue: unknown;
-  newValue: unknown;
+  previousValue: JsonValue;
+  newValue: JsonValue;
   ip: string | null;
   createdAt: string;
 }
 
 export interface SettingRow {
   key: string;
-  value: unknown;
+  value: JsonValue;
   isPublic: boolean;
   updatedAt: string;
 }

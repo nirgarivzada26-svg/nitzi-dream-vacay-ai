@@ -12,7 +12,7 @@ import { listDeals, type Deal } from "./deals";
 import { smartPrice } from "./smart-price";
 import type {
   AdminAlert, AdminFlightRow, AdminOrder, AdminOverview, AdminPackageRow, AdminPermission,
-  AdminRole, AdminUserRow, AuditRow, DayPoint, NamedCount, Paged, SearchAnalytics, SettingRow,
+  AdminRole, AdminUserRow, AuditRow, DayPoint, JsonValue, NamedCount, Paged, SearchAnalytics, SettingRow,
 } from "./admin-types";
 
 /* ------------------------------------------------------------------ auth */
@@ -560,7 +560,7 @@ export async function buildAlerts(): Promise<AdminAlert[]> {
   if (error) throw new AdminError(error.message);
   return (data ?? []).map((a) => ({
     id: a.id, type: a.type, severity: a.severity, message: a.message,
-    context: a.context, resolvedAt: a.resolved_at, createdAt: a.created_at,
+    context: a.context as JsonValue, resolvedAt: a.resolved_at, createdAt: a.created_at,
   }));
 }
 
@@ -575,7 +575,7 @@ export async function resolveAlert(id: string) {
 export async function buildSettings(): Promise<SettingRow[]> {
   const { data, error } = await supabaseAdmin.from("system_settings").select("*").order("key");
   if (error) throw new AdminError(error.message);
-  return (data ?? []).map((s) => ({ key: s.key, value: s.value, isPublic: s.is_public, updatedAt: s.updated_at }));
+  return (data ?? []).map((s) => ({ key: s.key, value: s.value as JsonValue, isPublic: s.is_public, updatedAt: s.updated_at }));
 }
 
 export async function saveSetting(key: string, value: unknown, actorId: string) {
@@ -608,7 +608,7 @@ export async function buildAudit(filters: {
     total: count ?? 0,
     rows: (data ?? []).map((r) => ({
       id: r.id, actorEmail: r.actor_email, action: r.action, resource: r.resource,
-      resourceId: r.resource_id, previousValue: r.previous_value, newValue: r.new_value,
+      resourceId: r.resource_id, previousValue: r.previous_value as JsonValue, newValue: r.new_value as JsonValue,
       ip: r.ip_address, createdAt: r.created_at,
     })),
   };
