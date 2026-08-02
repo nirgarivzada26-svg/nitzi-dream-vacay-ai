@@ -156,6 +156,7 @@ export type Database = {
           destination_name: string
           end_date: string
           id: string
+          idempotency_key: string | null
           nights: number
           people: number
           price_per_person: number
@@ -172,6 +173,7 @@ export type Database = {
           destination_name: string
           end_date: string
           id?: string
+          idempotency_key?: string | null
           nights: number
           people: number
           price_per_person: number
@@ -188,6 +190,7 @@ export type Database = {
           destination_name?: string
           end_date?: string
           id?: string
+          idempotency_key?: string | null
           nights?: number
           people?: number
           price_per_person?: number
