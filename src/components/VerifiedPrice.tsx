@@ -29,6 +29,7 @@ export function VerifiedPrice({
   onRefresh?: () => void;
   className?: string;
 }) {
+  const reason = quote?.reason ?? null;
   if (!canRenderPrice(quote)) {
     return (
       <div className={`space-y-1 text-right ${className}`}>
@@ -44,7 +45,7 @@ export function VerifiedPrice({
             {REFRESH_TO_VERIFY_LABEL}
           </button>
         ) : (
-          <p className="text-[11px] font-semibold text-muted-foreground">{quote?.reason ?? REFRESH_TO_VERIFY_LABEL}</p>
+          <p className="text-[11px] font-semibold text-muted-foreground">{reason ?? REFRESH_TO_VERIFY_LABEL}</p>
         )}
       </div>
     );
