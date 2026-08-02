@@ -31,6 +31,7 @@ import { Route as AuthenticatedAdminPackagesRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin/orders'
 import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin/notifications'
 import { Route as AuthenticatedAdminFlightsRouteImport } from './routes/_authenticated/admin/flights'
+import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 
 const ResultRoute = ResultRouteImport.update({
@@ -147,6 +148,11 @@ const AuthenticatedAdminFlightsRoute =
     path: '/flights',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
 const AuthenticatedAdminAnalyticsRoute =
   AuthenticatedAdminAnalyticsRouteImport.update({
     id: '/analytics',
@@ -169,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/hotel/$id': typeof HotelIdRoute
   '/package/$id': typeof PackageIdRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/flights': typeof AuthenticatedAdminFlightsRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -192,6 +199,7 @@ export interface FileRoutesByTo {
   '/hotel/$id': typeof HotelIdRoute
   '/package/$id': typeof PackageIdRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/flights': typeof AuthenticatedAdminFlightsRoute
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -218,6 +226,7 @@ export interface FileRoutesById {
   '/hotel/$id': typeof HotelIdRoute
   '/package/$id': typeof PackageIdRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
+  '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/flights': typeof AuthenticatedAdminFlightsRoute
   '/_authenticated/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -244,6 +253,7 @@ export interface FileRouteTypes {
     | '/hotel/$id'
     | '/package/$id'
     | '/admin/analytics'
+    | '/admin/audit'
     | '/admin/flights'
     | '/admin/notifications'
     | '/admin/orders'
@@ -267,6 +277,7 @@ export interface FileRouteTypes {
     | '/hotel/$id'
     | '/package/$id'
     | '/admin/analytics'
+    | '/admin/audit'
     | '/admin/flights'
     | '/admin/notifications'
     | '/admin/orders'
@@ -292,6 +303,7 @@ export interface FileRouteTypes {
     | '/hotel/$id'
     | '/package/$id'
     | '/_authenticated/admin/analytics'
+    | '/_authenticated/admin/audit'
     | '/_authenticated/admin/flights'
     | '/_authenticated/admin/notifications'
     | '/_authenticated/admin/orders'
@@ -473,6 +485,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminFlightsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/audit': {
+      id: '/_authenticated/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/analytics': {
       id: '/_authenticated/admin/analytics'
       path: '/analytics'
@@ -485,6 +504,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
+  AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
   AuthenticatedAdminFlightsRoute: typeof AuthenticatedAdminFlightsRoute
   AuthenticatedAdminNotificationsRoute: typeof AuthenticatedAdminNotificationsRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
@@ -497,6 +517,7 @@ interface AuthenticatedAdminRouteRouteChildren {
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
     AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
+    AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
     AuthenticatedAdminFlightsRoute: AuthenticatedAdminFlightsRoute,
     AuthenticatedAdminNotificationsRoute: AuthenticatedAdminNotificationsRoute,
     AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
