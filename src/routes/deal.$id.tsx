@@ -182,7 +182,6 @@ function DealPage() {
         ? { text: "מקומות אחרונים", cls: "bg-amber-100 text-amber-900" }
         : { text: "זמין להזמנה", cls: "bg-emerald-100 text-emerald-800" };
 
-
   return (
     <div dir="rtl" className="min-h-screen bg-background pb-28">
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur-lg">

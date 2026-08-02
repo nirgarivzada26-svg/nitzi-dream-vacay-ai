@@ -14,7 +14,9 @@ const INTENT_KEY = "nitzi:auth-intent";
 export function setAuthIntent(path: string) {
   try {
     sessionStorage.setItem(INTENT_KEY, path);
-  } catch { /* non-critical */ }
+  } catch {
+    /* non-critical */
+  }
 }
 export function consumeAuthIntent(): string | null {
   try {

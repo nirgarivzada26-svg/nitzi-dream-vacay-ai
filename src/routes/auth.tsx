@@ -52,7 +52,9 @@ function AuthPage() {
     if (!notifyDeals) return;
     try {
       await updateNotifPrefs({ deals: true, email: true });
-    } catch { /* non-critical */ }
+    } catch {
+      /* non-critical */
+    }
   };
 
   const handleEmail = async (e: React.FormEvent) => {

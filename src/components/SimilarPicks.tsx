@@ -41,7 +41,9 @@ export function SimilarPicks({ catalog, excludeSlug, title = "אולי תאהב 
                     style: null,
                   }),
                 );
-              } catch { /* non-critical */ }
+              } catch {
+                /* non-critical */
+              }
             }}
             className="group relative block h-40 overflow-hidden rounded-2xl transition active:scale-[0.97]"
           >

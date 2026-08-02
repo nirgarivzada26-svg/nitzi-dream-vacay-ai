@@ -21,7 +21,9 @@ function load(): CompareEntry[] {
 function persist() {
   try {
     sessionStorage.setItem(KEY, JSON.stringify(state));
-  } catch { /* non-critical */ }
+  } catch {
+    /* non-critical */
+  }
   listeners.forEach((l) => l());
 }
 

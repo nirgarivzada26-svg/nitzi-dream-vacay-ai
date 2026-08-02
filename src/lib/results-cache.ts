@@ -24,7 +24,9 @@ export function setResultsCache(snap: Snapshot) {
   mem = snap;
   try {
     sessionStorage.setItem(KEY, JSON.stringify(snap));
-  } catch { /* non-critical */ }
+  } catch {
+    /* non-critical */
+  }
 }
 
 export function getResultsCache(): Snapshot | null {
