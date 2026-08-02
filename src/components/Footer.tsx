@@ -1,8 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Facebook, Twitter, Youtube, Mail, Shield, Sparkles } from "lucide-react";
 import { NitziLogo } from "@/components/NitziLogo";
+import { FOOTER_LEGAL_LINKS } from "@/lib/legal";
 
-const columns = [
+type FooterLink = { label: string; href?: string; to?: string; params?: { doc: string } };
+
+const columns: { title: string; links: FooterLink[] }[] = [
   {
     title: "NITZI",
     links: [
@@ -16,24 +19,23 @@ const columns = [
   {
     title: "עזרה ושירות",
     links: [
-      { label: "מרכז העזרה", href: "#help" },
-      { label: "שאלות נפוצות", href: "#faq" },
-      { label: "צור קשר", href: "#contact" },
-      { label: "מדיניות ביטולים", href: "#cancel" },
-      { label: "סטטוס מערכת", href: "#status" },
+      { label: "מרכז העזרה", to: "/support" },
+      { label: "שאלות נפוצות", to: "/support" },
+      { label: "מדיניות ביטולים", to: "/legal/$doc", params: { doc: "cancellation" } },
+      { label: "מדיניות החזרים", to: "/legal/$doc", params: { doc: "refunds" } },
+      { label: "תנאי נסיעה", to: "/legal/$doc", params: { doc: "travel-terms" } },
     ],
   },
   {
     title: "מידע משפטי",
-    links: [
-      { label: "תנאי שימוש", href: "#terms" },
-      { label: "מדיניות פרטיות", href: "#privacy" },
-      { label: "תקנון האתר", href: "#tos" },
-      { label: "מדיניות עוגיות", href: "#cookies" },
-      { label: "הצהרת נגישות", href: "#a11y" },
-    ],
+    links: FOOTER_LEGAL_LINKS.map((l) => ({
+      label: l.label,
+      to: "/legal/$doc",
+      params: { doc: l.slug },
+    })),
   },
 ];
+
 
 export function Footer() {
   return (
