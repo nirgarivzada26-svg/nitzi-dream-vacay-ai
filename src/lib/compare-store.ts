@@ -8,6 +8,7 @@ export interface CompareEntry {
 }
 
 const KEY = "nitzi:compare";
+const EMPTY: CompareEntry[] = [];
 let state: CompareEntry[] = load();
 const listeners = new Set<() => void>();
 
@@ -52,6 +53,6 @@ export function useCompare() {
       return () => listeners.delete(cb);
     },
     () => state,
-    () => state,
+    () => EMPTY,
   );
 }
