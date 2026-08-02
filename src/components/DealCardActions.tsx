@@ -110,7 +110,7 @@ export function DealCardActions({ deal, openQuickViewSignal }: { deal: Deal; ope
           stop(e);
           setQuickView(true);
         }}
-        className="absolute bottom-[calc(100%-14rem)] right-3 z-20 hidden items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-[11px] font-black text-foreground opacity-0 backdrop-blur transition group-hover:opacity-100 sm:inline-flex"
+        className="absolute right-3 top-12 z-20 hidden items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-[11px] font-black text-foreground opacity-0 backdrop-blur transition group-hover:opacity-100 sm:inline-flex"
       >
         <Eye className="h-3.5 w-3.5" /> תצוגה מהירה
       </button>
