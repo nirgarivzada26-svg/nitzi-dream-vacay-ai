@@ -6,7 +6,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { CheckCircle2, AlertTriangle, XCircle, Rocket, RefreshCw } from "lucide-react";
-import { AdminError, AdminLoading, SectionCard, StatCard, dateTime } from "@/components/admin/AdminUI";
+import {
+  AdminError,
+  AdminLoading,
+  SectionCard,
+  StatCard,
+  dateTime,
+} from "@/components/admin/AdminUI";
 import { getLaunchState, runLaunchChecklistFn, type LaunchState } from "@/lib/launch.functions";
 import type { LaunchCheck, LaunchStatus } from "@/lib/launch/launch-types";
 import { cn } from "@/lib/utils";
@@ -122,8 +128,8 @@ function LaunchPage() {
       {!report && (
         <SectionCard title="הרצה נדרשת">
           <p className="text-sm text-muted-foreground">
-            לחץ על «הרץ צ׳קליסט מלא» כדי לבצע את הבדיקות עכשיו. ההרצה מבצעת חיפושים אמיתיים,
-            אימותי מחיר, בדיקות מסד נתונים והפקת מסמכים.
+            לחץ על «הרץ צ׳קליסט מלא» כדי לבצע את הבדיקות עכשיו. ההרצה מבצעת חיפושים אמיתיים, אימותי
+            מחיר, בדיקות מסד נתונים והפקת מסמכים.
           </p>
         </SectionCard>
       )}

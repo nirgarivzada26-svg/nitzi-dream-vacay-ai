@@ -128,13 +128,8 @@ async function flightChecks(fx: Fixture): Promise<LaunchCheck[]> {
     await run("flights.booking-validation", "ולידציית הזמנה", () => {
       const unverified = offers.filter((o) => !canRenderPrice(o.quote));
       return sellable.length > 0
-        ? ok(
-            `${sellable.length} הצעות עברו אימות; ${unverified.length} לא-מאומתות נחסמו להזמנה`,
-          )
-        : fail(
-            "אף הצעה לא עברה אימות מחיר",
-            "בדוק את שכבת ה-verification של ספק הטיסות",
-          );
+        ? ok(`${sellable.length} הצעות עברו אימות; ${unverified.length} לא-מאומתות נחסמו להזמנה`)
+        : fail("אף הצעה לא עברה אימות מחיר", "בדוק את שכבת ה-verification של ספק הטיסות");
     }),
     await run("flights.revalidation", "אימות מחדש לפני תשלום", async () => {
       const o = sellable[0];
@@ -193,10 +188,7 @@ async function hotelChecks(fx: Fixture): Promise<LaunchCheck[]> {
       const withAmen = hotels.filter((h) => h.amenities.length > 0);
       return withAmen.length === hotels.length && hotels.length > 0
         ? ok("לכל המלונות רשימת מתקנים")
-        : fail(
-            `${hotels.length - withAmen.length} מלונות ללא מתקנים`,
-            "מפה amenities מהספק",
-          );
+        : fail(`${hotels.length - withAmen.length} מלונות ללא מתקנים`, "מפה amenities מהספק");
     }),
   ];
 }
@@ -263,13 +255,8 @@ async function packageChecks(fx: Fixture): Promise<LaunchCheck[]> {
       const gross = bundled.components.reduce((s, c) => s + c.perBooking, 0);
       const expected = Math.round(gross * (1 - dyn.PACKAGE_BUNDLE_DISCOUNT));
       return bundled.total === expected && flightOnly.total > 0
-        ? ok(
-            `הנחת חבילה ${Math.round(dyn.PACKAGE_BUNDLE_DISCOUNT * 100)}% הוחלה רק כשיש טיסה+מלון`,
-          )
-        : fail(
-            `חושב ${bundled.total} במקום ${expected}`,
-            "תקן את חישוב הנחת החבילה",
-          );
+        ? ok(`הנחת חבילה ${Math.round(dyn.PACKAGE_BUNDLE_DISCOUNT * 100)}% הוחלה רק כשיש טיסה+מלון`)
+        : fail(`חושב ${bundled.total} במקום ${expected}`, "תקן את חישוב הנחת החבילה");
     }),
     await run("packages.taxes", "מסים ואגרות מאומתים", () => {
       const policy = taxSetting.data?.value as { included?: boolean; note?: string } | null;
@@ -290,9 +277,7 @@ async function packageChecks(fx: Fixture): Promise<LaunchCheck[]> {
       const saved = gross - bundled.total;
       const unavailable = !broken.quote.verified;
       return saved > 0 && unavailable
-        ? ok(
-            `חיסכון ${saved}₪ נגזר מחישוב שרת; חבילה עם רכיב לא מאומת נחסמת אוטומטית`,
-          )
+        ? ok(`חיסכון ${saved}₪ נגזר מחישוב שרת; חבילה עם רכיב לא מאומת נחסמת אוטומטית`)
         : fail(
             "ההנחה או חסימת רכיב לא-מאומת אינן פועלות",
             "בדוק את validateProduct בתוך buildDynamicPackage",
@@ -351,10 +336,7 @@ async function checkoutChecks(fx: Fixture): Promise<LaunchCheck[]> {
       );
       return bad.length === 0
         ? ok(`${list.length} קופונים תקינים (קוד + ערך בתחום מותר)`)
-        : fail(
-            `${bad.length} קופונים לא תקינים`,
-            "תקן את הרשומות ב-system_settings.coupons",
-          );
+        : fail(`${bad.length} קופונים לא תקינים`, "תקן את הרשומות ב-system_settings.coupons");
     }),
     await run("checkout.terms", "אישור תנאי שימוש", () => {
       const v = terms.data?.value as string | null;
@@ -373,9 +355,8 @@ async function checkoutChecks(fx: Fixture): Promise<LaunchCheck[]> {
 }
 
 async function paymentChecks(): Promise<LaunchCheck[]> {
-  const { PAYMENT_ADAPTERS, paymentAdapterStatuses } = await import(
-    "@/lib/providers/payment-adapters.server"
-  );
+  const { PAYMENT_ADAPTERS, paymentAdapterStatuses } =
+    await import("@/lib/providers/payment-adapters.server");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const statuses = paymentAdapterStatuses();
   const adapters = Object.values(PAYMENT_ADAPTERS);
@@ -588,10 +569,7 @@ async function aiChecks(): Promise<LaunchCheck[]> {
       recs.length > 0 && recs.every((r) => r.dealId && r.source)
         ? ok(`${recs.length} המלצות, כולן עם dealId ומקור ספק מהקטלוג`)
         : recs.length === 0
-          ? fail(
-              res.emptyReason ?? "הסוכן לא החזיר המלצות",
-              "בדוק את agent-search מול הקטלוג",
-            )
+          ? fail(res.emptyReason ?? "הסוכן לא החזיר המלצות", "בדוק את agent-search מול הקטלוג")
           : fail("המלצה ללא מזהה דיל/מקור", "הסר המלצות שאינן מגובות בנתוני ספק"),
     ),
     await run("ai.availability", "אינו ממליץ על מלאי לא זמין", () => {
@@ -633,9 +611,7 @@ export async function runLaunchChecklist(): Promise<LaunchReport> {
     warn: all.filter((c) => c.status === "warn").length,
     fail: all.filter((c) => c.status === "fail").length,
   };
-  const blockers = all
-    .filter((c) => c.status !== "pass")
-    .map((c) => `${c.label}: ${c.detail}`);
+  const blockers = all.filter((c) => c.status !== "pass").map((c) => `${c.label}: ${c.detail}`);
 
   const { liveMode } = await import("@/lib/providers/live-registry.server");
 
