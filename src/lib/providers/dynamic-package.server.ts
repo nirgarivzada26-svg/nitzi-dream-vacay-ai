@@ -89,16 +89,13 @@ export function buildDynamicPackage(
     });
   }
 
-  const { lines, total: extrasTotal } = computeExtras(
-    req.extras as Parameters<typeof computeExtras>[0],
-    people,
-  );
+  const { lines } = computeExtras(req.extras as Parameters<typeof computeExtras>[0], people);
   for (const line of lines) {
     components.push({
       id: line.id,
       label: line.label,
-      perPerson: Math.round(line.total / people),
-      perBooking: line.total,
+      perPerson: Math.round(line.amount / people),
+      perBooking: line.amount,
     });
   }
 
