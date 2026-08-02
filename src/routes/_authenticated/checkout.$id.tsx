@@ -20,7 +20,8 @@ import {
   Wallet,
   XCircle,
 } from "lucide-react";
-import { getDeal, revalidateDeal, type Deal, type RevalidationResult } from "@/lib/deals";
+import { getDeal, type Deal } from "@/lib/deals";
+import { revalidateCheckout, type CheckoutRevalidation } from "@/lib/checkout.functions";
 import { placeBooking } from "@/lib/bookings.functions";
 import { EXTRAS, computeExtras, type ExtraId } from "@/lib/booking-extras";
 import { NitziLogo } from "@/components/NitziLogo";
@@ -69,7 +70,7 @@ function CheckoutPage() {
   const catalog = useDestinations();
 
   const [deal, setDeal] = useState<Deal | null>(() => getDeal(id, catalog));
-  const [reval, setReval] = useState<RevalidationResult | null>(null);
+  const [reval, setReval] = useState<CheckoutRevalidation | null>(null);
   const [checking, setChecking] = useState(true);
   const [step, setStep] = useState(0);
   const [busy, setBusy] = useState(false);
@@ -98,11 +99,30 @@ function CheckoutPage() {
     let alive = true;
     (async () => {
       if (!deal) return;
-      const res = await revalidateDeal(deal);
-      if (!alive) return;
-      setDeal(res.deal);
-      setReval(res);
-      setChecking(false);
+      try {
+        const res = await revalidateCheckout({ data: { dealId: deal.id } });
+        if (!alive) return;
+        setReval(res);
+        if (res.perPerson !== null && res.total !== null) {
+          setDeal((d) =>
+            d
+              ? {
+                  ...d,
+                  price: {
+                    ...d.price,
+                    perPerson: res.perPerson!,
+                    total: res.total!,
+                    verifiedAt: res.verifiedAt ?? d.price.verifiedAt,
+                  },
+                }
+              : d,
+          );
+        }
+      } catch {
+        if (alive) setReval(null);
+      } finally {
+        if (alive) setChecking(false);
+      }
     })();
     return () => {
       alive = false;
@@ -138,7 +158,10 @@ function CheckoutPage() {
   }
 
   const changed = reval?.status === "changed";
-  const soldOut = reval?.status === "sold-out" || deal.price.availability === "sold-out";
+  const soldOut =
+    reval?.status === "sold-out" ||
+    reval?.status === "unavailable" ||
+    deal.price.availability === "sold-out";
 
   const passengersValid =
     passengers.every(
@@ -510,10 +533,8 @@ function CheckoutPage() {
                     </div>
                     <p className="mt-1 text-[12px]">
                       קודם:{" "}
-                      <span className="line-through">
-                        {fmtILS(reval!.status === "changed" ? reval.oldPrice : 0)}
-                      </span>{" "}
-                      · חדש: <span className="font-black">{fmtILS(deal.price.total)}</span>
+                      <span className="line-through">{fmtILS(reval?.previousTotal ?? 0)}</span> ·
+                      חדש: <span className="font-black">{fmtILS(deal.price.total)}</span>
                     </p>
                   </div>
                 ) : (

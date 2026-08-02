@@ -15,6 +15,7 @@ import {
   Menu,
   Package,
   Plane,
+  PlugZap,
   Settings,
   ShieldCheck,
   ScrollText,
@@ -57,6 +58,7 @@ const NAV: {
   { to: "/admin/reports", label: "דוחות", icon: FileBarChart, perm: "reports" },
   { to: "/admin/audit", label: "יומן פעולות", icon: ScrollText, perm: "audit" },
   { to: "/admin/settings", label: "הגדרות", icon: Settings, perm: "settings" },
+  { to: "/admin/providers", label: "בריאות ספקים", icon: PlugZap, perm: "settings" },
   { to: "/admin/permissions", label: "הרשאות", icon: ShieldCheck, perm: "permissions" },
 ];
 
