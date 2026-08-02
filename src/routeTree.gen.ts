@@ -25,6 +25,7 @@ import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedCheckoutIdRouteImport } from './routes/_authenticated/checkout.$id'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin/orders'
 import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 
@@ -107,6 +108,11 @@ const AuthenticatedCheckoutIdRoute = AuthenticatedCheckoutIdRouteImport.update({
   path: '/checkout/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
 const AuthenticatedAdminOrdersRoute =
   AuthenticatedAdminOrdersRouteImport.update({
     id: '/orders',
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/package/$id': typeof PackageIdRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -154,6 +161,7 @@ export interface FileRoutesByTo {
   '/package/$id': typeof PackageIdRoute
   '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
@@ -175,6 +183,7 @@ export interface FileRoutesById {
   '/package/$id': typeof PackageIdRoute
   '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -196,6 +205,7 @@ export interface FileRouteTypes {
     | '/package/$id'
     | '/admin/analytics'
     | '/admin/orders'
+    | '/admin/users'
     | '/checkout/$id'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -214,6 +224,7 @@ export interface FileRouteTypes {
     | '/package/$id'
     | '/admin/analytics'
     | '/admin/orders'
+    | '/admin/users'
     | '/checkout/$id'
     | '/admin'
   id:
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | '/package/$id'
     | '/_authenticated/admin/analytics'
     | '/_authenticated/admin/orders'
+    | '/_authenticated/admin/users'
     | '/_authenticated/checkout/$id'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
@@ -367,6 +379,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCheckoutIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/orders': {
       id: '/_authenticated/admin/orders'
       path: '/orders'
@@ -387,6 +406,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
@@ -394,6 +414,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
   {
     AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
     AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
+    AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   }
 
