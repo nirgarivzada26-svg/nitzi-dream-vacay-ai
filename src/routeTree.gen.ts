@@ -34,6 +34,7 @@ import { Route as AuthenticatedBookingIdRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin/reports'
+import { Route as AuthenticatedAdminProvidersRouteImport } from './routes/_authenticated/admin/providers'
 import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin/permissions'
 import { Route as AuthenticatedAdminPackagesRouteImport } from './routes/_authenticated/admin/packages'
 import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin/orders'
@@ -169,6 +170,12 @@ const AuthenticatedAdminReportsRoute =
     path: '/reports',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
+const AuthenticatedAdminProvidersRoute =
+  AuthenticatedAdminProvidersRouteImport.update({
+    id: '/providers',
+    path: '/providers',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 const AuthenticatedAdminPermissionsRoute =
   AuthenticatedAdminPermissionsRouteImport.update({
     id: '/permissions',
@@ -243,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/packages': typeof AuthenticatedAdminPackagesRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
+  '/admin/providers': typeof AuthenticatedAdminProvidersRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -276,6 +284,7 @@ export interface FileRoutesByTo {
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/admin/packages': typeof AuthenticatedAdminPackagesRoute
   '/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
+  '/admin/providers': typeof AuthenticatedAdminProvidersRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -312,6 +321,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
   '/_authenticated/admin/packages': typeof AuthenticatedAdminPackagesRoute
   '/_authenticated/admin/permissions': typeof AuthenticatedAdminPermissionsRoute
+  '/_authenticated/admin/providers': typeof AuthenticatedAdminProvidersRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
@@ -348,6 +358,7 @@ export interface FileRouteTypes {
     | '/admin/orders'
     | '/admin/packages'
     | '/admin/permissions'
+    | '/admin/providers'
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/users'
@@ -381,6 +392,7 @@ export interface FileRouteTypes {
     | '/admin/orders'
     | '/admin/packages'
     | '/admin/permissions'
+    | '/admin/providers'
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/users'
@@ -416,6 +428,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/orders'
     | '/_authenticated/admin/packages'
     | '/_authenticated/admin/permissions'
+    | '/_authenticated/admin/providers'
     | '/_authenticated/admin/reports'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/users'
@@ -623,6 +636,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
+    '/_authenticated/admin/providers': {
+      id: '/_authenticated/admin/providers'
+      path: '/providers'
+      fullPath: '/admin/providers'
+      preLoaderRoute: typeof AuthenticatedAdminProvidersRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
     '/_authenticated/admin/permissions': {
       id: '/_authenticated/admin/permissions'
       path: '/permissions'
@@ -690,6 +710,7 @@ interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminOrdersRoute: typeof AuthenticatedAdminOrdersRoute
   AuthenticatedAdminPackagesRoute: typeof AuthenticatedAdminPackagesRoute
   AuthenticatedAdminPermissionsRoute: typeof AuthenticatedAdminPermissionsRoute
+  AuthenticatedAdminProvidersRoute: typeof AuthenticatedAdminProvidersRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
@@ -705,6 +726,7 @@ const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren
     AuthenticatedAdminOrdersRoute: AuthenticatedAdminOrdersRoute,
     AuthenticatedAdminPackagesRoute: AuthenticatedAdminPackagesRoute,
     AuthenticatedAdminPermissionsRoute: AuthenticatedAdminPermissionsRoute,
+    AuthenticatedAdminProvidersRoute: AuthenticatedAdminProvidersRoute,
     AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
     AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
     AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
