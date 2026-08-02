@@ -83,16 +83,17 @@ function CheckoutPage() {
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const people = deal?.people ?? 2;
+  const selectedExtras = useMemo(
+    () => (Object.keys(extras) as ExtraId[]).filter((k) => extras[k]),
+    [extras],
+  );
   const extrasLines = useMemo(
-    () =>
-      EXTRAS.filter((e) => extras[e.id] && e.price > 0).map((e) => ({
-        label: e.label,
-        amount: e.perPerson ? e.price * people : e.price,
-      })),
-    [extras, people],
+    () => computeExtras(selectedExtras, people).lines,
+    [selectedExtras, people],
   );
   const extrasTotal = extrasLines.reduce((s, l) => s + l.amount, 0);
   const grandTotal = (deal?.price.total ?? 0) + extrasTotal;
+
 
   if (!deal) {
     return (
