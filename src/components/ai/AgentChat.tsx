@@ -67,7 +67,6 @@ export function AgentChat({
   onFirstUserMessage?: (text: string) => boolean;
 }) {
   const { user } = useAuth();
-  const [input, setInput] = useState("");
   const [profile, setProfile] = useState<Profile | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const savedIds = useRef<Set<string>>(new Set(initialMessages.map((m) => m.id)));
@@ -132,10 +131,8 @@ export function AgentChat({
     const value = text.trim();
     if (!value || busy) return;
     if (onFirstUserMessage && messages.length === 0 && onFirstUserMessage(value)) {
-      setInput("");
       return;
     }
-    setInput("");
     void sendMessage({ text: value });
     focusInput();
   };
