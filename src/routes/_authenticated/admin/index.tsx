@@ -5,7 +5,7 @@ import {
 } from "recharts";
 import { Banknote, Eye, Percent, ShoppingBag, TrendingUp, UserPlus, Users, Wallet } from "lucide-react";
 import {
-  AdminEmpty, AdminError, AdminLoading, DataTable, SectionCard, StatCard, dateTime, money,
+  AdminEmpty, AdminError, AdminLoading, DataTable, SectionCard, StatCard, StatusChip, dateTime, money,
 } from "@/components/admin/AdminUI";
 import { adminOverview } from "@/lib/admin.functions";
 import type { AdminOrder, AdminOverview, AdminUserRow, NamedCount } from "@/lib/admin-types";
@@ -134,15 +134,4 @@ function AdminDashboard() {
       </SectionCard>
     </div>
   );
-}
-
-export function StatusChip({ status }: { status: string }) {
-  const map: Record<string, { label: string; cls: string }> = {
-    confirmed: { label: "מאושרת", cls: "bg-emerald-100 text-emerald-800" },
-    pending: { label: "ממתינה", cls: "bg-amber-100 text-amber-900" },
-    cancelled: { label: "בוטלה", cls: "bg-rose-100 text-rose-800" },
-    refunded: { label: "זוכתה", cls: "bg-slate-200 text-slate-800" },
-  };
-  const s = map[status] ?? { label: status, cls: "bg-muted text-muted-foreground" };
-  return <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${s.cls}`}>{s.label}</span>;
 }
