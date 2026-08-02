@@ -103,7 +103,20 @@ function Home() {
 
       <div className="mx-auto mt-12 w-full max-w-[1600px] px-5 sm:mt-16 sm:px-8">
         <DealRails />
+
+        <div className="mt-12 flex flex-col items-center gap-3 text-center">
+          <Link
+            to="/packages"
+            className="inline-flex items-center gap-2 rounded-full bg-gradient-sunset px-10 py-5 text-lg font-black text-white shadow-glow transition hover:scale-[1.02] active:scale-95 sm:text-xl"
+          >
+            <Sparkles className="h-5 w-5" /> לכל החבילות
+          </Link>
+          <p className="text-sm text-muted-foreground">
+            כל קטלוג החבילות של NITZI — עם סינון לפי מחיר, מדינה, כוכבים והכל כלול.
+          </p>
+        </div>
       </div>
+
 
       <PopularDestinations />
 
