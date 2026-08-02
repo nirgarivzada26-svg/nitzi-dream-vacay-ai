@@ -355,6 +355,45 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_log: {
+        Row: {
+          channel: string
+          context: Json
+          created_at: string
+          error_message: string | null
+          id: string
+          provider_id: string
+          recipient: string
+          status: string
+          template: string
+          user_id: string | null
+        }
+        Insert: {
+          channel: string
+          context?: Json
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          provider_id: string
+          recipient: string
+          status: string
+          template: string
+          user_id?: string | null
+        }
+        Update: {
+          channel?: string
+          context?: Json
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          provider_id?: string
+          recipient?: string
+          status?: string
+          template?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       notification_preferences: {
         Row: {
           deals: boolean
@@ -381,6 +420,65 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      payment_transactions: {
+        Row: {
+          amount: number
+          booking_id: string | null
+          created_at: string
+          currency: string
+          error_message: string | null
+          id: string
+          idempotency_key: string
+          operation: string
+          payload: Json
+          provider_id: string
+          provider_reference: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount?: number
+          booking_id?: string | null
+          created_at?: string
+          currency?: string
+          error_message?: string | null
+          id?: string
+          idempotency_key: string
+          operation: string
+          payload?: Json
+          provider_id: string
+          provider_reference?: string | null
+          status: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          booking_id?: string | null
+          created_at?: string
+          currency?: string
+          error_message?: string | null
+          id?: string
+          idempotency_key?: string
+          operation?: string
+          payload?: Json
+          provider_id?: string
+          provider_reference?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transactions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       price_alerts: {
         Row: {
@@ -436,6 +534,81 @@ export type Database = {
           display_name?: string | null
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      provider_events: {
+        Row: {
+          context: Json
+          created_at: string
+          error_code: string | null
+          error_message: string | null
+          id: string
+          latency_ms: number
+          ok: boolean
+          operation: string
+          provider_id: string
+          provider_kind: string
+        }
+        Insert: {
+          context?: Json
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          latency_ms?: number
+          ok: boolean
+          operation: string
+          provider_id: string
+          provider_kind: string
+        }
+        Update: {
+          context?: Json
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          latency_ms?: number
+          ok?: boolean
+          operation?: string
+          provider_id?: string
+          provider_kind?: string
+        }
+        Relationships: []
+      }
+      provider_webhook_events: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          event_type: string
+          external_id: string
+          id: string
+          payload: Json
+          processed: boolean
+          provider_id: string
+          verified: boolean
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          event_type: string
+          external_id: string
+          id?: string
+          payload?: Json
+          processed?: boolean
+          provider_id: string
+          verified?: boolean
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          event_type?: string
+          external_id?: string
+          id?: string
+          payload?: Json
+          processed?: boolean
+          provider_id?: string
+          verified?: boolean
         }
         Relationships: []
       }
