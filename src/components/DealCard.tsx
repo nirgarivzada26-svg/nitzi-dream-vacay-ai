@@ -46,6 +46,8 @@ export function DealCard({ deal, fluid = false }: { deal: Deal; fluid?: boolean 
       <div className="space-y-2.5 p-4">
         <p className="line-clamp-1 text-sm font-black text-foreground">{d.hotel.name}</p>
         <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-bold">
+          <SmartPriceBadge deal={d} />
+
           <span className="flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-muted-foreground">
             <Star className="h-3 w-3 fill-amber-400 text-amber-400" /> {d.hotel.stars}★ · {d.hotel.guestRating}
           </span>
