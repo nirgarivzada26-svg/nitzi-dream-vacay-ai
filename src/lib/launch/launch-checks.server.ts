@@ -533,7 +533,7 @@ async function adminChecks(): Promise<LaunchCheck[]> {
       const a = await admin.buildSearchAnalytics();
       return routeExists("_authenticated/admin/reports") && a
         ? ok("דוחות ואנליטיקת חיפוש נטענים מנתוני אמת")
-        : fail("דוחות אינם זמינים", "בדוק את /admin/reports"),
+        : fail("דוחות אינם זמינים", "בדוק את /admin/reports");
     }),
     await run("admin.audit", "יומן פעולות", async () => {
       const audit = await admin.buildAudit({});
@@ -602,7 +602,7 @@ async function aiChecks(): Promise<LaunchCheck[]> {
       const noReason = recs.filter((r) => r.reasons.length === 0);
       return recs.length > 0 && noReason.length === 0
         ? ok("לכל המלצה יש נימוקים מפורשים למשתמש")
-        : fail("המלצות ללא הסבר", "ודא שכל המלצה מייצרת reasons"),
+        : fail("המלצות ללא הסבר", "ודא שכל המלצה מייצרת reasons");
     }),
   ];
 }
