@@ -15,6 +15,7 @@ import {
   Menu,
   Package,
   Plane,
+  PlugZap,
   Settings,
   ShieldCheck,
   ScrollText,
