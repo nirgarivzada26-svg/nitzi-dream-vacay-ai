@@ -185,7 +185,7 @@ export async function notifyAdmins(pulse: MonitorPulse): Promise<boolean> {
     subject: `NITZI — ${pulse.alerts.length} התראות ניטור`,
     template: "support_reply",
     html: `<div dir="rtl"><h2>התראות ניטור NITZI</h2><pre style="font-family:inherit">${lines}</pre><p>חלון: ${pulse.windowHours} שעות · ${pulse.ranAt}</p></div>`,
-    text: lines,
+    });
   });
   return res.ok;
 }
