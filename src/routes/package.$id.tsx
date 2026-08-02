@@ -7,7 +7,9 @@ import { TripTimeline } from "@/components/TripTimeline";
 import { findPackage, getResultsCache } from "@/lib/results-cache";
 import { explainPackage } from "@/lib/explain";
 import { isCompared, toggleCompare, useCompare } from "@/lib/compare-store";
-import { pickDestination } from "@/lib/nitzi-data";
+import { pickDestination } from "@/lib/catalog";
+import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
+import { DestinationImage } from "@/components/DestinationImage";
 
 export const Route = createFileRoute("/package/$id")({
   head: () => ({
@@ -18,6 +20,7 @@ export const Route = createFileRoute("/package/$id")({
       { property: "og:description", content: "טיסה + מלון + מסלול יומי במחיר משתלם יותר." },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
   component: PackageDetailPage,
 });
 
@@ -27,11 +30,14 @@ function fmtTime(iso: string) { const d = new Date(iso); return `${String(d.getH
 function PackageDetailPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
+  const catalog = useDestinations();
   const pkg = findPackage(id);
   const cache = getResultsCache();
   useCompare();
 
-  if (!pkg || !cache) {
+  const dest = cache ? pickDestination(catalog, cache.answers) : null;
+
+  if (!pkg || !cache || !dest) {
     return (
       <div dir="rtl" className="grid min-h-screen place-items-center bg-background px-6 text-center">
         <div>
@@ -42,7 +48,6 @@ function PackageDetailPage() {
     );
   }
 
-  const dest = pickDestination(cache.answers);
   const savePct = Math.round((pkg.savings / Math.max(1, pkg.separatePrice)) * 100);
   const inCompare = isCompared(pkg.id, "package");
   const reasons = [
@@ -71,7 +76,7 @@ function PackageDetailPage() {
         <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
           <div className="space-y-5">
             <section className="relative overflow-hidden rounded-[2rem] shadow-glow">
-              <img src={dest.image} alt={pkg.title} className="h-[340px] w-full object-cover sm:h-[440px] lg:h-[500px]" />
+              <DestinationImage destination={dest} className="h-[340px] w-full object-cover sm:h-[440px] lg:h-[500px]" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
               <span className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-gradient-sunset px-3 py-1.5 text-[11px] font-black text-white shadow-glow">
                 <Sparkles className="h-3.5 w-3.5" /> חבילה מומלצת · חיסכון {savePct}%
