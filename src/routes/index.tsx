@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import heroImg from "@/assets/hero-main.jpg";
-import { NitziLogo } from "@/components/NitziLogo";
+import { TopNav } from "@/components/TopNav";
 import { SearchEngine } from "@/components/SearchEngine";
 import { DealRails } from "@/components/DealRails";
 import { SecretDealCard } from "@/components/SecretDealCard";
@@ -10,8 +10,7 @@ import { Footer } from "@/components/Footer";
 import { DemoDataNotice } from "@/components/DemoDataNotice";
 import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
 import { DestinationImage } from "@/components/DestinationImage";
-import { displayNameOf, useAuth } from "@/lib/auth";
-import { LogIn, Sparkles, User as UserIcon } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -35,7 +34,6 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [signInOpen, setSignInOpen] = useState(false);
 
   return (
