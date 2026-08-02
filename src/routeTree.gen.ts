@@ -25,6 +25,7 @@ import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedCheckoutIdRouteImport } from './routes/_authenticated/checkout.$id'
+import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 
 const ResultRoute = ResultRouteImport.update({
   id: '/result',
@@ -105,6 +106,12 @@ const AuthenticatedCheckoutIdRoute = AuthenticatedCheckoutIdRouteImport.update({
   path: '/checkout/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminAnalyticsRoute =
+  AuthenticatedAdminAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
   '/package/$id': typeof PackageIdRoute
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -136,6 +144,7 @@ export interface FileRoutesByTo {
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
   '/package/$id': typeof PackageIdRoute
+  '/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
@@ -155,6 +164,7 @@ export interface FileRoutesById {
   '/flight/$id': typeof FlightIdRoute
   '/hotel/$id': typeof HotelIdRoute
   '/package/$id': typeof PackageIdRoute
+  '/_authenticated/admin/analytics': typeof AuthenticatedAdminAnalyticsRoute
   '/_authenticated/checkout/$id': typeof AuthenticatedCheckoutIdRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
     | '/flight/$id'
     | '/hotel/$id'
     | '/package/$id'
+    | '/admin/analytics'
     | '/checkout/$id'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/flight/$id'
     | '/hotel/$id'
     | '/package/$id'
+    | '/admin/analytics'
     | '/checkout/$id'
     | '/admin'
   id:
@@ -208,6 +220,7 @@ export interface FileRouteTypes {
     | '/flight/$id'
     | '/hotel/$id'
     | '/package/$id'
+    | '/_authenticated/admin/analytics'
     | '/_authenticated/checkout/$id'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
@@ -341,15 +354,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCheckoutIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/analytics': {
+      id: '/_authenticated/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminAnalyticsRoute: typeof AuthenticatedAdminAnalyticsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
+    AuthenticatedAdminAnalyticsRoute: AuthenticatedAdminAnalyticsRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   }
 
