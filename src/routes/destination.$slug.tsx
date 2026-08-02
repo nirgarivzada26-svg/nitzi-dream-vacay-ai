@@ -24,7 +24,12 @@ import { findDestination } from "@/lib/catalog";
 import { getDeal } from "@/lib/deals";
 
 export const Route = createFileRoute("/destination/$slug")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
+  loader: async ({ context, params }) => {
+    const catalog = await context.queryClient.ensureQueryData(destinationsQueryOptions);
+    // Resolve here so an unknown slug renders notFoundComponent without the
+    // component ever throwing during render.
+    if (!findDestination(catalog, decodeURIComponent(params.slug))) throw notFound();
+  },
   head: ({ params }) => {
     const name = decodeURIComponent(params.slug);
     return {
@@ -136,7 +141,7 @@ function DestinationPage() {
   const { slug } = Route.useParams();
   const catalog = useDestinations();
   const dest = findDestination(catalog, decodeURIComponent(slug));
-  if (!dest) throw notFound();
+  if (!dest) return null;
 
   const deal = dest.hasOffers ? getDeal(dest.slug, catalog) : null;
   const nearby = catalog
