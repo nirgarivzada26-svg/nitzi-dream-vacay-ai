@@ -26,7 +26,7 @@ export async function readLaunchGate(force = false): Promise<LaunchGateRecord | 
   const { data } = await supabaseAdmin
     .from("system_settings")
     .select("value")
-    .eq(" key" .trim(), LAUNCH_GATE_KEY)
+    .eq("key", LAUNCH_GATE_KEY)
     .maybeSingle();
   const value = (data?.value ?? null) as LaunchGateRecord | null;
   cache = { value, at: Date.now() };
