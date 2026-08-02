@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, Sparkles, X, MapPin } from "lucide-react";
-import { destinations, popularDestinations } from "@/lib/nitzi-data";
+import { groupByCountry } from "@/lib/catalog";
+import { useDestinations } from "@/lib/use-catalog";
+import { DestinationImage } from "@/components/DestinationImage";
 
 interface Props {
   open: boolean;
@@ -9,6 +11,7 @@ interface Props {
 }
 
 export function DestinationPicker({ open, onClose, onSelect }: Props) {
+  const destinations = useDestinations();
   const [q, setQ] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -27,26 +30,23 @@ export function DestinationPicker({ open, onClose, onSelect }: Props) {
     const term = q.trim();
     if (!term) return destinations;
     return destinations.filter(
-      (d) => d.name.includes(term) || d.country.includes(term) || d.tagline.includes(term)
+      (d) =>
+        d.name.includes(term) ||
+        d.country.includes(term) ||
+        d.tagline.includes(term) ||
+        d.slug.toLowerCase().includes(term.toLowerCase()),
     );
-  }, [q]);
+  }, [q, destinations]);
 
-  // Group by country
-  const grouped = useMemo(() => {
-    const map = new Map<string, { emoji: string; items: typeof destinations }>();
-    for (const d of filtered) {
-      const g = map.get(d.country) ?? { emoji: d.emoji, items: [] as typeof destinations };
-      g.items.push(d);
-      map.set(d.country, g);
-    }
-    return Array.from(map.entries());
-  }, [filtered]);
+  const grouped = useMemo(() => groupByCountry(filtered), [filtered]);
 
-  const popular = destinations.filter((d) =>
-    popularDestinations.some((p) => d.country.includes(p) || p.includes(d.country) || d.name.includes(p))
+  const popular = useMemo(
+    () => destinations.filter((d) => d.isPopular).slice(0, 9),
+    [destinations],
   );
 
-  const pick = (name: string) => { onSelect(name); onClose(); };
+  // We pass the slug on — it is the catalog's stable identifier.
+  const pick = (slug: string) => { onSelect(slug); onClose(); };
 
   if (!open) return null;
 
@@ -96,8 +96,8 @@ export function DestinationPicker({ open, onClose, onSelect }: Props) {
               <h3 className="mb-2 text-xs font-black uppercase tracking-widest text-muted-foreground">🔥 פופולריים</h3>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {popular.map((d) => (
-                  <button key={`pop-${d.name}`} onClick={() => pick(d.name)} className="group relative h-24 overflow-hidden rounded-2xl text-right transition active:scale-[0.97]">
-                    <img src={d.image} alt={d.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition group-hover:scale-110" />
+                  <button key={`pop-${d.slug}`} onClick={() => pick(d.slug)} className="group relative h-24 overflow-hidden rounded-2xl text-right transition active:scale-[0.97]">
+                    <DestinationImage destination={d} className="absolute inset-0 h-full w-full object-cover transition group-hover:scale-110" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                     <div className="absolute inset-x-0 bottom-0 p-2 text-white">
                       <p className="text-[10px] font-semibold text-white/85">{d.country} {d.emoji}</p>
@@ -122,11 +122,11 @@ export function DestinationPicker({ open, onClose, onSelect }: Props) {
                 <div className="space-y-2">
                   {group.items.map((d) => (
                     <button
-                      key={d.name}
-                      onClick={() => pick(d.name)}
+                      key={d.slug}
+                      onClick={() => pick(d.slug)}
                       className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-2.5 text-right transition hover:border-primary/50 hover:bg-muted/40 active:scale-[0.99]"
                     >
-                      <img src={d.image} alt={d.name} loading="lazy" className="h-14 w-14 shrink-0 rounded-xl object-cover" />
+                      <DestinationImage destination={d} sizeHint="sm" className="h-14 w-14 shrink-0 rounded-xl object-cover" />
                       <span className="min-w-0 flex-1">
                         <span className="flex items-center gap-1.5 text-sm font-black text-foreground">
                           {d.name} <span className="text-xs text-muted-foreground">{d.emoji}</span>
@@ -134,7 +134,7 @@ export function DestinationPicker({ open, onClose, onSelect }: Props) {
                         <span className="mt-0.5 line-clamp-1 block text-[11px] text-muted-foreground">{d.tagline}</span>
                       </span>
                       <span className="shrink-0 text-[10px] font-bold text-muted-foreground">
-                        מ־₪{d.avgBudgetPerPerson.toLocaleString()}
+                        {d.hasOffers ? `מ־₪${d.avgBudgetPerPerson.toLocaleString()}` : "אין דילים כרגע"}
                       </span>
                     </button>
                   ))}
