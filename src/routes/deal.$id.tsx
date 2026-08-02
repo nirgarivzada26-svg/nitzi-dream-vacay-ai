@@ -163,7 +163,7 @@ function DealPage() {
       </header>
 
       <div className="mx-auto w-full max-w-[1600px] px-4 pt-4 sm:px-6 lg:pt-6">
-        <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+        <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
           <div className="space-y-5">
             <section className="relative overflow-hidden rounded-[2rem] shadow-glow animate-fade-up">
               <img src={dest.image} alt={dest.name} className="h-[320px] w-full object-cover sm:h-[420px] lg:h-[480px]" />
