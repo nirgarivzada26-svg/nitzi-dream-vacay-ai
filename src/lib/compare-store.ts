@@ -32,9 +32,9 @@ export function toggleCompare(entry: CompareEntry) {
   const exists = state.some((e) => e.id === entry.id && e.kind === entry.kind);
   if (exists) state = state.filter((e) => !(e.id === entry.id && e.kind === entry.kind));
   else {
-    // limit to 4 & same kind only
+    // limit to 3 & same kind only
     const sameKind = state.filter((e) => e.kind === entry.kind);
-    state = [...sameKind, entry].slice(-4);
+    state = [...sameKind, entry].slice(-3);
   }
   persist();
 }

@@ -57,7 +57,7 @@ function ComparePage() {
           <Sparkles className="h-6 w-6 text-primary" /> השוואה חכמה של NITZI
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          בחר עד 4 פריטים מדף התוצאות והשווה בין הפרמטרים החשובים.
+          בחר עד 3 פריטים מדף התוצאות והשווה בין הפרמטרים החשובים.
         </p>
 
         {empty ? (
