@@ -162,14 +162,67 @@ function FlightDetailPage() {
             <WhyNitziButton reasons={reasons} score={flight.score} />
           </div>
 
-          <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-sunset py-5 text-lg font-black text-white shadow-glow">
-            <Plane className="h-5 w-5" /> הזמן עכשיו
-          </button>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <FareItem icon={Plane} label="מטוס">
+              {fare.aircraft ?? "סוג המטוס יתעדכן מהמוביל"}
+            </FareItem>
+            <FareItem icon={BadgeCheck} label="מחלקה">
+              {fare.cabin}
+            </FareItem>
+            <FareItem icon={Briefcase} label="כבודת יד">
+              {fare.carryOn}
+            </FareItem>
+            <FareItem icon={Luggage} label="כבודה למטען">
+              {fare.checkedBag}
+            </FareItem>
+            <FareItem icon={Utensils} label="כיבוד בטיסה">
+              {fare.meal}
+            </FareItem>
+            <FareItem icon={Shield} label="שינויים">
+              {fare.changePolicy}
+            </FareItem>
+            {fare.alliance && (
+              <FareItem icon={Sparkles} label="ברית תעופה">
+                {fare.alliance}
+              </FareItem>
+            )}
+            <FareItem icon={BadgeCheck} label="מקור הנתונים">
+              {flight.source}
+            </FareItem>
+          </div>
+
+          <Link
+            to="/result"
+            search={{ destination: destinationSlug } as never}
+            className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-sunset py-5 text-lg font-black text-white shadow-glow"
+          >
+            <Plane className="h-5 w-5" /> המשך להזמנה עם הטיסה הזו
+          </Link>
           <p className="mt-2 text-center text-[11px] text-muted-foreground">
-            <Shield className="mr-1 inline h-3 w-3" /> ביטול בכפוף למדיניות חברת התעופה
+            <Shield className="mr-1 inline h-3 w-3" /> {fare.refundPolicy}
           </p>
         </section>
       </div>
     </div>
   );
 }
+
+function FareItem({
+  icon: Icon,
+  label,
+  children,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl border border-border/60 bg-muted/30 p-4">
+      <div className="flex items-center gap-2 text-[11px] font-black text-muted-foreground">
+        <Icon className="h-3.5 w-3.5" /> {label}
+      </div>
+      <p className="mt-1 text-sm font-bold text-foreground">{children}</p>
+    </div>
+  );
+}
+
