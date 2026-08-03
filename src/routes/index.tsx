@@ -105,20 +105,30 @@ function Home() {
         <DealRails />
 
         <div className="mt-12 flex flex-col items-center gap-3 text-center">
-          <Link
-            to="/packages"
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-sunset px-10 py-5 text-lg font-black text-white shadow-glow transition hover:scale-[1.02] active:scale-95 sm:text-xl"
-          >
-            <Sparkles className="h-5 w-5" /> לכל החבילות
-          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              to="/packages"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-sunset px-10 py-5 text-lg font-black text-white shadow-glow transition hover:scale-[1.02] active:scale-95 sm:text-xl"
+            >
+              <Sparkles className="h-5 w-5" /> לכל החבילות
+            </Link>
+            <Link
+              to="/flights"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-10 py-5 text-lg font-black text-foreground shadow-soft transition hover:border-primary hover:text-primary active:scale-95 sm:text-xl"
+            >
+              לכל הטיסות
+            </Link>
+          </div>
           <p className="text-sm text-muted-foreground">
             כל קטלוג החבילות של NITZI — עם סינון לפי מחיר, מדינה, כוכבים והכל כלול.
           </p>
         </div>
       </div>
 
+      <WhyNitzi />
 
       <PopularDestinations />
+
 
       <Footer />
 
@@ -170,6 +180,42 @@ function PopularDestinations() {
               </p>
             </div>
           </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/** Why NITZI — the trust promise, stated once on the homepage. */
+function WhyNitzi() {
+  const items = [
+    {
+      title: "רק מחירים מאומתים",
+      body: "כל דיל נבדק מול הספק לפני שהוא מוצג, ושוב לפני התשלום. אין מחירים מנופחים ואין הפתעות בקופה.",
+    },
+    {
+      title: "AI שמסביר את עצמו",
+      body: "לכל המלצה יש ציון NITZI ונימוקים גלויים — מחיר, מזג אוויר, זמן טיסה והתאמה לסגנון החופשה שלך.",
+    },
+    {
+      title: "הכול במקום אחד",
+      body: "טיסה, מלון, תוספות והזמנה — בלי לקפוץ בין אתרים, עם אזור אישי, מסמכי נסיעה ותמיכה בעברית.",
+    },
+  ];
+
+  return (
+    <section className="mx-auto mt-14 w-full max-w-[1600px] px-5 sm:mt-20 sm:px-8">
+      <h2 className="text-2xl font-black text-foreground sm:text-3xl">למה NITZI?</h2>
+      <p className="mt-1 text-sm text-muted-foreground">החיים קצרים. תצא לחוות — בביטחון מלא.</p>
+      <div className="mt-5 grid gap-4 md:grid-cols-3">
+        {items.map((it) => (
+          <div
+            key={it.title}
+            className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft"
+          >
+            <h3 className="text-lg font-black text-foreground">{it.title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{it.body}</p>
+          </div>
         ))}
       </div>
     </section>

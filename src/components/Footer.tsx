@@ -9,11 +9,11 @@ const columns: { title: string; links: FooterLink[] }[] = [
   {
     title: "NITZI",
     links: [
-      { label: "אודות NITZI", href: "#about" },
-      { label: "החזון שלנו", href: "#vision" },
-      { label: "בלוג טיולים", href: "#blog" },
-      { label: "עיתונות", href: "#press" },
-      { label: "קריירה", href: "#careers" },
+      { label: "חבילות נופש", to: "/packages" },
+      { label: "טיסות", to: "/flights" },
+      { label: "NITZI AI", to: "/ai" },
+      { label: "תכנן לי חופשה", to: "/quiz" },
+      { label: "צור קשר", to: "/support" },
     ],
   },
   {
@@ -72,14 +72,14 @@ export function Footer() {
                 { Icon: Youtube, label: "YouTube" },
                 { Icon: Mail, label: "Email" },
               ].map(({ Icon, label }) => (
-                <a
+                <Link
                   key={label}
-                  href="#"
+                  to="/support"
                   aria-label={label}
                   className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card text-muted-foreground transition hover:border-primary hover:text-primary"
                 >
                   <Icon className="h-4 w-4" />
-                </a>
+                </Link>
               ))}
             </div>
 

@@ -13,6 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import { TopNav } from "@/components/TopNav";
+import { fareDetails } from "@/lib/flight-details";
 import { Footer } from "@/components/Footer";
 import { DestinationPicker } from "@/components/DestinationPicker";
 import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
@@ -221,7 +222,7 @@ function FlightsPage() {
                       </div>
                       <div className="flex flex-wrap gap-2 text-[11px] font-bold">
                         <span className="flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-muted-foreground">
-                          <Briefcase className="h-3 w-3" /> כבודה 20 ק״ג
+                          <Briefcase className="h-3 w-3" /> {fareDetails(f).checkedBag}
                         </span>
                         <span className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-primary">
                           <Clock className="h-3 w-3" /> ציון NITZI {f.score}%
