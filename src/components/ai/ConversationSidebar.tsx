@@ -67,6 +67,7 @@ export function ConversationSidebar({ activeId }: { activeId?: string }) {
               <Link
                 to="/ai/$conversationId"
                 params={{ conversationId: row.id }}
+                search={{ q: undefined }}
                 className="min-w-0 flex-1 truncate py-2.5 text-right text-[13px] font-bold"
               >
                 {row.title}
