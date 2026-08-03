@@ -1,9 +1,21 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, BadgeCheck, Clock, Plane, Shield, Sparkles } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  BadgeCheck,
+  Briefcase,
+  Clock,
+  Luggage,
+  Plane,
+  Shield,
+  Sparkles,
+  Utensils,
+} from "lucide-react";
 import { NitziLogo } from "@/components/NitziLogo";
 import { WhyNitziButton } from "@/components/WhyNitziButton";
 import { findFlight, getResultsCache } from "@/lib/results-cache";
 import { explainFlight } from "@/lib/explain";
+import { fareDetails } from "@/lib/flight-details";
+
 
 export const Route = createFileRoute("/flight/$id")({
   head: () => ({
