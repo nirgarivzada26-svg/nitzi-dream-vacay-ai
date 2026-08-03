@@ -105,20 +105,30 @@ function Home() {
         <DealRails />
 
         <div className="mt-12 flex flex-col items-center gap-3 text-center">
-          <Link
-            to="/packages"
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-sunset px-10 py-5 text-lg font-black text-white shadow-glow transition hover:scale-[1.02] active:scale-95 sm:text-xl"
-          >
-            <Sparkles className="h-5 w-5" /> לכל החבילות
-          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              to="/packages"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-sunset px-10 py-5 text-lg font-black text-white shadow-glow transition hover:scale-[1.02] active:scale-95 sm:text-xl"
+            >
+              <Sparkles className="h-5 w-5" /> לכל החבילות
+            </Link>
+            <Link
+              to="/flights"
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-10 py-5 text-lg font-black text-foreground shadow-soft transition hover:border-primary hover:text-primary active:scale-95 sm:text-xl"
+            >
+              לכל הטיסות
+            </Link>
+          </div>
           <p className="text-sm text-muted-foreground">
             כל קטלוג החבילות של NITZI — עם סינון לפי מחיר, מדינה, כוכבים והכל כלול.
           </p>
         </div>
       </div>
 
+      <WhyNitzi />
 
       <PopularDestinations />
+
 
       <Footer />
 
