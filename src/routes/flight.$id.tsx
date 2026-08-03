@@ -85,7 +85,6 @@ function FlightDetailPage() {
   ];
 
   const fare = fareDetails(flight);
-  const destinationSlug = cache.answers.destination;
 
   return (
 
@@ -193,7 +192,6 @@ function FlightDetailPage() {
 
           <Link
             to="/result"
-            search={{ destination: destinationSlug } as never}
             className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-sunset py-5 text-lg font-black text-white shadow-glow"
           >
             <Plane className="h-5 w-5" /> המשך להזמנה עם הטיסה הזו
