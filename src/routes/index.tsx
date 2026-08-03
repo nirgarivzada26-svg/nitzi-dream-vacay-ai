@@ -185,3 +185,39 @@ function PopularDestinations() {
     </section>
   );
 }
+
+/** Why NITZI — the trust promise, stated once on the homepage. */
+function WhyNitzi() {
+  const items = [
+    {
+      title: "רק מחירים מאומתים",
+      body: "כל דיל נבדק מול הספק לפני שהוא מוצג, ושוב לפני התשלום. אין מחירים מנופחים ואין הפתעות בקופה.",
+    },
+    {
+      title: "AI שמסביר את עצמו",
+      body: "לכל המלצה יש ציון NITZI ונימוקים גלויים — מחיר, מזג אוויר, זמן טיסה והתאמה לסגנון החופשה שלך.",
+    },
+    {
+      title: "הכול במקום אחד",
+      body: "טיסה, מלון, תוספות והזמנה — בלי לקפוץ בין אתרים, עם אזור אישי, מסמכי נסיעה ותמיכה בעברית.",
+    },
+  ];
+
+  return (
+    <section className="mx-auto mt-14 w-full max-w-[1600px] px-5 sm:mt-20 sm:px-8">
+      <h2 className="text-2xl font-black text-foreground sm:text-3xl">למה NITZI?</h2>
+      <p className="mt-1 text-sm text-muted-foreground">החיים קצרים. תצא לחוות — בביטחון מלא.</p>
+      <div className="mt-5 grid gap-4 md:grid-cols-3">
+        {items.map((it) => (
+          <div
+            key={it.title}
+            className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft"
+          >
+            <h3 className="text-lg font-black text-foreground">{it.title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{it.body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
