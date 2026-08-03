@@ -84,7 +84,11 @@ function FlightDetailPage() {
     `ציון NITZI: ${flight.score}% — משוקלל לפי מחיר, עצירות, משך וזמני המראה.`,
   ];
 
+  const fare = fareDetails(flight);
+  const destinationSlug = cache.answers.destination;
+
   return (
+
     <div dir="rtl" className="min-h-screen bg-background pb-32">
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur-lg">
         <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between px-4 py-3 sm:px-6">
