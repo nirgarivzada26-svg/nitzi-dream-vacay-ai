@@ -214,9 +214,9 @@ describe("destination search", () => {
 
   it("never returns invalid destinations", () => {
     const broken = rowToDestination(row({ slug: "broken", latitude: 1000 }));
-    expect(searchDestinations([...catalog, broken], { query: "יעד" }).map((d) => d.slug)).not.toContain(
-      "broken",
-    );
+    expect(
+      searchDestinations([...catalog, broken], { query: "יעד" }).map((d) => d.slug),
+    ).not.toContain("broken");
   });
 
   it("can restrict results to destinations we can fly to", () => {

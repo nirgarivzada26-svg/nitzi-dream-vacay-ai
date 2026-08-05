@@ -112,7 +112,6 @@ export interface DestinationRow {
   is_trending: boolean | null;
 }
 
-
 const IMAGE_BY_SLUG: Record<string, string> = {
   santorini: santoriniImg,
   amalfi: amalfiImg,
@@ -211,7 +210,6 @@ export function rowToDestination(row: DestinationRow): Destination {
     isTrending: row.is_trending ?? false,
   };
 }
-
 
 export function findDestination(
   catalog: Destination[],

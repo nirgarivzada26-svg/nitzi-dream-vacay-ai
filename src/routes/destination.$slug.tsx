@@ -96,7 +96,6 @@ const CATEGORY_HE: Record<string, string> = {
   adventure: "הרפתקאות",
 };
 
-
 /** Facts we can state because they come from the catalog row. */
 function Fact({
   icon: Icon,
@@ -279,8 +278,6 @@ function DestinationPage() {
           ))}
         </div>
 
-
-
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
           <div className="grid gap-4">
             <section className="rounded-3xl border border-border bg-card p-5 shadow-soft">
@@ -401,7 +398,6 @@ function DestinationPage() {
             )}
 
             {nearby.length > 0 && (
-
               <section className="rounded-3xl border border-border bg-card p-5 shadow-soft">
                 <h2 className="text-lg font-black">יעדים נוספים ב{dest.region}</h2>
                 <ul className="mt-3 grid gap-2">
