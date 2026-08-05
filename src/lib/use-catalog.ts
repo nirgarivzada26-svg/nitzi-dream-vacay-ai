@@ -1,12 +1,14 @@
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { listDestinationRows } from "./catalog.functions";
 import { rowToDestination, type Destination } from "./catalog";
+import { validDestinations } from "./destination-validation";
 
 export const destinationsQueryOptions = queryOptions({
   queryKey: ["destinations"],
   queryFn: async (): Promise<Destination[]> => {
     const rows = await listDestinationRows();
-    return rows.map(rowToDestination);
+    // Invalid or duplicated catalog rows never reach the UI.
+    return validDestinations(rows.map(rowToDestination));
   },
   staleTime: 10 * 60 * 1000,
 });
