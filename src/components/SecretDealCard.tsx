@@ -21,9 +21,11 @@ export function SecretDealCard() {
   const secret = useMemo(() => getSecretDeal(catalog), [catalog]);
   const { isAuthenticated } = useAuth();
   const [signInOpen, setSignInOpen] = useState(false);
-  const [now, setNow] = useState(Date.now());
+  // Null until hydration so server and client render the same markup.
+  const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
+    setNow(Date.now());
     const t = setInterval(() => setNow(Date.now()), 60000);
     return () => clearInterval(t);
   }, []);
@@ -59,7 +61,7 @@ export function SecretDealCard() {
           </div>
           <div className="absolute top-4 left-4 flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur">
             <Timer className="h-3 w-3" /> מתחלף בעוד{" "}
-            {formatCountdown(nextRotationAt.getTime() - now)}
+            {now === null ? "—" : formatCountdown(nextRotationAt.getTime() - now)}
           </div>
 
           <div className="absolute inset-x-0 bottom-0 p-5 text-white">

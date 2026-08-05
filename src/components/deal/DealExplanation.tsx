@@ -7,10 +7,12 @@ export function DealExplanation({
   deal,
   peers = [],
   defaultOpen = false,
+  title = "למה NITZI בחרה בדיל הזה?",
 }: {
   deal: Deal;
   peers?: Deal[];
   defaultOpen?: boolean;
+  title?: string;
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const id = useId();
@@ -28,7 +30,7 @@ export function DealExplanation({
         <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-gradient-sunset text-white">
           <Sparkles className="h-4 w-4" aria-hidden />
         </span>
-        <span className="text-sm font-black text-foreground">למה NITZI בחרה בדיל הזה?</span>
+        <span className="text-sm font-black text-foreground">{title}</span>
         <ChevronDown
           className={`ms-auto h-4 w-4 shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
           aria-hidden
