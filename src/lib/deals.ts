@@ -108,8 +108,12 @@ function buildDeal(dest: Destination, opts?: { secret?: boolean; seed?: string }
   const nights = 4 + Math.floor(r() * 4); // 4..7
   const people = 2;
 
-  const start = new Date(Date.now() + (14 + Math.floor(r() * 21)) * 86400000);
-  start.setHours(0, 0, 0, 0);
+  // Keep demo catalog dates stable across SSR and hydration. Using Date.now() here
+  // can produce a different calendar day when the server and browser render
+  // around midnight, which changes the visible date on an otherwise identical card.
+  const catalogAsOf = Date.UTC(2026, 7, 5);
+  const start = new Date(catalogAsOf + (14 + Math.floor(r() * 21)) * 86400000);
+  start.setUTCHours(0, 0, 0, 0);
   const end = new Date(start.getTime() + nights * 86400000);
 
   const airOut = pick(r, AIRLINES);
