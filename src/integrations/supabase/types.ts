@@ -288,71 +288,128 @@ export type Database = {
       }
       destinations: {
         Row: {
+          airport_codes: string[]
           attractions: string[]
+          average_trip_duration: number | null
           avg_budget_per_person: number
+          best_travel_months: number[]
+          city_en: string | null
           country: string
           country_code: string
+          country_en: string | null
           created_at: string
+          currency: string | null
+          demo_supported: boolean
+          direct_flight_from_tlv: boolean
           flag: string
           flight_hours: number
           has_offers: boolean
           hotels: Json
+          image_url: string | null
           is_active: boolean
+          is_featured: boolean
           is_popular: boolean
+          is_trending: boolean
           itinerary: string[]
+          languages: string[]
+          latitude: number | null
+          longitude: number | null
           matches: string[]
           name: string
+          provider_supported: boolean
           region: string
           restaurants: string[]
+          short_description: string | null
           slug: string
           sort_order: number
+          subregion: string | null
           tagline: string
+          timezone: string | null
+          travel_categories: string[]
           updated_at: string
           weather: string
         }
         Insert: {
+          airport_codes?: string[]
           attractions?: string[]
+          average_trip_duration?: number | null
           avg_budget_per_person: number
+          best_travel_months?: number[]
+          city_en?: string | null
           country: string
           country_code: string
+          country_en?: string | null
           created_at?: string
+          currency?: string | null
+          demo_supported?: boolean
+          direct_flight_from_tlv?: boolean
           flag: string
           flight_hours: number
           has_offers?: boolean
           hotels?: Json
+          image_url?: string | null
           is_active?: boolean
+          is_featured?: boolean
           is_popular?: boolean
+          is_trending?: boolean
           itinerary?: string[]
+          languages?: string[]
+          latitude?: number | null
+          longitude?: number | null
           matches?: string[]
           name: string
+          provider_supported?: boolean
           region: string
           restaurants?: string[]
+          short_description?: string | null
           slug: string
           sort_order?: number
+          subregion?: string | null
           tagline: string
+          timezone?: string | null
+          travel_categories?: string[]
           updated_at?: string
           weather?: string
         }
         Update: {
+          airport_codes?: string[]
           attractions?: string[]
+          average_trip_duration?: number | null
           avg_budget_per_person?: number
+          best_travel_months?: number[]
+          city_en?: string | null
           country?: string
           country_code?: string
+          country_en?: string | null
           created_at?: string
+          currency?: string | null
+          demo_supported?: boolean
+          direct_flight_from_tlv?: boolean
           flag?: string
           flight_hours?: number
           has_offers?: boolean
           hotels?: Json
+          image_url?: string | null
           is_active?: boolean
+          is_featured?: boolean
           is_popular?: boolean
+          is_trending?: boolean
           itinerary?: string[]
+          languages?: string[]
+          latitude?: number | null
+          longitude?: number | null
           matches?: string[]
           name?: string
+          provider_supported?: boolean
           region?: string
           restaurants?: string[]
+          short_description?: string | null
           slug?: string
           sort_order?: number
+          subregion?: string | null
           tagline?: string
+          timezone?: string | null
+          travel_categories?: string[]
           updated_at?: string
           weather?: string
         }
