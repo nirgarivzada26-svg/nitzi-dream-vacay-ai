@@ -184,6 +184,7 @@ export function SearchEngine({ size = "md" }: { size?: "md" | "lg" }) {
       <DestinationPicker
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
+        value={destination || null}
         onSelect={(v) => setDestination(v)}
       />
     </>

@@ -20,6 +20,8 @@ import lisbonImg from "@/assets/dest-lisbon.jpg";
 import parisImg from "@/assets/dest-paris.jpg";
 import londonImg from "@/assets/dest-london.jpg";
 import pragueImg from "@/assets/dest-prague.jpg";
+import tokyoImg from "@/assets/dest-tokyo.jpg";
+import baliImg from "@/assets/dest-bali.jpg";
 
 import type { QuizAnswers, TripType } from "./nitzi-data";
 
@@ -48,6 +50,25 @@ export interface Destination {
   attractions: string[];
   restaurants: string[];
   itinerary: string[];
+  // --- catalog metadata (Slice 2) ---
+  cityEn: string;
+  countryEn: string;
+  subregion: string;
+  airportCodes: string[];
+  latitude: number | null;
+  longitude: number | null;
+  timezone: string;
+  currency: string;
+  languages: string[];
+  shortDescription: string;
+  bestTravelMonths: number[];
+  averageTripDuration: number | null;
+  travelCategories: string[];
+  directFlightFromTLV: boolean;
+  providerSupported: boolean;
+  demoSupported: boolean;
+  isFeatured: boolean;
+  isTrending: boolean;
 }
 
 /** Raw row shape from `public.destinations`. */
@@ -70,6 +91,25 @@ export interface DestinationRow {
   restaurants: string[] | null;
   itinerary: string[] | null;
   sort_order: number;
+  city_en: string | null;
+  country_en: string | null;
+  subregion: string | null;
+  airport_codes: string[] | null;
+  latitude: number | string | null;
+  longitude: number | string | null;
+  timezone: string | null;
+  currency: string | null;
+  languages: string[] | null;
+  image_url: string | null;
+  short_description: string | null;
+  best_travel_months: number[] | null;
+  average_trip_duration: number | null;
+  travel_categories: string[] | null;
+  direct_flight_from_tlv: boolean | null;
+  provider_supported: boolean | null;
+  demo_supported: boolean | null;
+  is_featured: boolean | null;
+  is_trending: boolean | null;
 }
 
 const IMAGE_BY_SLUG: Record<string, string> = {
@@ -85,6 +125,12 @@ const IMAGE_BY_SLUG: Record<string, string> = {
   paris: parisImg,
   london: londonImg,
   prague: pragueImg,
+  tokyo: tokyoImg,
+  osaka: tokyoImg,
+  bangkok: baliImg,
+  phuket: baliImg,
+  "koh-samui": baliImg,
+  krabi: baliImg,
 };
 
 const IMAGE_BY_COUNTRY: Record<string, string> = {
@@ -97,6 +143,8 @@ const IMAGE_BY_COUNTRY: Record<string, string> = {
   GB: londonImg,
   CZ: pragueImg,
   AE: dubaiImg,
+  JP: tokyoImg,
+  TH: baliImg,
 };
 
 export function imageFor(slug: string, countryCode: string): string | null {
@@ -137,11 +185,29 @@ export function rowToDestination(row: DestinationRow): Destination {
     matches: (row.matches ?? []).filter((m): m is TripType => TRIP_TYPES.includes(m as TripType)),
     isPopular: row.is_popular,
     hasOffers: row.has_offers,
-    image: imageFor(row.slug, row.country_code),
+    image: imageFor(row.slug, row.country_code) ?? row.image_url ?? null,
     hotels: toHotels(row.hotels),
     attractions: row.attractions ?? [],
     restaurants: row.restaurants ?? [],
     itinerary: row.itinerary ?? [],
+    cityEn: row.city_en ?? "",
+    countryEn: row.country_en ?? "",
+    subregion: row.subregion ?? "",
+    airportCodes: (row.airport_codes ?? []).map((c) => c.toUpperCase()),
+    latitude: row.latitude === null ? null : Number(row.latitude),
+    longitude: row.longitude === null ? null : Number(row.longitude),
+    timezone: row.timezone ?? "",
+    currency: row.currency ?? "",
+    languages: row.languages ?? [],
+    shortDescription: row.short_description ?? row.tagline,
+    bestTravelMonths: row.best_travel_months ?? [],
+    averageTripDuration: row.average_trip_duration ?? null,
+    travelCategories: row.travel_categories ?? [],
+    directFlightFromTLV: row.direct_flight_from_tlv ?? false,
+    providerSupported: row.provider_supported ?? false,
+    demoSupported: row.demo_supported ?? false,
+    isFeatured: row.is_featured ?? false,
+    isTrending: row.is_trending ?? false,
   };
 }
 

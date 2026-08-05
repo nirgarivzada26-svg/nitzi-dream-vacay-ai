@@ -7,7 +7,7 @@ import type { Database } from "@/integrations/supabase/types";
 import type { DestinationRow } from "./catalog";
 
 const COLUMNS =
-  "slug,name,country,country_code,flag,region,tagline,weather,flight_hours,avg_budget_per_person,matches,is_popular,has_offers,hotels,attractions,restaurants,itinerary,sort_order";
+  "slug,name,country,country_code,flag,region,tagline,weather,flight_hours,avg_budget_per_person,matches,is_popular,has_offers,hotels,attractions,restaurants,itinerary,sort_order,city_en,country_en,subregion,airport_codes,latitude,longitude,timezone,currency,languages,image_url,short_description,best_travel_months,average_trip_duration,travel_categories,direct_flight_from_tlv,provider_supported,demo_supported,is_featured,is_trending";
 
 export async function fetchDestinationRows(): Promise<DestinationRow[]> {
   const supabase = createClient<Database>(

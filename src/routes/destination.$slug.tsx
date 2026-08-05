@@ -69,6 +69,33 @@ export const Route = createFileRoute("/destination/$slug")({
 
 const fmtILS = (n: number) => `₪${Math.round(n).toLocaleString("he-IL")}`;
 
+const MONTHS_HE = [
+  "ינואר",
+  "פברואר",
+  "מרץ",
+  "אפריל",
+  "מאי",
+  "יוני",
+  "יולי",
+  "אוגוסט",
+  "ספטמבר",
+  "אוקטובר",
+  "נובמבר",
+  "דצמבר",
+];
+
+const CATEGORY_HE: Record<string, string> = {
+  beach: "חופים",
+  city: "עיר",
+  island: "אי",
+  romantic: "רומנטי",
+  family: "משפחות",
+  friends: "חברים",
+  nightlife: "חיי לילה",
+  nature: "טבע",
+  adventure: "הרפתקאות",
+};
+
 /** Facts we can state because they come from the catalog row. */
 function Fact({
   icon: Icon,
@@ -195,6 +222,62 @@ function DestinationPage() {
           />
         </section>
 
+        <section className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <Fact
+            icon={Plane}
+            label="שדות תעופה"
+            value={dest.airportCodes.length ? dest.airportCodes.join(" · ") : null}
+          />
+          <Fact icon={Coins} label="מטבע מקומי" value={dest.currency || null} />
+          <Fact
+            icon={Compass}
+            label="שפות"
+            value={dest.languages.length ? dest.languages.join(", ") : null}
+          />
+          <Fact
+            icon={CalendarDays}
+            label="חודשים מומלצים"
+            value={
+              dest.bestTravelMonths.length
+                ? dest.bestTravelMonths.map((m) => MONTHS_HE[m - 1] ?? m).join(", ")
+                : null
+            }
+          />
+        </section>
+
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-muted px-3 py-1.5 text-[11px] font-black text-muted-foreground">
+            {dest.cityEn}, {dest.countryEn} · {dest.subregion || dest.region}
+          </span>
+          {dest.directFlightFromTLV ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-black text-emerald-800">
+              <Plane className="h-3.5 w-3.5" /> קיימת טיסה ישירה מתל אביב
+            </span>
+          ) : (
+            <span className="rounded-full bg-muted px-3 py-1.5 text-[11px] font-black text-muted-foreground">
+              ללא טיסה ישירה מתל אביב
+            </span>
+          )}
+          {dest.averageTripDuration && (
+            <span className="rounded-full bg-muted px-3 py-1.5 text-[11px] font-black text-muted-foreground">
+              משך חופשה טיפוסי: {dest.averageTripDuration} ימים
+            </span>
+          )}
+          {dest.timezone && (
+            <span className="rounded-full bg-muted px-3 py-1.5 text-[11px] font-black text-muted-foreground">
+              אזור זמן: {dest.timezone}
+            </span>
+          )}
+          {dest.travelCategories.map((c) => (
+            <span
+              key={c}
+              className="rounded-full border border-border px-3 py-1.5 text-[11px] font-black text-muted-foreground"
+            >
+              {CATEGORY_HE[c] ?? c}
+            </span>
+          ))}
+        </div>
+
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
           <div className="grid gap-4">
             <section className="rounded-3xl border border-border bg-card p-5 shadow-soft">
@@ -296,6 +379,23 @@ function DestinationPage() {
                 </Link>
               </div>
             </section>
+
+            {dest.latitude !== null && dest.longitude !== null && (
+              <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
+                <h2 className="flex items-center gap-2 p-5 pb-3 text-lg font-black">
+                  <MapPin className="h-4 w-4 text-primary" /> מפה
+                </h2>
+                <iframe
+                  title={`מפה של ${dest.name}`}
+                  loading="lazy"
+                  className="h-64 w-full border-0"
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${dest.longitude - 0.15}%2C${dest.latitude - 0.12}%2C${dest.longitude + 0.15}%2C${dest.latitude + 0.12}&layer=mapnik&marker=${dest.latitude}%2C${dest.longitude}`}
+                />
+                <p className="px-5 py-3 text-[11px] font-bold text-muted-foreground">
+                  {dest.latitude.toFixed(4)}, {dest.longitude.toFixed(4)} · OpenStreetMap
+                </p>
+              </section>
+            )}
 
             {nearby.length > 0 && (
               <section className="rounded-3xl border border-border bg-card p-5 shadow-soft">
