@@ -12,6 +12,7 @@ import {
   Plane,
   Share2,
   Shield,
+  Scale,
   Sparkles,
   Star,
   Users,
@@ -52,6 +53,13 @@ import {
 import { nitziScore } from "@/lib/deal-score";
 import { dealVariantsFor } from "@/lib/deals";
 import { SIMILAR_LABEL, similarDeals } from "@/lib/similar-deals";
+import { ScoreBreakdownPanel } from "@/components/deal/ScoreBreakdownPanel";
+import { DealComparison } from "@/components/deal/DealComparison";
+import { BookTimingCard } from "@/components/deal/BookTimingCard";
+import { TravelTips } from "@/components/deal/TravelTips";
+import { scoreBreakdown } from "@/lib/deal-scores";
+import { buildComparisons } from "@/lib/deal-comparison";
+import { bookTiming } from "@/lib/book-timing";
 
 export const Route = createFileRoute("/deal/$id")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -150,6 +158,12 @@ function DealPage() {
   const score = nitziScore(deal);
   const peers = dealVariantsFor(dest.slug, catalog, 3).filter((d) => d.id !== canonical.id);
   const related = similarDeals(canonical, catalog);
+  const scores = scoreBreakdown(deal, peers, selectedFlightId);
+  const comparisons = buildComparisons(
+    deal,
+    [...peers, ...related.map((r) => r.deal)],
+  );
+  const timing = bookTiming(deal, peers);
 
   const refresh = async () => {
     setRefreshing(true);
@@ -363,6 +377,10 @@ function DealPage() {
 
             <Section title="האזור בקצרה" icon={<MapPin className="h-4 w-4" />}>
               <DealMap dest={dest} hotelName={deal.hotel.name} />
+            </Section>
+
+            <Section title="טיפים ליעד" icon={<MapPin className="h-4 w-4" />}>
+              <TravelTips dest={dest} />
             </Section>
 
             <Section title="מה כלול ומה לא" icon={<ListChecks className="h-4 w-4" />}>
