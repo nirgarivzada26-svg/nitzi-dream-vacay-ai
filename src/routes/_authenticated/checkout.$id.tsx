@@ -231,7 +231,9 @@ function CheckoutPage() {
       <header className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-5 pt-6 sm:px-10">
         <button
           onClick={() =>
-            step > 0 && !placed ? setStep(step - 1) : navigate({ to: "/deal/$id", params: { id } })
+            step > 0 && !placed
+              ? setStep(step - 1)
+              : navigate({ to: "/deal/$id", params: { id }, search: { flight: undefined } })
           }
           className="grid h-11 w-11 place-items-center rounded-full border border-border bg-card"
         >

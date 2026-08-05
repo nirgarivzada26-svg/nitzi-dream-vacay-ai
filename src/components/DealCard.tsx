@@ -9,7 +9,7 @@ import { DealVariants } from "@/components/DealVariants";
 
 const fmt = (n: number) => `₪${Math.round(n).toLocaleString()}`;
 const fmtDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("he-IL", { day: "2-digit", month: "short" });
+  new Date(iso).toLocaleDateString("he-IL", { day: "2-digit", month: "short", timeZone: "UTC" });
 
 export function DealCard({
   deal,
@@ -33,6 +33,7 @@ export function DealCard({
       <Link
         to="/deal/$id"
         params={{ id: d.id }}
+        search={{ flight: undefined }}
         draggable={false}
         className="block overflow-hidden rounded-3xl border border-border/60 bg-card text-right shadow-soft transition hover:shadow-glow active:scale-[0.99]"
       >

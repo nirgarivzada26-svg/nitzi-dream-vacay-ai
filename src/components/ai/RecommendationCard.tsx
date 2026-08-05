@@ -155,6 +155,7 @@ export function RecommendationCard({ rec }: { rec: AgentRecommendation }) {
                 <Link
                   to="/deal/$id"
                   params={{ id: rec.dealId }}
+                  search={{ flight: undefined }}
                   className="rounded-2xl bg-gradient-sunset px-4 py-2.5 text-sm font-black text-white shadow-glow"
                 >
                   לצפייה בדיל

@@ -167,6 +167,7 @@ export function DealQuickView({
             <Link
               to="/deal/$id"
               params={{ id: deal.id }}
+              search={{ flight: undefined }}
               className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-sunset py-3 text-sm font-black text-white shadow-glow"
             >
               לדיל המלא
@@ -174,6 +175,7 @@ export function DealQuickView({
             <Link
               to="/deal/$id"
               params={{ id: deal.id }}
+              search={{ flight: undefined }}
               className="flex items-center justify-center gap-2 rounded-2xl border border-border py-3 text-sm font-black text-foreground hover:border-primary/50"
             >
               <Wallet className="h-4 w-4" /> הזמן עכשיו

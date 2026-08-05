@@ -369,6 +369,7 @@ function FavoritesTab() {
                 <Link
                   to="/deal/$id"
                   params={{ id: f.deal_id }}
+                  search={{ flight: undefined }}
                   className="rounded-2xl bg-gradient-sunset px-3 py-1.5 text-sm font-black text-white shadow-glow"
                 >
                   לפרטים
