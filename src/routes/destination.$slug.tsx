@@ -195,6 +195,64 @@ function DestinationPage() {
           />
         </section>
 
+        <section className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <Fact
+            icon={Plane}
+            label="שדות תעופה"
+            value={dest.airportCodes.length ? dest.airportCodes.join(" · ") : null}
+          />
+          <Fact icon={Coins} label="מטבע מקומי" value={dest.currency || null} />
+          <Fact
+            icon={Compass}
+            label="שפות"
+            value={dest.languages.length ? dest.languages.join(", ") : null}
+          />
+          <Fact
+            icon={CalendarDays}
+            label="חודשים מומלצים"
+            value={
+              dest.bestTravelMonths.length
+                ? dest.bestTravelMonths.map((m) => MONTHS_HE[m - 1] ?? m).join(", ")
+                : null
+            }
+          />
+        </section>
+
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-muted px-3 py-1.5 text-[11px] font-black text-muted-foreground">
+            {dest.cityEn}, {dest.countryEn} · {dest.subregion || dest.region}
+          </span>
+          {dest.directFlightFromTLV ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-[11px] font-black text-emerald-800">
+              <Plane className="h-3.5 w-3.5" /> קיימת טיסה ישירה מתל אביב
+            </span>
+          ) : (
+            <span className="rounded-full bg-muted px-3 py-1.5 text-[11px] font-black text-muted-foreground">
+              ללא טיסה ישירה מתל אביב
+            </span>
+          )}
+          {dest.averageTripDuration && (
+            <span className="rounded-full bg-muted px-3 py-1.5 text-[11px] font-black text-muted-foreground">
+              משך חופשה טיפוסי: {dest.averageTripDuration} ימים
+            </span>
+          )}
+          {dest.timezone && (
+            <span className="rounded-full bg-muted px-3 py-1.5 text-[11px] font-black text-muted-foreground">
+              אזור זמן: {dest.timezone}
+            </span>
+          )}
+          {dest.travelCategories.map((c) => (
+            <span
+              key={c}
+              className="rounded-full border border-border px-3 py-1.5 text-[11px] font-black text-muted-foreground"
+            >
+              {CATEGORY_HE[c] ?? c}
+            </span>
+          ))}
+        </div>
+
+
+
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
           <div className="grid gap-4">
             <section className="rounded-3xl border border-border bg-card p-5 shadow-soft">
