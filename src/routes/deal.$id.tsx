@@ -13,9 +13,11 @@ import {
   Share2,
   Shield,
   Scale,
+  PiggyBank,
   Sparkles,
-  Star,
+  ThermometerSun,
   Users,
+  Star,
   Wallet,
 } from "lucide-react";
 import { NitziLogo } from "@/components/NitziLogo";
@@ -53,6 +55,18 @@ import {
 import { nitziScore } from "@/lib/deal-score";
 import { dealVariantsFor } from "@/lib/deals";
 import { SIMILAR_LABEL, similarDeals } from "@/lib/similar-deals";
+import { ConciergeItinerary } from "@/components/deal/ConciergeItinerary";
+import { ConciergeCost } from "@/components/deal/ConciergeCost";
+import {
+  ConciergeAudience,
+  ConciergeExperience,
+  ConciergeWeather,
+} from "@/components/deal/ConciergeProfile";
+import {
+  ConciergeAlternatives,
+  ConciergeClosing,
+  ConciergeSavings,
+} from "@/components/deal/ConciergeExtras";
 import { ScoreBreakdownPanel } from "@/components/deal/ScoreBreakdownPanel";
 import { DealComparison } from "@/components/deal/DealComparison";
 import { BookTimingCard } from "@/components/deal/BookTimingCard";
@@ -408,13 +422,32 @@ function DealPage() {
               </ul>
             </Section>
 
-            <Section title="מסלול מוצע" icon={<Calendar className="h-4 w-4" />}>
-              <TripTimeline
-                destinationName={dest.name}
-                itinerary={dest.itinerary}
-                restaurants={dest.restaurants}
-                attractions={dest.attractions}
-              />
+            <Section title="המסלול היומי שלכם" icon={<Calendar className="h-4 w-4" />}>
+              <ConciergeItinerary deal={deal} />
+            </Section>
+
+            <Section title="הערכת עלות החופשה כולה" icon={<Wallet className="h-4 w-4" />}>
+              <ConciergeCost deal={deal} />
+            </Section>
+
+            <Section title="למי החופשה הזו מתאימה?" icon={<Users className="h-4 w-4" />}>
+              <ConciergeAudience deal={deal} />
+            </Section>
+
+            <Section title="מזג אוויר ועונתיות" icon={<ThermometerSun className="h-4 w-4" />}>
+              <ConciergeWeather deal={deal} />
+            </Section>
+
+            <Section title="פרופיל החוויה" icon={<Sparkles className="h-4 w-4" />}>
+              <ConciergeExperience deal={deal} />
+            </Section>
+
+            <Section title="איך אפשר לחסוך" icon={<PiggyBank className="h-4 w-4" />}>
+              <ConciergeSavings deal={deal} peers={peers} />
+            </Section>
+
+            <Section title="יעדים דומים" icon={<MapPin className="h-4 w-4" />}>
+              <ConciergeAlternatives deal={deal} catalog={catalog} />
             </Section>
 
             <Section title="שאלות נפוצות" icon={<ListChecks className="h-4 w-4" />}>
@@ -444,6 +477,8 @@ function DealPage() {
                 ))}
               </ul>
             </section>
+
+            <ConciergeClosing deal={deal} peers={peers} />
           </main>
 
           <aside className="hidden lg:block">
