@@ -102,7 +102,22 @@ export function explainDeal(deal: Deal, peers: Deal[] = []): DealExplanation {
     deal.board === "all-inclusive" ? "מתאים למי שמעדיף תקציב סגור מראש" : null,
   ]);
 
+  add("package", "למה החבילה הזו", [
+    `${deal.dates.nights} לילות · ${deal.people} נוסעים · ${boardLabels[deal.board]}`,
+    deal.includes.length > 0 ? `כלול בחבילה: ${deal.includes.slice(0, 4).join(" · ")}` : null,
+    "טיסות ומלון נרכשים כחבילה אחת — הרכיבים מתומחרים יחד ולא בנפרד.",
+  ]);
+
+  add("now", "למה עכשיו", [
+    inSeason ? "התאריכים נופלים בעונה המומלצת ביעד לפי הקטלוג" : null,
+    deal.discountPct >= 5 ? `הספק מציג הנחה של ${deal.discountPct}% ממחיר המחירון` : null,
+    deal.price.availability === "limited" ? "הזמינות מסומנת כמוגבלת אצל הספק" : null,
+    deal.price.availability === "sold-out" ? "החבילה מסומנת כאזלה אצל הספק" : null,
+    `הצעת המחיר נבדקה לאחרונה ותקפה ל-${Math.round(deal.price.ttlSeconds / 60)} דקות ממועד הבדיקה`,
+  ]);
+
   add("pros", "יתרונות", [
+
     direct ? "טיסה ישירה" : null,
     deal.board !== "room-only" ? `${boardLabels[deal.board]} כלול` : null,
     deal.freeCancellation ? "ביטול חינם" : null,
