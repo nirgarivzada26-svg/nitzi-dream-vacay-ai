@@ -35,7 +35,8 @@ export interface ItinerarySlot {
 
 export interface ItineraryDay {
   day: number;
-  date: string; // ISO date
+  /** ISO date, or null when the offer has no parsable start date. */
+  date: string | null;
   label: string;
   slots: ItinerarySlot[];
 }
@@ -47,10 +48,11 @@ const hhmm = (iso: string) => {
     : `${String(d.getUTCHours()).padStart(2, "0")}:${String(d.getUTCMinutes()).padStart(2, "0")}`;
 };
 
-const addDays = (iso: string, n: number) => {
-  const d = new Date(`${iso}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + n);
-  return d.toISOString().slice(0, 10);
+const addDays = (iso: string, n: number): string | null => {
+  const base = new Date(iso.length <= 10 ? `${iso}T00:00:00Z` : iso);
+  if (Number.isNaN(base.getTime())) return null;
+  base.setUTCDate(base.getUTCDate() + n);
+  return base.toISOString().slice(0, 10);
 };
 
 const has = (dest: Destination, ...keys: string[]) =>

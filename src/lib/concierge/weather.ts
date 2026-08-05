@@ -51,7 +51,8 @@ export function weatherSummary(dest: Destination): WeatherFact[] {
 /** Whether the trip dates fall inside the destination's recommended months. */
 export function inBestSeason(dest: Destination, startISO: string): boolean | null {
   if (dest.bestTravelMonths.length === 0) return null;
-  const m = new Date(`${startISO}T00:00:00Z`).getUTCMonth() + 1;
-  if (Number.isNaN(m)) return null;
+  const d = new Date(startISO.length <= 10 ? `${startISO}T00:00:00Z` : startISO);
+  if (Number.isNaN(d.getTime())) return null;
+  const m = d.getUTCMonth() + 1;
   return dest.bestTravelMonths.includes(m);
 }

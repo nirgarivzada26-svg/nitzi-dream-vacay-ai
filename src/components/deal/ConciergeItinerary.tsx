@@ -30,7 +30,7 @@ export function ConciergeItinerary({ deal }: { deal: Deal }) {
                 </span>
                 <span className="text-sm font-black text-foreground">{d.label}</span>
                 <span className="flex items-center gap-1 text-[11px] font-semibold text-muted-foreground">
-                  <CalendarDays className="h-3 w-3" /> {d.date}
+                  <CalendarDays className="h-3 w-3" /> {d.date ?? "תאריך לא זמין"}
                 </span>
               </span>
               <ChevronDown
