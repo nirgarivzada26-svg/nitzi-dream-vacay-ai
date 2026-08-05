@@ -383,7 +383,25 @@ function DestinationPage() {
               </div>
             </section>
 
+            {dest.latitude !== null && dest.longitude !== null && (
+              <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
+                <h2 className="flex items-center gap-2 p-5 pb-3 text-lg font-black">
+                  <MapPin className="h-4 w-4 text-primary" /> מפה
+                </h2>
+                <iframe
+                  title={`מפה של ${dest.name}`}
+                  loading="lazy"
+                  className="h-64 w-full border-0"
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${dest.longitude - 0.15}%2C${dest.latitude - 0.12}%2C${dest.longitude + 0.15}%2C${dest.latitude + 0.12}&layer=mapnik&marker=${dest.latitude}%2C${dest.longitude}`}
+                />
+                <p className="px-5 py-3 text-[11px] font-bold text-muted-foreground">
+                  {dest.latitude.toFixed(4)}, {dest.longitude.toFixed(4)} · OpenStreetMap
+                </p>
+              </section>
+            )}
+
             {nearby.length > 0 && (
+
               <section className="rounded-3xl border border-border bg-card p-5 shadow-soft">
                 <h2 className="text-lg font-black">יעדים נוספים ב{dest.region}</h2>
                 <ul className="mt-3 grid gap-2">
