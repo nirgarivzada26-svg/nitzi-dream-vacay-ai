@@ -301,7 +301,25 @@ function DealPage() {
             />
             {revalidation && <RevalidationNote res={revalidation} />}
 
-            <DealExplanation deal={deal} peers={peers} />
+            <DealExplanation
+              deal={deal}
+              peers={peers}
+              defaultOpen
+              title="למה זו הבחירה של NITZI?"
+            />
+
+            <Section title="ניקוד NITZI — פירוט מלא" icon={<Sparkles className="h-4 w-4" />}>
+              <ScoreBreakdownPanel breakdown={scores} />
+            </Section>
+
+            <Section title="השוואה לחלופות" icon={<Scale className="h-4 w-4" />}>
+              <DealComparison comparisons={comparisons} />
+            </Section>
+
+            <Section title="האם זה זמן טוב להזמין?" icon={<Clock className="h-4 w-4" />}>
+              <BookTimingCard timing={timing} />
+            </Section>
+
 
             <Section title="פרטי הטיסה" icon={<Plane className="h-4 w-4" />}>
               <DealFlightSection
