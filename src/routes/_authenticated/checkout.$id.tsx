@@ -93,7 +93,6 @@ function CheckoutPage() {
     meals: false,
   });
   const [payMethod, setPayMethod] = useState<"card" | "apple" | "google">("card");
-  const [card, setCard] = useState({ number: "", name: "", expiry: "", cvc: "" });
 
   useEffect(() => {
     let alive = true;
@@ -169,12 +168,10 @@ function CheckoutPage() {
     ) &&
     /\S+@\S+\.\S+/.test(contact.email) &&
     contact.phone.length >= 9;
-  const paymentValid =
-    payMethod !== "card" ||
-    (card.number.replace(/\s/g, "").length >= 14 &&
-      card.name &&
-      card.expiry &&
-      card.cvc.length >= 3);
+  // No card details are collected in this app — charging (when a live
+  // payment provider is configured) happens through the provider directly.
+  // Method selection alone is always a valid choice.
+  const paymentValid = true;
 
   const confirm = async () => {
     setBusy(true);
@@ -407,7 +404,8 @@ function CheckoutPage() {
               <section>
                 <h1 className="text-2xl font-black text-foreground sm:text-3xl">תשלום</h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  בגרסת ה-MVP לא מבוצע חיוב אמיתי.
+                  פרטי כרטיס אשראי אינם נאספים באתר. החיוב מתבצע ישירות מול ספק הסליקה בעת אישור
+                  ההזמנה.
                 </p>
                 <div className="mt-6 grid gap-3 sm:grid-cols-3">
                   {(
@@ -430,30 +428,6 @@ function CheckoutPage() {
                     </button>
                   ))}
                 </div>
-                {payMethod === "card" && (
-                  <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                    <Field
-                      label="מספר כרטיס"
-                      value={card.number}
-                      onChange={(v) => setCard((c) => ({ ...c, number: v }))}
-                    />
-                    <Field
-                      label="שם בעל הכרטיס"
-                      value={card.name}
-                      onChange={(v) => setCard((c) => ({ ...c, name: v }))}
-                    />
-                    <Field
-                      label="תוקף (MM/YY)"
-                      value={card.expiry}
-                      onChange={(v) => setCard((c) => ({ ...c, expiry: v }))}
-                    />
-                    <Field
-                      label="CVC"
-                      value={card.cvc}
-                      onChange={(v) => setCard((c) => ({ ...c, cvc: v }))}
-                    />
-                  </div>
-                )}
                 {error && (
                   <div className="mt-4 rounded-2xl bg-rose-50 p-3 text-[12px] font-bold text-rose-800">
                     {error}

@@ -42,12 +42,32 @@ export const adminMe = createServerFn({ method: "GET" })
     };
   });
 
-/** First signed-in user may claim super admin while no staff exists. */
+/**
+ * First signed-in user may claim super admin while no staff exists —
+ * but ONLY when an operator has explicitly opted in via
+ * ADMIN_BOOTSTRAP_ENABLED=true. Without that flag, an unrelated visitor who
+ * finds /admin before the intended owner does could otherwise silently
+ * become super_admin on a fresh deployment. Set the flag for the first
+ * deploy/claim, then unset it (or leave it unset going forward — the DB-side
+ * advisory-locked claim_super_admin RPC already refuses a second claim once
+ * any staff row exists, so this flag only matters for that narrow window).
+ */
+export function bootstrapEnabled(): boolean {
+  return (process.env.ADMIN_BOOTSTRAP_ENABLED ?? "").toLowerCase() === "true";
+}
+
 export const claimSuperAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ ok: true }> => {
     const m = await import("./admin.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    if (!bootstrapEnabled()) {
+      throw new m.AdminError(
+        "בוטסטראפ מנהל כבוי. יש להגדיר את משתנה הסביבה ADMIN_BOOTSTRAP_ENABLED=true זמנית כדי לתפוס הרשאת סופר אדמין ראשונה, ולאחר מכן לכבות אותו.",
+      );
+    }
+
     // Atomic bootstrap: the DB takes an advisory lock and refuses a second claim,
     // so two concurrent requests can never both become super admin.
     const { data: claimed, error } = await supabaseAdmin.rpc("claim_super_admin", {
