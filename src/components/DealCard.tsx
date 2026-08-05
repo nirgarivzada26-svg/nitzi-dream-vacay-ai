@@ -1,16 +1,28 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { BadgeCheck, Clock, Moon, Plane, Star } from "lucide-react";
 import { boardLabels, type Deal } from "@/lib/deals";
 import { DestinationImage } from "@/components/DestinationImage";
 import { SmartPriceBadge } from "@/components/SmartPriceBadge";
 import { DealCardActions } from "@/components/DealCardActions";
+import { DealVariants } from "@/components/DealVariants";
 
 const fmt = (n: number) => `₪${Math.round(n).toLocaleString()}`;
 const fmtDate = (iso: string) =>
   new Date(iso).toLocaleDateString("he-IL", { day: "2-digit", month: "short" });
 
-export function DealCard({ deal, fluid = false }: { deal: Deal; fluid?: boolean }) {
+export function DealCard({
+  deal,
+  fluid = false,
+  variants = [],
+}: {
+  deal: Deal;
+  fluid?: boolean;
+  /** Other canonical offers for the same destination. */
+  variants?: Deal[];
+}) {
   const d = deal;
+  const [variantsOpen, setVariantsOpen] = useState(false);
   return (
     <div
       className={`group relative ${
@@ -98,6 +110,24 @@ export function DealCard({ deal, fluid = false }: { deal: Deal; fluid?: boolean 
         </div>
       </div>
       </Link>
+
+      {variants.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setVariantsOpen(true)}
+          className="mt-2 w-full rounded-2xl border border-dashed border-border bg-muted/40 px-3 py-2 text-[11px] font-black text-muted-foreground transition hover:border-primary/50 hover:text-primary"
+        >
+          עוד {variants.length} אפשרויות ליעד הזה
+        </button>
+      )}
+
+      {variantsOpen && (
+        <DealVariants
+          destinationName={d.destination.name}
+          deals={[d, ...variants]}
+          onClose={() => setVariantsOpen(false)}
+        />
+      )}
     </div>
 
   );
