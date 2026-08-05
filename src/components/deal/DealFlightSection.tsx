@@ -1,4 +1,4 @@
-import { Baggage, Clock, Plane } from "lucide-react";
+import { Briefcase, Clock, Plane } from "lucide-react";
 import type { Deal } from "@/lib/deals";
 import type { FlightAlternative } from "@/lib/deal-alternatives";
 import type { VerificationPresentation } from "@/lib/deal-verification";
@@ -88,7 +88,7 @@ export function DealFlightSection({
         <Fact
           label="כבודת יד"
           value={alt.carryOnIncluded ? "כלולה" : "בתשלום"}
-          icon={<Baggage className="h-3.5 w-3.5" aria-hidden />}
+          icon={<Briefcase className="h-3.5 w-3.5" aria-hidden />}
         />
         <Fact
           label="מזוודה למטען"
