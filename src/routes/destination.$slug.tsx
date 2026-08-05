@@ -69,6 +69,34 @@ export const Route = createFileRoute("/destination/$slug")({
 
 const fmtILS = (n: number) => `₪${Math.round(n).toLocaleString("he-IL")}`;
 
+const MONTHS_HE = [
+  "ינואר",
+  "פברואר",
+  "מרץ",
+  "אפריל",
+  "מאי",
+  "יוני",
+  "יולי",
+  "אוגוסט",
+  "ספטמבר",
+  "אוקטובר",
+  "נובמבר",
+  "דצמבר",
+];
+
+const CATEGORY_HE: Record<string, string> = {
+  beach: "חופים",
+  city: "עיר",
+  island: "אי",
+  romantic: "רומנטי",
+  family: "משפחות",
+  friends: "חברים",
+  nightlife: "חיי לילה",
+  nature: "טבע",
+  adventure: "הרפתקאות",
+};
+
+
 /** Facts we can state because they come from the catalog row. */
 function Fact({
   icon: Icon,
