@@ -289,3 +289,41 @@ export function getSecretDeal(catalog: Destination[]): { deal: Deal; nextRotatio
   if (!deal) return null;
   return { deal, nextRotationAt: new Date((slot + 1) * slotMs) };
 }
+
+/* ------------------------------------------------------------------ *
+ * Canonical grouping
+ *
+ * Every offer lives under one canonical record id (`slug` or `slug~vN`)
+ * and one canonical route: /deal/:id. A "group" is all the offers that
+ * belong to the same destination, so the UI can show ONE card plus a
+ * variation selector instead of many near-identical cards.
+ * ------------------------------------------------------------------ */
+
+export interface DealGroup {
+  /** Canonical destination slug the group is keyed by. */
+  key: string;
+  /** The offer we surface on the card. */
+  main: Deal;
+  /** Other canonical offers for the same destination (never duplicates). */
+  variants: Deal[];
+}
+
+/** Groups deals by destination, keeping the given order for the main offer. */
+export function groupDeals(deals: Deal[]): DealGroup[] {
+  const map = new Map<string, Deal[]>();
+  for (const d of deals) {
+    const list = map.get(d.destination.slug) ?? [];
+    list.push(d);
+    map.set(d.destination.slug, list);
+  }
+  return Array.from(map.entries()).map(([key, list]) => ({
+    key,
+    main: list[0],
+    variants: list.slice(1),
+  }));
+}
+
+/** All canonical offers for one destination (main first). */
+export function dealVariantsFor(slug: string, catalog: Destination[], variants = 3): Deal[] {
+  return listDeals(catalog, variants).filter((d) => d.destination.slug === slug);
+}

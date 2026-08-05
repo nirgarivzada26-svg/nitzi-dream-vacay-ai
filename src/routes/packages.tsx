@@ -5,7 +5,21 @@ import { TopNav } from "@/components/TopNav";
 import { Footer } from "@/components/Footer";
 import { DealCard } from "@/components/DealCard";
 import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
-import { listDeals } from "@/lib/deals";
+import { groupDeals, listDeals, type Deal } from "@/lib/deals";
+
+type SortKey = "value" | "price" | "discount" | "soon";
+
+interface PackagesSearch {
+  country?: string;
+  region?: string;
+  board?: "all-inclusive";
+  stars?: number;
+  beach?: boolean;
+  direct?: boolean;
+  sort?: SortKey;
+}
+
+const SORTS: SortKey[] = ["value", "price", "discount", "soon"];
 
 export const Route = createFileRoute("/packages")({
   head: () => ({
@@ -25,22 +39,35 @@ export const Route = createFileRoute("/packages")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  validateSearch: (raw: Record<string, unknown>): PackagesSearch => ({
+    country: typeof raw.country === "string" ? raw.country : undefined,
+    region: typeof raw.region === "string" ? raw.region : undefined,
+    board: raw.board === "all-inclusive" ? "all-inclusive" : undefined,
+    stars: Number(raw.stars) > 0 ? Number(raw.stars) : undefined,
+    beach: raw.beach === true || raw.beach === "true" ? true : undefined,
+    direct: raw.direct === true || raw.direct === "true" ? true : undefined,
+    sort: SORTS.includes(raw.sort as SortKey) ? (raw.sort as SortKey) : undefined,
+  }),
   loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
   component: PackagesPage,
 });
 
 const hasPool = (note: string) => /בריכ|pool/i.test(note);
 
+const valueScore = (d: Deal) => d.hotel.guestRating * 100 - d.price.perPerson / 50;
+
 function PackagesPage() {
   const catalog = useDestinations();
+  const search = Route.useSearch();
   const all = useMemo(() => listDeals(catalog, 3), [catalog]);
 
   const [maxPrice, setMaxPrice] = useState(15000);
-  const [country, setCountry] = useState("all");
-  const [minStars, setMinStars] = useState(0);
+  const [country, setCountry] = useState(search.country ?? "all");
+  const [minStars, setMinStars] = useState(search.stars ?? 0);
   const [pool, setPool] = useState(false);
-  const [allInclusive, setAllInclusive] = useState(false);
-  const [nearBeach, setNearBeach] = useState(false);
+  const [allInclusive, setAllInclusive] = useState(search.board === "all-inclusive");
+  const [nearBeach, setNearBeach] = useState(Boolean(search.beach));
+  const [directOnly, setDirectOnly] = useState(Boolean(search.direct));
 
   const countries = useMemo(
     () => Array.from(new Set(all.map((d) => d.destination.country))).sort(),
@@ -49,6 +76,8 @@ function PackagesPage() {
 
   const filtered = all.filter((d) => {
     if (d.price.perPerson > maxPrice) return false;
+    if (search.region && d.destination.region !== search.region) return false;
+    if (directOnly && (d.outbound.stops > 0 || d.inbound.stops > 0)) return false;
     if (country !== "all" && d.destination.country !== country) return false;
     if (minStars && d.hotel.stars < minStars) return false;
     if (pool && !hasPool(d.hotel.note)) return false;
@@ -56,6 +85,22 @@ function PackagesPage() {
     if (nearBeach && !d.destination.matches.includes("beach")) return false;
     return true;
   });
+
+  const sorted = [...filtered].sort((a, b) => {
+    switch (search.sort) {
+      case "price":
+        return a.price.perPerson - b.price.perPerson;
+      case "discount":
+        return b.discountPct - a.discountPct;
+      case "soon":
+        return +new Date(a.dates.start) - +new Date(b.dates.start);
+      default:
+        return valueScore(b) - valueScore(a);
+    }
+  });
+
+  // One canonical card per destination; the rest are offered as variations.
+  const groups = groupDeals(sorted);
 
   return (
     <div dir="rtl" className="min-h-screen bg-background">
@@ -151,22 +196,28 @@ function PackagesPage() {
               label="🌊 קרוב לים"
               icon={<Waves className="h-3 w-3" />}
             />
+            <Toggle on={directOnly} onClick={() => setDirectOnly(!directOnly)} label="🛫 טיסה ישירה" />
           </div>
         </section>
 
         <p className="mt-6 text-sm font-bold text-muted-foreground">
-          {filtered.length} חבילות תואמות
+          {groups.length} יעדים · {filtered.length} חבילות תואמות
         </p>
 
-        {filtered.length === 0 ? (
+        {groups.length === 0 ? (
           <div className="mt-4 flex items-center gap-3 rounded-3xl border border-dashed border-border bg-muted/40 p-6 text-sm text-muted-foreground">
             <Info className="h-4 w-4 shrink-0" />
             אין חבילות שתואמות את הסינון הזה. נסו להרחיב את התקציב או להסיר פילטר.
           </div>
         ) : (
           <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filtered.map((deal) => (
-              <DealCard key={deal.id} deal={deal} fluid />
+            {groups.map((group) => (
+              <DealCard
+                key={group.key}
+                deal={group.main}
+                variants={group.variants}
+                fluid
+              />
             ))}
           </div>
         )}
