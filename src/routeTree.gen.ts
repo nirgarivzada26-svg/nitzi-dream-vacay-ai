@@ -25,6 +25,7 @@ import { Route as HotelIdRouteImport } from './routes/hotel.$id'
 import { Route as FlightIdRouteImport } from './routes/flight.$id'
 import { Route as DestinationSlugRouteImport } from './routes/destination.$slug'
 import { Route as DealIdRouteImport } from './routes/deal.$id'
+import { Route as BookingRequestDealIdRouteImport } from './routes/booking-request.$dealId'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AiConversationIdRouteImport } from './routes/ai.$conversationId'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
@@ -125,6 +126,11 @@ const DestinationSlugRoute = DestinationSlugRouteImport.update({
 const DealIdRoute = DealIdRouteImport.update({
   id: '/deal/$id',
   path: '/deal/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookingRequestDealIdRoute = BookingRequestDealIdRouteImport.update({
+  id: '/booking-request/$dealId',
+  path: '/booking-request/$dealId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -264,6 +270,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AuthenticatedAccountRoute
   '/ai/$conversationId': typeof AiConversationIdRoute
   '/api/chat': typeof ApiChatRoute
+  '/booking-request/$dealId': typeof BookingRequestDealIdRoute
   '/deal/$id': typeof DealIdRoute
   '/destination/$slug': typeof DestinationSlugRoute
   '/flight/$id': typeof FlightIdRoute
@@ -302,6 +309,7 @@ export interface FileRoutesByTo {
   '/account': typeof AuthenticatedAccountRoute
   '/ai/$conversationId': typeof AiConversationIdRoute
   '/api/chat': typeof ApiChatRoute
+  '/booking-request/$dealId': typeof BookingRequestDealIdRoute
   '/deal/$id': typeof DealIdRoute
   '/destination/$slug': typeof DestinationSlugRoute
   '/flight/$id': typeof FlightIdRoute
@@ -343,6 +351,7 @@ export interface FileRoutesById {
   '/_authenticated/account': typeof AuthenticatedAccountRoute
   '/ai/$conversationId': typeof AiConversationIdRoute
   '/api/chat': typeof ApiChatRoute
+  '/booking-request/$dealId': typeof BookingRequestDealIdRoute
   '/deal/$id': typeof DealIdRoute
   '/destination/$slug': typeof DestinationSlugRoute
   '/flight/$id': typeof FlightIdRoute
@@ -384,6 +393,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/ai/$conversationId'
     | '/api/chat'
+    | '/booking-request/$dealId'
     | '/deal/$id'
     | '/destination/$slug'
     | '/flight/$id'
@@ -422,6 +432,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/ai/$conversationId'
     | '/api/chat'
+    | '/booking-request/$dealId'
     | '/deal/$id'
     | '/destination/$slug'
     | '/flight/$id'
@@ -462,6 +473,7 @@ export interface FileRouteTypes {
     | '/_authenticated/account'
     | '/ai/$conversationId'
     | '/api/chat'
+    | '/booking-request/$dealId'
     | '/deal/$id'
     | '/destination/$slug'
     | '/flight/$id'
@@ -501,6 +513,7 @@ export interface RootRouteChildren {
   SupportRoute: typeof SupportRoute
   AiConversationIdRoute: typeof AiConversationIdRoute
   ApiChatRoute: typeof ApiChatRoute
+  BookingRequestDealIdRoute: typeof BookingRequestDealIdRoute
   DealIdRoute: typeof DealIdRoute
   DestinationSlugRoute: typeof DestinationSlugRoute
   FlightIdRoute: typeof FlightIdRoute
@@ -624,6 +637,13 @@ declare module '@tanstack/react-router' {
       path: '/deal/$id'
       fullPath: '/deal/$id'
       preLoaderRoute: typeof DealIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/booking-request/$dealId': {
+      id: '/booking-request/$dealId'
+      path: '/booking-request/$dealId'
+      fullPath: '/booking-request/$dealId'
+      preLoaderRoute: typeof BookingRequestDealIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -852,6 +872,7 @@ const rootRouteChildren: RootRouteChildren = {
   SupportRoute: SupportRoute,
   AiConversationIdRoute: AiConversationIdRoute,
   ApiChatRoute: ApiChatRoute,
+  BookingRequestDealIdRoute: BookingRequestDealIdRoute,
   DealIdRoute: DealIdRoute,
   DestinationSlugRoute: DestinationSlugRoute,
   FlightIdRoute: FlightIdRoute,
