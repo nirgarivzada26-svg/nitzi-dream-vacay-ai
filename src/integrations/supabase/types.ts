@@ -208,7 +208,6 @@ export type Database = {
           id: string
           idempotency_key: string | null
           nights: number
-          payment_status: string
           people: number
           price_per_person: number
           refund_status: string | null
@@ -229,7 +228,6 @@ export type Database = {
           id?: string
           idempotency_key?: string | null
           nights: number
-          payment_status?: string
           people: number
           price_per_person: number
           refund_status?: string | null
@@ -250,7 +248,6 @@ export type Database = {
           id?: string
           idempotency_key?: string | null
           nights?: number
-          payment_status?: string
           people?: number
           price_per_person?: number
           refund_status?: string | null
