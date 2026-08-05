@@ -451,7 +451,15 @@ export async function buildPackages(): Promise<AdminPackageRow[]> {
       active: dest.hasOffers,
       hasOffers: dest.hasOffers,
       nitziScore: deal ? Math.round(deal.hotel.guestRating * 10) : 0,
-      smartPrice: verdict ? (verdict.level === "normal" ? "fair" : verdict.level) : "unknown",
+      smartPrice: verdict
+        ? verdict.level === "normal" || verdict.level === "good"
+          ? "fair"
+          : verdict.level === "expensive"
+            ? "wait"
+            : verdict.level === "great"
+              ? "great"
+              : "unknown"
+        : "unknown",
       views,
       orders,
       conversionRate: views ? Number(((orders / views) * 100).toFixed(1)) : 0,

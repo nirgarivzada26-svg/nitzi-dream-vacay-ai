@@ -18,6 +18,8 @@ export interface DealPrice {
   verifiedAt: string; // ISO
   availability: Availability;
   source: string; // provider id
+  /** Where the number came from. Demo offers must never be shown as live-verified. */
+  mode: "demo" | "catalog" | "live";
   ttlSeconds: number; // how long this quote is trusted
 }
 
@@ -182,7 +184,8 @@ function buildDeal(dest: Destination, opts?: { secret?: boolean; seed?: string }
       currency: "ILS",
       verifiedAt: new Date().toISOString(),
       availability: r() > 0.85 ? "limited" : "available",
-      source: "NITZI Verified",
+      source: "NITZI Demo Catalog",
+      mode: "demo",
       ttlSeconds: 15 * 60,
     },
     includes: [

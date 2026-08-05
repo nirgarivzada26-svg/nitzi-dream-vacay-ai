@@ -3,51 +3,72 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
-  BadgeCheck,
   Calendar,
-  CheckCircle2,
+  ChevronDown,
   Clock,
+  Heart,
+  ListChecks,
   MapPin,
   Plane,
   Share2,
   Shield,
-  ShieldCheck,
   Sparkles,
   Star,
-  Timer,
-  Utensils,
+  Users,
   Wallet,
-  XCircle,
-  RefreshCw,
-  Heart,
-  Lock,
 } from "lucide-react";
 import { NitziLogo } from "@/components/NitziLogo";
 import { SignInModal } from "@/components/SignInModal";
-import { getDeal, revalidateDeal, type Deal, type RevalidationResult } from "@/lib/deals";
+import {
+  boardLabels,
+  getDeal,
+  revalidateDeal,
+  type Deal,
+  type RevalidationResult,
+} from "@/lib/deals";
 import { setAuthIntent, useAuth } from "@/lib/auth";
 import { addFavorite, isDealFavorited, removeFavorite } from "@/lib/user-data";
 import { TripTimeline } from "@/components/TripTimeline";
-import { SimilarPicks } from "@/components/SimilarPicks";
-import { RelatedDeals } from "@/components/RelatedDeals";
 import { recordViewedDeal } from "@/lib/recently-viewed";
-import { WhyNitziButton } from "@/components/WhyNitziButton";
 import { SmartPriceBadge } from "@/components/SmartPriceBadge";
 import { PriceAlertButton } from "@/components/PriceAlertButton";
-
 import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
 import { DestinationImage } from "@/components/DestinationImage";
+import { VerificationBadge } from "@/components/deal/VerificationBadge";
+import { DealExplanation } from "@/components/deal/DealExplanation";
+import { DealFlightSection } from "@/components/deal/DealFlightSection";
+import { DealFlightAlternatives } from "@/components/deal/DealFlightAlternatives";
+import { DealMap } from "@/components/deal/DealMap";
+import { DealInclusions } from "@/components/deal/DealInclusions";
+import { DealPriceBreakdown } from "@/components/deal/DealPriceBreakdown";
+import { verificationFor } from "@/lib/deal-verification";
+import { breakdownFor } from "@/lib/deal-pricing";
+import { inclusionsFor } from "@/lib/deal-inclusions";
+import {
+  RECOMMENDED_ALTERNATIVE_ID,
+  applyAlternative,
+  findAlternative,
+} from "@/lib/deal-alternatives";
+import { nitziScore } from "@/lib/deal-score";
+import { dealVariantsFor } from "@/lib/deals";
+import { SIMILAR_LABEL, similarDeals } from "@/lib/similar-deals";
 
 export const Route = createFileRoute("/deal/$id")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    flight: typeof s.flight === "string" ? s.flight : undefined,
+  }),
   head: ({ params }) => ({
     meta: [
       { title: `דיל ל${decodeURIComponent(params.id)} — NITZI` },
       {
         name: "description",
-        content: `חבילת נופש מלאה ל${decodeURIComponent(params.id)}: טיסות, מלון, אטרקציות ומחיר מאומת.`,
+        content: `חבילת נופש מלאה ל${decodeURIComponent(params.id)}: טיסות, מלון, מסלול, פירוט מחיר מלא ומצב אימות שקוף.`,
       },
       { property: "og:title", content: `דיל ל${decodeURIComponent(params.id)} — NITZI` },
-      { property: "og:description", content: "טיסה + מלון + מסלול. מחיר נבדק ואומת מול הספק." },
+      {
+        property: "og:description",
+        content: "טיסה + מלון + מסלול, עם פירוט מחיר מלא ומצב אימות שקוף.",
+      },
       { property: "og:type", content: "product" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -56,29 +77,12 @@ export const Route = createFileRoute("/deal/$id")({
   component: DealPage,
 });
 
-function fmtILS(n: number) {
-  return `₪${Math.round(n).toLocaleString()}`;
-}
-function fmtDate(iso: string) {
-  return new Date(iso).toLocaleDateString("he-IL", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-function fmtTime(iso: string) {
-  const d = new Date(iso);
-  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-}
-function fmtDur(min: number) {
-  const h = Math.floor(min / 60),
-    m = min % 60;
-  return `${h}ש׳ ${m ? `${m}ד׳` : ""}`.trim();
-}
-// `now` is null until the component has mounted, so the server render and the
-// first client render produce identical text (no hydration mismatch).
-function agoLabel(iso: string, now: number | null) {
-  if (now === null) return "עכשיו";
+const fmtILS = (n: number) => `₪${Math.round(n).toLocaleString("he-IL")}`;
+const fmtDate = (iso: string) =>
+  new Date(iso).toLocaleDateString("he-IL", { day: "2-digit", month: "short", year: "numeric" });
+
+function agoLabel(iso: string | null, now: number | null) {
+  if (!iso || now === null) return "עכשיו";
   const s = Math.max(1, Math.floor((now - new Date(iso).getTime()) / 1000));
   if (s < 60) return `לפני ${s} שנ׳`;
   const m = Math.floor(s / 60);
@@ -88,39 +92,40 @@ function agoLabel(iso: string, now: number | null) {
 
 function DealPage() {
   const { id } = Route.useParams();
+  const { flight } = Route.useSearch();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { isAuthenticated } = useAuth();
   const catalog = useDestinations();
-  const [deal, setDeal] = useState<Deal | null>(() => getDeal(id, catalog));
-  const [refreshing, setRefreshing] = useState(false);
+
+  const [refreshed, setRefreshed] = useState<Deal | null>(null);
   const [revalidation, setRevalidation] = useState<RevalidationResult | null>(null);
-  const [signInOpen, setSignInOpen] = useState(false);
-  const [pendingAction, setPendingAction] = useState<null | "save" | "book">(null);
+  const [refreshing, setRefreshing] = useState(false);
   const [now, setNow] = useState<number | null>(null);
+  const [signInOpen, setSignInOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"save" | "book" | null>(null);
 
-  useEffect(() => {
-    if (deal) recordViewedDeal(deal.id);
-  }, [deal?.id]);
-
-  useEffect(() => {
-    setNow(Date.now());
-    const t = setInterval(() => setNow(Date.now()), 30000);
-    return () => clearInterval(t);
-  }, []);
+  const canonical = useMemo(() => getDeal(id, catalog), [id, catalog]);
+  const selectedFlightId = flight ?? RECOMMENDED_ALTERNATIVE_ID;
+  const configured = useMemo(
+    () => (canonical ? applyAlternative(refreshed ?? canonical, selectedFlightId) : null),
+    [canonical, refreshed, selectedFlightId],
+  );
 
   const savedQ = useQuery({
-    queryKey: ["fav", id, isAuthenticated],
+    queryKey: ["fav", id],
     queryFn: () => isDealFavorited(id),
     enabled: isAuthenticated,
   });
 
-  if (!deal) {
+  useEffect(() => setNow(Date.now()), []);
+  useEffect(() => {
+    if (configured) recordViewedDeal(configured.id);
+  }, [configured]);
+
+  if (!canonical || !configured) {
     return (
-      <div
-        dir="rtl"
-        className="grid min-h-screen place-items-center bg-background px-6 text-center"
-      >
+      <div dir="rtl" className="grid min-h-screen place-items-center bg-background px-6 text-center">
         <div>
           <h1 className="text-2xl font-black">הדיל לא נמצא</h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -137,29 +142,34 @@ function DealPage() {
     );
   }
 
+  const deal = configured;
   const dest = deal.destination;
-  const priceAgeMs = (now ?? new Date(deal.price.verifiedAt).getTime()) - new Date(deal.price.verifiedAt).getTime();
-  const stale = priceAgeMs > deal.price.ttlSeconds * 1000;
+  const v = verificationFor(deal, now ?? undefined);
+  const alt = findAlternative(canonical, selectedFlightId);
+  const breakdown = breakdownFor(deal);
+  const score = nitziScore(deal);
+  const peers = dealVariantsFor(dest.slug, catalog, 3).filter((d) => d.id !== canonical.id);
+  const related = similarDeals(canonical, catalog);
 
   const refresh = async () => {
     setRefreshing(true);
-    const res = await revalidateDeal(deal);
-    setDeal(res.deal);
+    const res = await revalidateDeal(canonical);
+    setRefreshed(res.deal);
     setRevalidation(res);
     setRefreshing(false);
-    setTimeout(() => setRevalidation(null), 4000);
+    setNow(Date.now());
+    setTimeout(() => setRevalidation(null), 5000);
   };
 
   const toggleSave = async () => {
     if (!isAuthenticated) {
-      setAuthIntent(`/deal/${deal.id}`);
+      setAuthIntent(`/deal/${canonical.id}`);
       setPendingAction("save");
       setSignInOpen(true);
       return;
     }
-    const currently = !!savedQ.data;
     try {
-      if (currently) await removeFavorite(deal.id);
+      if (savedQ.data) await removeFavorite(canonical.id);
       else await addFavorite(deal);
       qc.invalidateQueries({ queryKey: ["fav", id] });
       qc.invalidateQueries({ queryKey: ["favorites"] });
@@ -168,306 +178,297 @@ function DealPage() {
     }
   };
 
-  const startBooking = async () => {
-    if (!isAuthenticated) {
-      setAuthIntent(`/deal/${deal.id}`);
-      setPendingAction("book");
-      setSignInOpen(true);
-      return;
-    }
-    setRefreshing(true);
-    const res = await revalidateDeal(deal);
-    setDeal(res.deal);
-    setRevalidation(res);
-    setRefreshing(false);
-    if (res.status === "sold-out") return;
-    navigate({ to: "/checkout/$id", params: { id: deal.id } });
-  };
+  const goBookingRequest = () =>
+    navigate({
+      to: "/booking-request/$dealId",
+      params: { dealId: canonical.id },
+      search: { flight: selectedFlightId },
+    });
 
-  // Plain computation (not useMemo) — this sits after an early return, so a
-  // hook here would break the rules-of-hooks ordering.
-  const availabilityChip =
-    deal.price.availability === "sold-out"
-      ? { text: "אזל המלאי", cls: "bg-rose-100 text-rose-800" }
-      : deal.price.availability === "limited"
-        ? { text: "מקומות אחרונים", cls: "bg-amber-100 text-amber-900" }
-        : { text: "זמין להזמנה", cls: "bg-emerald-100 text-emerald-800" };
+  const selectFlight = (altId: string) =>
+    navigate({
+      to: "/deal/$id",
+      params: { id: canonical.id },
+      search: { flight: altId },
+      replace: true,
+    });
 
   return (
-    <div dir="rtl" className="min-h-screen bg-background pb-28">
+    <div dir="rtl" className="min-h-screen overflow-x-hidden bg-background pb-32 lg:pb-12">
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur-lg">
         <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-4 py-3 sm:px-6">
           <button
             onClick={() => navigate({ to: "/" })}
-            className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card"
-            aria-label="חזרה"
+            className="grid h-11 w-11 place-items-center rounded-full border border-border bg-card"
+            aria-label="חזרה לעמוד הבית"
           >
-            <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+            <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden />
           </button>
           <NitziLogo />
           <div className="flex gap-1">
             <button
               onClick={toggleSave}
-              className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card"
-              aria-label="שמור"
+              className="grid h-11 w-11 place-items-center rounded-full border border-border bg-card"
+              aria-label={savedQ.data ? "הסר מהשמורים" : "שמור דיל"}
             >
-              <Heart className={`h-4 w-4 ${savedQ.data ? "fill-rose-500 text-rose-500" : ""}`} />
+              <Heart
+                className={`h-4 w-4 ${savedQ.data ? "fill-rose-500 text-rose-500" : ""}`}
+                aria-hidden
+              />
             </button>
             <button
               onClick={() => {
                 if (navigator.share)
                   navigator.share({ title: dest.name, url: window.location.href }).catch(() => {});
               }}
-              className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card"
-              aria-label="שתף"
+              className="grid h-11 w-11 place-items-center rounded-full border border-border bg-card"
+              aria-label="שתף דיל"
             >
-              <Share2 className="h-4 w-4" />
+              <Share2 className="h-4 w-4" aria-hidden />
             </button>
           </div>
         </div>
       </header>
 
       <div className="mx-auto w-full max-w-[1600px] px-4 pt-4 sm:px-6 lg:pt-6">
-        <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
-          <div className="space-y-5">
-            <section className="relative overflow-hidden rounded-[2rem] shadow-glow animate-fade-up">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_420px]">
+          <main className="min-w-0 space-y-5">
+            <section className="relative overflow-hidden rounded-[2rem] shadow-glow">
               <DestinationImage
                 destination={dest}
-                className="h-[320px] w-full object-cover sm:h-[420px] lg:h-[480px]"
+                className="h-[280px] w-full object-cover sm:h-[420px] lg:h-[480px]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              {deal.secret && (
+              {canonical.secret && (
                 <span className="absolute top-4 right-4 flex items-center gap-1.5 rounded-full bg-gradient-sunset px-3 py-1.5 text-[11px] font-black text-white shadow-glow">
-                  <Sparkles className="h-3.5 w-3.5" /> הדיל הסודי של NITZI
+                  <Sparkles className="h-3.5 w-3.5" aria-hidden /> הדיל הסודי של NITZI
                 </span>
               )}
-              <div className="absolute bottom-0 inset-x-0 p-5 text-white sm:p-6">
+              <div className="absolute inset-x-0 bottom-0 p-5 text-white sm:p-6">
                 <p className="text-[11px] font-bold text-white/85">
                   {dest.country} {dest.emoji}
                 </p>
-                <h1 className="text-3xl font-black leading-tight drop-shadow-md sm:text-4xl lg:text-5xl">
+                <h1 className="text-2xl font-black leading-tight drop-shadow-md sm:text-4xl">
                   {dest.name}
                 </h1>
-                <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/90 sm:text-base">
-                  {deal.title}
-                </p>
+                <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/90">{deal.title}</p>
               </div>
             </section>
 
-            <section className="rounded-3xl border border-emerald-200 bg-emerald-50/70 p-4 shadow-soft animate-fade-up">
-              <div className="flex flex-wrap items-center gap-3 text-sm">
-                <div className="flex items-center gap-2 text-emerald-900">
-                  <BadgeCheck className="h-5 w-5" />
-                  <span className="font-black">מחיר נבדק ואומת</span>
-                </div>
-                <span className="text-[11px] text-emerald-800">
-                  מקור: {deal.price.source} · עודכן {agoLabel(deal.price.verifiedAt, now)}
-                </span>
-                <span
-                  className={`ms-auto rounded-full px-2.5 py-1 text-[11px] font-bold ${availabilityChip.cls}`}
-                >
-                  {availabilityChip.text}
-                </span>
-                <button
-                  onClick={refresh}
-                  disabled={refreshing}
-                  className="flex items-center gap-1 rounded-full border border-emerald-200 bg-white px-3 py-1 text-[11px] font-bold text-emerald-900 transition hover:bg-emerald-100 disabled:opacity-50"
-                >
-                  <RefreshCw className={`h-3 w-3 ${refreshing ? "animate-spin" : ""}`} /> בדוק מחיר
-                  עכשיו
-                </button>
-              </div>
-              {stale && (
-                <p className="mt-2 flex items-center gap-1 text-[11px] font-bold text-amber-800">
-                  <Timer className="h-3 w-3" /> ההצעה מוצגת מעל 15 דקות — לחץ "בדוק מחיר עכשיו"
-                  לאימות מחודש.
-                </p>
-              )}
-              {revalidation && <RevalidationBanner res={revalidation} />}
+            <section className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <Fact icon={<MapPin className="h-3.5 w-3.5" />} label="מלון" value={deal.hotel.name} />
+              <Fact
+                icon={<Star className="h-3.5 w-3.5" />}
+                label="דירוג"
+                value={`${deal.hotel.stars}★ · ${deal.hotel.guestRating.toFixed(1)}/10`}
+              />
+              <Fact
+                icon={<Calendar className="h-3.5 w-3.5" />}
+                label="תאריכים"
+                value={`${fmtDate(deal.dates.start)} → ${fmtDate(deal.dates.end)}`}
+              />
+              <Fact
+                icon={<Users className="h-3.5 w-3.5" />}
+                label="נוסעים ולילות"
+                value={`${deal.people} נוסעים · ${deal.dates.nights} לילות`}
+              />
+              <Fact
+                icon={<Wallet className="h-3.5 w-3.5" />}
+                label="בסיס אירוח"
+                value={boardLabels[deal.board]}
+              />
+              <Fact
+                icon={<Sparkles className="h-3.5 w-3.5" />}
+                label="ניקוד NITZI"
+                value={`${score.value}/100`}
+              />
+              <Fact
+                icon={<Wallet className="h-3.5 w-3.5" />}
+                label="מחיר לאדם"
+                value={fmtILS(deal.price.perPerson)}
+              />
+              <Fact
+                icon={<Clock className="h-3.5 w-3.5" />}
+                label="עודכן"
+                value={agoLabel(deal.price.verifiedAt, now)}
+              />
             </section>
 
-            <Section title="המלון" icon={<MapPin className="h-4 w-4" />}>
-              <div className="flex items-start gap-4">
-                <div className="flex-1">
-                  <h3 className="text-lg font-black text-foreground">{deal.hotel.name}</h3>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                    <Stars n={deal.hotel.stars} />
-                    <span>· {deal.hotel.stars} כוכבים</span>
-                    <span>· דירוג אורחים {deal.hotel.guestRating.toFixed(1)}/10</span>
-                    <span>· {deal.hotel.reviewsCount.toLocaleString()} ביקורות</span>
-                  </div>
-                  <p className="mt-2 text-sm text-foreground">{deal.hotel.note}</p>
-                </div>
-                <div className="grid place-items-center rounded-2xl bg-gradient-sunset px-3 py-2 text-white shadow-glow">
-                  <div className="text-[9px] font-bold uppercase tracking-widest opacity-90">
-                    דירוג
-                  </div>
-                  <div className="text-xl font-black leading-none">
-                    {deal.hotel.guestRating.toFixed(1)}
-                  </div>
-                </div>
-              </div>
+            <VerificationBadge
+              v={v}
+              updatedLabel={agoLabel(deal.price.verifiedAt, now)}
+              onRefresh={refreshing ? undefined : refresh}
+            />
+            {revalidation && <RevalidationNote res={revalidation} />}
+
+            <DealExplanation deal={deal} peers={peers} />
+
+            <Section title="פרטי הטיסה" icon={<Plane className="h-4 w-4" />}>
+              <DealFlightSection
+                deal={deal}
+                alt={alt}
+                verification={v}
+                flightsCents={breakdown.flightsCents + breakdown.taxesCents}
+              />
             </Section>
 
-            <Section title="פרטי הטיסות" icon={<Plane className="h-4 w-4" />}>
-              <FlightLine label="הלוך" f={deal.outbound} />
-              <div className="my-3 h-px bg-border" />
-              <FlightLine label="חזור" f={deal.inbound} />
-            </Section>
-
-            <Section title="תאריכים ומשך" icon={<Calendar className="h-4 w-4" />}>
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <Info label="יציאה" value={fmtDate(deal.dates.start)} />
-                <Info label="חזרה" value={fmtDate(deal.dates.end)} />
-                <Info label="מספר לילות" value={`${deal.dates.nights}`} />
-              </div>
-            </Section>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Section title="מה כלול" icon={<CheckCircle2 className="h-4 w-4" />}>
-                <ul className="space-y-2 text-sm">
-                  {deal.includes.map((i) => (
-                    <li key={i} className="flex gap-2">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" /> {i}
-                    </li>
-                  ))}
-                </ul>
-              </Section>
-              <Section title="מה לא כלול" icon={<XCircle className="h-4 w-4" />}>
-                <ul className="space-y-2 text-sm">
-                  {deal.excludes.map((i) => (
-                    <li key={i} className="flex gap-2">
-                      <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-500" /> {i}
-                    </li>
-                  ))}
-                </ul>
-              </Section>
-            </div>
-
-            <Section title="על המפה" icon={<MapPin className="h-4 w-4" />}>
-              <div className="relative h-52 overflow-hidden rounded-2xl border border-border">
-                <div className="absolute inset-0 bg-gradient-ocean opacity-80" />
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-white text-primary shadow-glow animate-pulse-glow">
-                    <MapPin className="h-5 w-5" />
-                  </div>
-                  <div className="mt-1 text-xs font-black text-white drop-shadow">{dest.name}</div>
-                </div>
-              </div>
+            <Section title="אפשרויות טיסה נוספות" icon={<Plane className="h-4 w-4" />}>
+              <DealFlightAlternatives
+                deal={canonical}
+                selectedId={selectedFlightId}
+                onSelect={(a) => selectFlight(a.id)}
+              />
               <p className="mt-2 text-[11px] text-muted-foreground">
-                מפה אינטראקטיבית תתווסף בגרסה הבאה.
+                בחירת אפשרות אחרת מעדכנת מחיר, כבודה, משך טיסה וניקוד NITZI. הדיל המקורי נשמר ללא
+                שינוי, והבחירה תאומת שוב לפני שליחת בקשת ההזמנה.
               </p>
             </Section>
 
-            <Section title="ציר זמן החופשה" icon={<Sparkles className="h-4 w-4" />}>
+            <Section title="המלון" icon={<MapPin className="h-4 w-4" />}>
+              <h3 className="text-lg font-black">{deal.hotel.name}</h3>
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <span aria-label={`${deal.hotel.stars} כוכבים`} className="inline-flex">
+                  {Array.from({ length: deal.hotel.stars }).map((_, i) => (
+                    <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                  ))}
+                </span>
+                <span>· דירוג אורחים {deal.hotel.guestRating.toFixed(1)}/10</span>
+                <span>· {deal.hotel.reviewsCount.toLocaleString("he-IL")} ביקורות</span>
+                <span>· {boardLabels[deal.board]}</span>
+              </div>
+              <p className="mt-2 text-sm">{deal.hotel.note}</p>
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                צ׳ק-אין ותנאי חדר מדויקים (סוג חדר, נגישות, מתקנים) מאושרים מול הספק לפני ההזמנה.
+                מוצגים כאן רק פרטים הקיימים בנתוני החבילה.
+              </p>
+            </Section>
+
+            <Section title="האזור בקצרה" icon={<MapPin className="h-4 w-4" />}>
+              <DealMap dest={dest} hotelName={deal.hotel.name} />
+            </Section>
+
+            <Section title="מה כלול ומה לא" icon={<ListChecks className="h-4 w-4" />}>
+              <DealInclusions items={inclusionsFor(deal, alt)} />
+            </Section>
+
+            <Section title="פירוט מחיר" icon={<Wallet className="h-4 w-4" />}>
+              <DealPriceBreakdown b={breakdown} />
+              <div className="mt-3">
+                <SmartPriceBadge deal={deal} full />
+              </div>
+            </Section>
+
+            <Section title="מדיניות וביטול" icon={<Shield className="h-4 w-4" />}>
+              <ul className="space-y-2 text-sm">
+                <li>ביטול: {deal.cancellation}</li>
+                <li>
+                  החזר כספי: החזרים מבוצעים לאמצעי התשלום המקורי לאחר אישור הספק. בהזמנת הדגמה לא
+                  מתבצע חיוב ולכן אין החזר.
+                </li>
+                <li>
+                  דרכון ומסמכים: נדרש דרכון בתוקף ל-6 חודשים לפחות מיום היציאה. דרישות ויזה נקבעות
+                  על ידי רשויות היעד — יש לבדוק לפני הנסיעה.
+                </li>
+              </ul>
+            </Section>
+
+            <Section title="מסלול מוצע" icon={<Calendar className="h-4 w-4" />}>
               <TripTimeline
                 destinationName={dest.name}
                 itinerary={dest.itinerary}
-                restaurants={deal.restaurants}
-                attractions={deal.attractions}
+                restaurants={dest.restaurants}
+                attractions={dest.attractions}
               />
             </Section>
 
-            <Section title="אטרקציות מומלצות" icon={<Sparkles className="h-4 w-4" />}>
-              <div className="flex flex-wrap gap-2">
-                {deal.attractions.map((a) => (
-                  <span
-                    key={a}
-                    className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground"
-                  >
-                    ✦ {a}
-                  </span>
-                ))}
-              </div>
+            <Section title="שאלות נפוצות" icon={<ListChecks className="h-4 w-4" />}>
+              <FAQ deal={deal} verificationLabel={v.label} />
             </Section>
 
-            <Section title="מסעדות נבחרות" icon={<Utensils className="h-4 w-4" />}>
-              <ul className="space-y-2 text-sm">
-                {deal.restaurants.map((r) => (
-                  <li key={r} className="flex gap-2">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                    {r}
+            <section>
+              <h2 className="mb-3 text-lg font-black">חבילות דומות</h2>
+              <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                {related.map(({ deal: d, reason }) => (
+                  <li key={d.id}>
+                    <Link
+                      to="/deal/$id"
+                      params={{ id: d.id }}
+                      className="block rounded-2xl border border-border bg-card p-4 shadow-soft transition hover:border-primary/50"
+                    >
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-black">
+                        {SIMILAR_LABEL[reason]}
+                      </span>
+                      <p className="mt-2 text-sm font-black">{d.destination.name}</p>
+                      <p className="text-[12px] text-muted-foreground">{d.hotel.name}</p>
+                      <p className="mt-1 text-sm font-black">
+                        {fmtILS(d.price.perPerson)} <span className="text-[11px]">לאדם</span>
+                      </p>
+                    </Link>
                   </li>
                 ))}
               </ul>
-            </Section>
-
-            <Section title="תנאי ביטול" icon={<Shield className="h-4 w-4" />}>
-              <p className="text-sm text-foreground">{deal.cancellation}</p>
-            </Section>
-
-            <Section title="שקיפות NITZI" icon={<ShieldCheck className="h-4 w-4" />}>
-              <ul className="space-y-2 text-sm text-foreground">
-                <li className="flex gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                  מקור הנתונים: {deal.price.source}
-                </li>
-                <li className="flex gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                  זמן העדכון האחרון: {agoLabel(deal.price.verifiedAt, now)}
-                </li>
-                <li className="flex gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                  סטטוס זמינות: {availabilityChip.text}
-                </li>
-                <li className="flex gap-2">
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                  לפני התשלום נבצע בדיקת מחיר נוספת ונציג לך כל שינוי לפני חיוב.
-                </li>
-              </ul>
-              <div className="mt-3">
-                <WhyNitziButton
-                  score={Math.round(85 + (deal.hotel.guestRating - 8) * 5)}
-                  reasons={[
-                    `מחיר לאדם ${fmtILS(deal.price.perPerson)} — כולל טיסה ומלון.`,
-                    `${deal.dates.nights} לילות ב-${deal.hotel.name} (${deal.hotel.stars}★, דירוג ${deal.hotel.guestRating}/10).`,
-                    `${deal.outbound.stops === 0 ? "טיסה ישירה" : `${deal.outbound.stops} עצירות`} עם ${deal.outbound.airline}.`,
-                    `המחיר אומת ${agoLabel(deal.price.verifiedAt, now)} מול ${deal.price.source} וייבדק שוב לפני חיוב.`,
-                  ]}
-                />
-              </div>
-            </Section>
-
-            <SimilarPicks catalog={catalog} excludeSlug={dest.slug} title="אולי תאהב גם..." />
-          </div>
+            </section>
+          </main>
 
           <aside className="hidden lg:block">
             <div className="sticky top-24 space-y-3">
-              <BookingCard
-                deal={deal}
-                onBook={startBooking}
-                availabilityChip={availabilityChip}
-                refreshing={refreshing}
-                authed={isAuthenticated}
-              />
+              <div className="rounded-3xl border border-border bg-card p-5 shadow-soft">
+                <VerificationBadge v={v} compact />
+                <div className="mt-3">
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                    מחיר לאדם
+                  </div>
+                  <div className="text-4xl font-black">{fmtILS(deal.price.perPerson)}</div>
+                  <div className="text-xs text-muted-foreground">
+                    סה״כ {fmtILS(deal.price.total)} · {deal.people} נוסעים
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <SmartPriceBadge deal={deal} full />
+                </div>
+                <button
+                  onClick={goBookingRequest}
+                  disabled={!v.bookable}
+                  className="mt-4 w-full rounded-2xl bg-gradient-sunset py-3 text-sm font-black text-white shadow-glow disabled:opacity-50"
+                >
+                  {v.bookable ? "המשך לבקשת הזמנה" : "החבילה אינה זמינה כרגע"}
+                </button>
+                <p className="mt-2 text-center text-[10px] text-muted-foreground">
+                  המחיר והזמינות יאומתו מול ספק צד ג׳ לפני אישור סופי. לא יתבצע חיוב בשלב זה.
+                </p>
+                <div className="mt-3">
+                  <PriceAlertButton deal={deal} />
+                </div>
+                <Link
+                  to="/destination/$slug"
+                  params={{ slug: dest.slug }}
+                  className="mt-2 block rounded-2xl border border-border px-4 py-3 text-center text-sm font-black hover:border-primary/50"
+                >
+                  מדריך היעד: {dest.name}
+                </Link>
+              </div>
             </div>
           </aside>
         </div>
-
-        <div className="mt-14 pb-24 lg:pb-8">
-          <RelatedDeals deal={deal} catalog={catalog} />
-        </div>
       </div>
 
-
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 p-3 shadow-glow backdrop-blur lg:hidden">
-        <div className="mx-auto flex max-w-[1600px] items-center gap-3 px-2">
+        <div className="mx-auto grid max-w-[1600px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-2">
           <div className="min-w-0">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-              מחיר לאדם
+            <div className="truncate text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+              {v.label}
             </div>
-            <div className="text-xl font-black text-foreground">{fmtILS(deal.price.perPerson)}</div>
+            <div className="text-xl font-black">{fmtILS(deal.price.perPerson)}</div>
             <div className="text-[10px] text-muted-foreground">
-              סה״כ {fmtILS(deal.price.total)} ל־{deal.people} נוסעים
+              סה״כ {fmtILS(deal.price.total)} ל-{deal.people} נוסעים
             </div>
           </div>
           <button
-            onClick={startBooking}
-            disabled={deal.price.availability === "sold-out" || refreshing}
-            className="ms-auto flex items-center gap-2 rounded-2xl bg-gradient-sunset px-5 py-3 text-sm font-black text-white shadow-glow disabled:opacity-50"
+            onClick={goBookingRequest}
+            disabled={!v.bookable}
+            className="shrink-0 rounded-2xl bg-gradient-sunset px-5 py-3 text-sm font-black text-white shadow-glow disabled:opacity-50"
           >
-            {!isAuthenticated && <Lock className="h-4 w-4" />}
-            הזמן עכשיו
+            {v.bookable ? "בקשת הזמנה" : "לא זמין"}
           </button>
         </div>
       </div>
@@ -480,120 +481,37 @@ function DealPage() {
             setPendingAction(null);
             return;
           }
-          if (pendingAction === "book") startBooking();
           if (pendingAction === "save") toggleSave();
+          if (pendingAction === "book") goBookingRequest();
           setPendingAction(null);
         }}
         reason={
           pendingAction === "save"
             ? "כדי לשמור לרשימה שלך צריך חשבון NITZI."
-            : "כדי להתקדם להזמנה צריך חשבון NITZI."
+            : "כדי להתקדם לבקשת הזמנה צריך חשבון NITZI."
         }
       />
     </div>
   );
 }
 
-function RevalidationBanner({ res }: { res: RevalidationResult }) {
-  if (res.status === "verified") {
+function RevalidationNote({ res }: { res: RevalidationResult }) {
+  if (res.status === "verified")
     return (
-      <div className="mt-2 flex items-center gap-2 rounded-2xl bg-emerald-100 px-3 py-2 text-[12px] font-bold text-emerald-900">
-        <BadgeCheck className="h-4 w-4" /> המחיר נבדק מחדש והוא תקף. תוכל להמשיך בביטחון.
-      </div>
-    );
-  }
-  if (res.status === "changed") {
-    return (
-      <div className="mt-2 rounded-2xl bg-amber-100 px-3 py-2 text-[12px] font-bold text-amber-900">
-        <div className="flex items-center gap-2">
-          <Timer className="h-4 w-4" /> הספק עדכן את המחיר.
-        </div>
-        <div className="mt-1">
-          מחיר קודם: <span className="line-through">{fmtILS(res.oldPrice)}</span> · חדש:{" "}
-          <span className="text-base font-black">{fmtILS(res.newPrice)}</span>. לא תחויב ללא אישור
-          מפורש.
-        </div>
-      </div>
-    );
-  }
-  return (
-    <div className="mt-2 flex items-center gap-2 rounded-2xl bg-rose-100 px-3 py-2 text-[12px] font-bold text-rose-900">
-      <XCircle className="h-4 w-4" /> לצערנו הדיל אזל בזמן שצפית בו. בוא נמצא לך אלטרנטיבה.
-    </div>
-  );
-}
-
-function BookingCard({
-  deal,
-  onBook,
-  availabilityChip,
-  refreshing,
-  authed,
-}: {
-  deal: Deal;
-  onBook: () => void;
-  availabilityChip: { text: string; cls: string };
-  refreshing: boolean;
-  authed: boolean;
-}) {
-  return (
-    <div className="rounded-3xl border border-border bg-card p-5 shadow-soft">
-      <div className="flex items-center justify-between">
-        <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${availabilityChip.cls}`}>
-          {availabilityChip.text}
-        </span>
-        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-black text-emerald-800">
-          <BadgeCheck className="h-3 w-3" /> מחיר מאומת
-        </span>
-      </div>
-      <div className="mt-3">
-        <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-          מחיר לאדם
-        </div>
-        <div className="text-4xl font-black text-foreground">{fmtILS(deal.price.perPerson)}</div>
-        <div className="text-xs text-muted-foreground">
-          סה״כ {fmtILS(deal.price.total)} · {deal.people} נוסעים
-        </div>
-      </div>
-      <div className="mt-3">
-        <SmartPriceBadge deal={deal} full />
-      </div>
-
-      <ul className="mt-3 space-y-1.5 text-xs text-foreground">
-        <li className="flex gap-2">
-          <Calendar className="h-3.5 w-3.5 text-primary" /> {fmtDate(deal.dates.start)} →{" "}
-          {fmtDate(deal.dates.end)}
-        </li>
-        <li className="flex gap-2">
-          <Plane className="h-3.5 w-3.5 text-primary" /> {deal.outbound.airline} ·{" "}
-          {deal.outbound.stops === 0 ? "ישירה" : `${deal.outbound.stops} עצירות`}
-        </li>
-        <li className="flex gap-2">
-          <MapPin className="h-3.5 w-3.5 text-primary" /> {deal.hotel.name}
-        </li>
-      </ul>
-      <button
-        onClick={onBook}
-        disabled={deal.price.availability === "sold-out" || refreshing}
-        className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-sunset py-3 text-sm font-black text-white shadow-glow disabled:opacity-50"
-      >
-        {!authed && <Lock className="h-4 w-4" />}
-        <Wallet className="h-4 w-4" /> הזמן עכשיו
-      </button>
-      <p className="mt-2 text-center text-[10px] text-muted-foreground">
-        לפני החיוב נבצע בדיקת מחיר נוספת ונציג כל שינוי לאישורך.
+      <p className="rounded-2xl bg-emerald-50 px-3 py-2 text-[12px] font-bold text-emerald-900">
+        הבדיקה הושלמה — המחיר שהוצג עדיין תקף.
       </p>
-      <div className="mt-3">
-        <PriceAlertButton deal={deal} />
-      </div>
-      <Link
-        to="/destination/$slug"
-        params={{ slug: deal.destination.slug }}
-        className="mt-2 block rounded-2xl border border-border px-4 py-3 text-center text-sm font-black hover:border-primary/50"
-      >
-        מדריך היעד: {deal.destination.name}
-      </Link>
-    </div>
+    );
+  if (res.status === "changed")
+    return (
+      <p className="rounded-2xl bg-amber-50 px-3 py-2 text-[12px] font-bold text-amber-900">
+        הספק עדכן מחיר: {fmtILS(res.oldPrice)} → {fmtILS(res.newPrice)}. לא יתבצע חיוב ללא אישורך.
+      </p>
+    );
+  return (
+    <p className="rounded-2xl bg-rose-50 px-3 py-2 text-[12px] font-bold text-rose-900">
+      החבילה אינה זמינה כרגע. אפשר לבחור תאריכים אחרים או חבילה דומה.
+    </p>
   );
 }
 
@@ -607,63 +525,77 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-3xl border border-border/70 bg-card/85 p-5 shadow-soft backdrop-blur animate-fade-up">
+    <section className="rounded-3xl border border-border/70 bg-card/85 p-5 shadow-soft backdrop-blur">
       <div className="flex items-center gap-2">
-        <span className="grid h-7 w-7 place-items-center rounded-lg bg-gradient-sunset text-white">
+        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-gradient-sunset text-white">
           {icon}
         </span>
-        <h3 className="text-sm font-black text-foreground">{title}</h3>
+        <h2 className="text-sm font-black">{title}</h2>
       </div>
       <div className="mt-3">{children}</div>
     </section>
   );
 }
 
-function Info({ label, value }: { label: string; value: string }) {
+function Fact({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
   return (
-    <div className="rounded-2xl border border-border bg-muted/40 p-3">
-      <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-        {label}
+    <div className="min-w-0 rounded-2xl border border-border bg-muted/40 p-3">
+      <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+        <span className="shrink-0">{icon}</span>
+        <span className="truncate">{label}</span>
       </div>
-      <div className="mt-0.5 text-sm font-black text-foreground">{value}</div>
+      <div className="mt-0.5 truncate text-[12px] font-black">{value}</div>
     </div>
   );
 }
 
-function Stars({ n }: { n: number }) {
+function FAQ({ deal, verificationLabel }: { deal: Deal; verificationLabel: string }) {
+  const items = [
+    {
+      q: "האם המחיר סופי?",
+      a: `סטטוס הנתונים כרגע: ${verificationLabel}. המחיר והזמינות מאומתים מול הספק לפני אישור סופי, וכל שינוי מוצג לפני חיוב.`,
+    },
+    {
+      q: "האם ניתן לשנות את הטיסה?",
+      a: "כן. בסעיף אפשרויות טיסה נוספות ניתן לבחור אפשרות אחרת; המחיר, הכבודה והניקוד מתעדכנים מיד.",
+    },
+    {
+      q: "מה כלול במחיר?",
+      a: "פירוט מלא מופיע בסעיף \"מה כלול ומה לא\", כולל פריטים אופציונליים ופריטים הטעונים אישור.",
+    },
+    {
+      q: "מה מדיניות הביטול?",
+      a: deal.cancellation,
+    },
+    {
+      q: "האם נדרש דרכון בתוקף?",
+      a: "כן — דרכון בתוקף ל-6 חודשים לפחות מיום היציאה, ובדיקת דרישות ויזה מול רשויות היעד.",
+    },
+  ];
   return (
-    <span className="inline-flex" aria-label={`${n} כוכבים`}>
-      {Array.from({ length: n }).map((_, i) => (
-        <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+    <ul className="space-y-2">
+      {items.map((i) => (
+        <li key={i.q} className="rounded-2xl border border-border bg-background/60">
+          <details className="group">
+            <summary className="flex cursor-pointer items-center gap-2 p-3 text-[13px] font-black">
+              {i.q}
+              <ChevronDown
+                className="ms-auto h-4 w-4 transition-transform group-open:rotate-180"
+                aria-hidden
+              />
+            </summary>
+            <p className="px-3 pb-3 text-[12px] leading-relaxed text-muted-foreground">{i.a}</p>
+          </details>
+        </li>
       ))}
-    </span>
-  );
-}
-
-function FlightLine({ label, f }: { label: string; f: Deal["outbound"] }) {
-  return (
-    <div className="flex items-center gap-3">
-      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-ocean text-white">
-        <Plane className="h-4 w-4" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 text-xs font-bold text-primary">{label}</div>
-        <div className="flex items-center gap-2 text-sm font-bold text-foreground">
-          <span>{fmtTime(f.departAt)}</span>
-          <span className="text-muted-foreground">→</span>
-          <span>{fmtTime(f.arriveAt)}</span>
-        </div>
-        <div className="mt-0.5 flex flex-wrap gap-2 text-[11px] text-muted-foreground">
-          <span>
-            {f.airline} · {f.flightNumber}
-          </span>
-          <span>
-            <Clock className="mr-0.5 inline h-3 w-3" /> {fmtDur(f.durationMinutes)}
-          </span>
-          <span>· {f.stops === 0 ? "ישירה" : `${f.stops} עצירות`}</span>
-          <span>· {fmtDate(f.departAt)}</span>
-        </div>
-      </div>
-    </div>
+    </ul>
   );
 }
