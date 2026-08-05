@@ -120,7 +120,7 @@ function DealPage() {
 
   useEffect(() => setNow(Date.now()), []);
   useEffect(() => {
-    if (configured) recordViewedDeal(configured);
+    if (configured) recordViewedDeal(configured.id);
   }, [configured]);
 
   if (!canonical || !configured) {
@@ -354,7 +354,7 @@ function DealPage() {
             <Section title="פירוט מחיר" icon={<Wallet className="h-4 w-4" />}>
               <DealPriceBreakdown b={breakdown} />
               <div className="mt-3">
-                <SmartPriceBadge deal={deal} peers={peers.map((p) => p.price.perPerson)} full />
+                <SmartPriceBadge deal={deal} full />
               </div>
             </Section>
 
@@ -424,7 +424,7 @@ function DealPage() {
                   </div>
                 </div>
                 <div className="mt-3">
-                  <SmartPriceBadge deal={deal} peers={peers.map((p) => p.price.perPerson)} full />
+                  <SmartPriceBadge deal={deal} full />
                 </div>
                 <button
                   onClick={goBookingRequest}
