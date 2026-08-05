@@ -300,6 +300,7 @@ function ManageBookingPage() {
                 <Link
                   to="/deal/$id"
                   params={{ id: b.deal_id }}
+                  search={{ flight: undefined }}
                   className="rounded-2xl border border-border px-4 py-3 text-center text-sm font-black hover:border-primary/50"
                 >
                   צפייה בדיל, במלון ובטיסה

@@ -101,7 +101,12 @@ function BookingRequestPage() {
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur-lg">
         <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-4 py-3 sm:px-6">
           <button
-            onClick={() => navigate({ to: "/deal/$id", params: { id: canonical.id } })}
+            onClick={() =>
+              navigate({
+                to: "/deal/$id",
+                params: { id: canonical.id },
+                search: { flight: undefined },
+              })}
             aria-label="חזרה לדיל"
             className="grid h-10 w-10 place-items-center rounded-full border border-border bg-card"
           >

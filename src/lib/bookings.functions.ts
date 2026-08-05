@@ -152,8 +152,8 @@ export const placeBooking = createServerFn({ method: "POST" })
             extrasTotal,
             payment: { method: data.paymentMethod, status: paymentStatus },
           },
-        } as unknown as never,
-      })
+        },
+      } as never)
       .select("*")
       .single();
 

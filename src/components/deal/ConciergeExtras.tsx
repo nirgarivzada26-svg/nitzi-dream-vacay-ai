@@ -32,6 +32,7 @@ export function ConciergeSavings({ deal, peers }: { deal: Deal; peers: Deal[] })
           <Link
             to="/deal/$id"
             params={{ id: t.dealId }}
+            search={{ flight: undefined }}
             className="shrink-0 rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-black text-primary"
           >
             להצעה

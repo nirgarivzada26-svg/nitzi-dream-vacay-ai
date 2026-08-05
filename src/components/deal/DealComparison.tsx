@@ -90,6 +90,7 @@ export function DealComparison({ comparisons }: { comparisons: Comparison[] }) {
           <Link
             to="/deal/$id"
             params={{ id: c.deal.id }}
+            search={{ flight: undefined }}
             className="mt-2 inline-block rounded-xl border border-border px-3 py-1.5 text-[11px] font-black hover:border-primary/50"
           >
             לצפייה בחבילה החלופית

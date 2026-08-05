@@ -101,7 +101,7 @@ export const Route = createFileRoute("/deal/$id")({
 
 const fmtILS = (n: number) => `₪${Math.round(n).toLocaleString("he-IL")}`;
 const fmtDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("he-IL", { day: "2-digit", month: "short", year: "numeric" });
+  new Date(iso).toLocaleDateString("he-IL", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" });
 
 function agoLabel(iso: string | null, now: number | null) {
   if (!iso || now === null) return "עכשיו";
@@ -462,6 +462,7 @@ function DealPage() {
                     <Link
                       to="/deal/$id"
                       params={{ id: d.id }}
+                      search={{ flight: undefined }}
                       className="block rounded-2xl border border-border bg-card p-4 shadow-soft transition hover:border-primary/50"
                     >
                       <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-black">

@@ -8,7 +8,7 @@ import { boardLabels, type Deal } from "@/lib/deals";
 
 const fmt = (n: number) => `₪${Math.round(n).toLocaleString()}`;
 const fmtDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("he-IL", { day: "2-digit", month: "short" });
+  new Date(iso).toLocaleDateString("he-IL", { day: "2-digit", month: "short", timeZone: "UTC" });
 
 export function DealVariants({
   destinationName,
@@ -56,6 +56,7 @@ export function DealVariants({
               <Link
                 to="/deal/$id"
                 params={{ id: d.id }}
+                search={{ flight: undefined }}
                 onClick={onClose}
                 className="flex items-center justify-between gap-4 rounded-2xl border border-border/60 bg-muted/30 p-4 text-right transition hover:border-primary/50 hover:bg-muted/60"
               >
