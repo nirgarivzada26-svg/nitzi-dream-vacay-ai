@@ -16,8 +16,10 @@ const fmtDate = (iso: string) =>
 
 const SMART_CLS: Record<string, string> = {
   great: "bg-emerald-100 text-emerald-800",
+  good: "bg-emerald-50 text-emerald-800",
   normal: "bg-amber-100 text-amber-900",
-  wait: "bg-rose-100 text-rose-800",
+  expensive: "bg-rose-100 text-rose-800",
+  unknown: "bg-muted text-muted-foreground",
 };
 
 export function RecommendationCard({ rec }: { rec: AgentRecommendation }) {
