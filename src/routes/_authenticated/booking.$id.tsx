@@ -184,13 +184,24 @@ function ManageBookingPage() {
               >
                 {cancelled ? "הזמנה מבוטלת" : upcoming ? "חופשה קרובה" : "הזמנה שהסתיימה"}
               </span>
+              {b.payment_status === "paid" ? (
+                <span className="ms-2 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-black text-emerald-800">
+                  <BadgeCheck className="h-3 w-3" aria-hidden /> התשלום אושר ונקלט
+                </span>
+              ) : (
+                <span className="ms-2 inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-[11px] font-black text-amber-900">
+                  הזמנת הדגמה — לא בוצע חיוב אמיתי
+                </span>
+              )}
               <h1 className="mt-2 text-3xl font-black sm:text-4xl">{b.destination_name}</h1>
               <p className="mt-1 text-sm font-bold text-muted-foreground">
                 מספר הזמנה #{bookingRef(b.id)} · נוצרה ב-{fmtDate(b.created_at)}
               </p>
             </div>
             <div className="text-left">
-              <div className="text-[11px] font-black text-muted-foreground">סה״כ שולם</div>
+              <div className="text-[11px] font-black text-muted-foreground">
+                {b.payment_status === "paid" ? "סה״כ שולם" : "סה״כ החבילה"}
+              </div>
               <div className="text-3xl font-black">{fmtILS(b.total_price)}</div>
               {b.refund_status && (
                 <div className="mt-1 text-[11px] font-black text-primary">
@@ -259,7 +270,10 @@ function ManageBookingPage() {
               </ul>
               {snap?.booking?.payment?.method && (
                 <p className="mt-2 flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground">
-                  <CreditCard className="h-3.5 w-3.5" /> שולם באמצעות{" "}
+                  <CreditCard className="h-3.5 w-3.5" />{" "}
+                  {b.payment_status === "paid"
+                    ? "שולם באמצעות"
+                    : "אמצעי תשלום שנבחר (הדגמה, ללא חיוב):"}{" "}
                   {snap.booking.payment.method === "card"
                     ? "כרטיס אשראי"
                     : snap.booking.payment.method}

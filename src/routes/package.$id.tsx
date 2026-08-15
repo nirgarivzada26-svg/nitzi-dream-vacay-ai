@@ -20,6 +20,7 @@ import { isCompared, toggleCompare, useCompare } from "@/lib/compare-store";
 import { pickDestination } from "@/lib/catalog";
 import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
 import { DestinationImage } from "@/components/DestinationImage";
+import { DealPageSkeleton } from "@/components/deal/DealPageSkeleton";
 
 export const Route = createFileRoute("/package/$id")({
   head: () => ({
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/package/$id")({
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
+  pendingComponent: DealPageSkeleton,
   component: PackageDetailPage,
 });
 

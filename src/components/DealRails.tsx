@@ -1,9 +1,11 @@
 import { Link } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 import { ArrowLeft, Info } from "lucide-react";
 import { Carousel } from "@/components/Carousel";
 import { DealCard } from "@/components/DealCard";
-import { buildDealRails, type RailFilters } from "@/lib/deal-categories";
-import { useDestinations } from "@/lib/use-catalog";
+import type { RailFilters } from "@/lib/deal-categories";
+import { getHomeRails } from "@/lib/home-rails.functions";
 
 /** Rail filters -> /packages search params, so "לכל החבילות" keeps the slice. */
 function toSearch(f: RailFilters) {
@@ -18,8 +20,24 @@ function toSearch(f: RailFilters) {
   };
 }
 
+export const homeRailsQueryOptions = queryOptions({
+  queryKey: ["home-rails"],
+  queryFn: () => getHomeRails(),
+  staleTime: 5 * 60 * 1000,
+});
+
 export function DealRails() {
-  const rails = buildDealRails(useDestinations());
+  const { data } = useSuspenseQuery(homeRailsQueryOptions);
+  const { rails, emptyReason } = data;
+
+  if (rails.length === 0) {
+    return (
+      <div className="flex items-center gap-3 rounded-3xl border border-dashed border-border bg-muted/40 p-6 text-sm text-muted-foreground">
+        <Info className="h-4 w-4 shrink-0" />
+        {emptyReason ?? "אין כרגע דילים זמינים. ברגע שיתקבלו הצעות מהספקים הן יופיעו כאן."}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-14">

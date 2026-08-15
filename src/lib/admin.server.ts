@@ -167,6 +167,7 @@ interface BookingRecord {
   total_price: number | string;
   currency: string;
   status: string;
+  payment_status: string;
   start_date: string;
   end_date: string;
   created_at: string;
@@ -177,7 +178,7 @@ async function allBookings(): Promise<BookingRecord[]> {
   const { data, error } = await supabaseAdmin
     .from("bookings")
     .select(
-      "id,user_id,deal_id,destination_name,people,nights,total_price,currency,status,start_date,end_date,created_at,snapshot",
+      "id,user_id,deal_id,destination_name,people,nights,total_price,currency,status,payment_status,start_date,end_date,created_at,snapshot",
     )
     .order("created_at", { ascending: false });
   if (error) throw new AdminError(error.message);
@@ -196,7 +197,7 @@ async function nameMap(): Promise<Map<string, string>> {
   return m;
 }
 
-function toOrder(
+export function toOrder(
   b: BookingRecord,
   names: Map<string, string>,
   emails: Map<string, string | null>,
@@ -213,6 +214,7 @@ function toOrder(
     total: Number(b.total_price),
     currency: b.currency,
     status: b.status,
+    paymentStatus: b.payment_status,
     paymentMethod: paymentMethodOf(b.snapshot),
     startDate: b.start_date,
     endDate: b.end_date,

@@ -84,6 +84,8 @@ export interface AdminOrder {
   total: number;
   currency: string;
   status: string;
+  /** 'paid' | 'demo' | 'failed' — the real payment state, never inferred from paymentMethod alone. */
+  paymentStatus: string;
   paymentMethod: string | null;
   startDate: string;
   endDate: string;

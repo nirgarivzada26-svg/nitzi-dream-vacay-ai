@@ -34,6 +34,25 @@ export function liveModeEnabled(): boolean {
   return raw === "true" || raw === "1";
 }
 
+export type OperatingMode = "demo" | "sandbox" | "live";
+
+/**
+ * The 3-way DEMO/SANDBOX/LIVE switch. `NITZI_OPERATING_MODE` is the new,
+ * explicit source of truth when set. `NITZI_LIVE_MODE` (the older boolean,
+ * still used by the existing provider/payment gating in registry.ts and
+ * left completely untouched here) is preserved as a deprecated fallback so
+ * nothing that already depends on it breaks during the transition:
+ * `NITZI_LIVE_MODE=true` with no `NITZI_OPERATING_MODE` set is read as
+ * "live". Sandbox is never inferred from the old boolean — it's only
+ * reachable via the new explicit variable, since the old system had no
+ * sandbox concept at all.
+ */
+export function currentOperatingMode(): OperatingMode {
+  const raw = env("NITZI_OPERATING_MODE")?.toLowerCase();
+  if (raw === "demo" || raw === "sandbox" || raw === "live") return raw;
+  return liveModeEnabled() ? "live" : "demo";
+}
+
 export async function httpJson(
   url: string,
   init: RequestInit & { timeoutMs?: number } = {},

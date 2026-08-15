@@ -19,6 +19,7 @@ import { DestinationPicker } from "@/components/DestinationPicker";
 import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
 import { findDestination } from "@/lib/catalog";
 import { searchFlights, type ScoredFlight } from "@/lib/flight-search";
+import { CardGridSkeleton } from "@/components/CardGridSkeleton";
 
 export const Route = createFileRoute("/flights")({
   head: () => ({
@@ -39,6 +40,7 @@ export const Route = createFileRoute("/flights")({
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
+  pendingComponent: CardGridSkeleton,
   component: FlightsPage,
 });
 

@@ -4,8 +4,10 @@ import { Info, SlidersHorizontal, Star, Waves } from "lucide-react";
 import { TopNav } from "@/components/TopNav";
 import { Footer } from "@/components/Footer";
 import { DealCard } from "@/components/DealCard";
-import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
-import { groupDeals, listDeals, type Deal } from "@/lib/deals";
+import { CardGridSkeleton } from "@/components/CardGridSkeleton";
+import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { groupDeals, type Deal } from "@/lib/deals";
+import { getPackagesOffers } from "@/lib/packages-offers.functions";
 
 type SortKey = "value" | "price" | "discount" | "soon";
 
@@ -20,6 +22,12 @@ interface PackagesSearch {
 }
 
 const SORTS: SortKey[] = ["value", "price", "discount", "soon"];
+
+export const packagesOffersQueryOptions = queryOptions({
+  queryKey: ["packages-offers"],
+  queryFn: () => getPackagesOffers(),
+  staleTime: 5 * 60 * 1000,
+});
 
 export const Route = createFileRoute("/packages")({
   head: () => ({
@@ -48,7 +56,8 @@ export const Route = createFileRoute("/packages")({
     direct: raw.direct === true || raw.direct === "true" ? true : undefined,
     sort: SORTS.includes(raw.sort as SortKey) ? (raw.sort as SortKey) : undefined,
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
+  loader: ({ context }) => context.queryClient.ensureQueryData(packagesOffersQueryOptions),
+  pendingComponent: CardGridSkeleton,
   component: PackagesPage,
 });
 
@@ -57,9 +66,9 @@ const hasPool = (note: string) => /בריכ|pool/i.test(note);
 const valueScore = (d: Deal) => d.hotel.guestRating * 100 - d.price.perPerson / 50;
 
 function PackagesPage() {
-  const catalog = useDestinations();
   const search = Route.useSearch();
-  const all = useMemo(() => listDeals(catalog, 3), [catalog]);
+  const { data } = useSuspenseQuery(packagesOffersQueryOptions);
+  const { deals: all, sourceMode, emptyReason: sourceEmptyReason } = data;
 
   const [maxPrice, setMaxPrice] = useState(15000);
   const [country, setCountry] = useState(search.country ?? "all");
@@ -196,30 +205,46 @@ function PackagesPage() {
               label="🌊 קרוב לים"
               icon={<Waves className="h-3 w-3" />}
             />
-            <Toggle on={directOnly} onClick={() => setDirectOnly(!directOnly)} label="🛫 טיסה ישירה" />
+            <Toggle
+              on={directOnly}
+              onClick={() => setDirectOnly(!directOnly)}
+              label="🛫 טיסה ישירה"
+            />
           </div>
         </section>
 
-        <p className="mt-6 text-sm font-bold text-muted-foreground">
-          {groups.length} יעדים · {filtered.length} חבילות תואמות
-        </p>
-
-        {groups.length === 0 ? (
-          <div className="mt-4 flex items-center gap-3 rounded-3xl border border-dashed border-border bg-muted/40 p-6 text-sm text-muted-foreground">
+        {sourceMode !== "demo" ? (
+          <div className="mt-6 flex items-center gap-3 rounded-3xl border border-dashed border-border bg-muted/40 p-6 text-sm text-muted-foreground">
             <Info className="h-4 w-4 shrink-0" />
-            אין חבילות שתואמות את הסינון הזה. נסו להרחיב את התקציב או להסיר פילטר.
+            {sourceEmptyReason ?? "תצוגת החבילות עבור מצב זה עדיין לא זמינה"}
           </div>
         ) : (
-          <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {groups.map((group) => (
-              <DealCard
-                key={group.key}
-                deal={group.main}
-                variants={group.variants}
-                fluid
-              />
-            ))}
-          </div>
+          <>
+            {(allInclusive || pool) && (
+              <div className="mt-6 flex items-center gap-2 rounded-2xl border border-dashed border-amber-300 bg-amber-50 p-3 text-[12px] font-bold text-amber-900">
+                <Info className="h-3.5 w-3.5 shrink-0" />
+                הפילטרים "הכל כלול" ו"בריכה" זמינים כרגע רק במצב הדגמה — לא ניתן לסנן לפיהם מול
+                ספקים אמיתיים עדיין.
+              </div>
+            )}
+
+            <p className="mt-6 text-sm font-bold text-muted-foreground">
+              {groups.length} יעדים · {filtered.length} חבילות תואמות
+            </p>
+
+            {groups.length === 0 ? (
+              <div className="mt-4 flex items-center gap-3 rounded-3xl border border-dashed border-border bg-muted/40 p-6 text-sm text-muted-foreground">
+                <Info className="h-4 w-4 shrink-0" />
+                אין חבילות שתואמות את הסינון הזה. נסו להרחיב את התקציב או להסיר פילטר.
+              </div>
+            ) : (
+              <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {groups.map((group) => (
+                  <DealCard key={group.key} deal={group.main} variants={group.variants} fluid />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </main>
 

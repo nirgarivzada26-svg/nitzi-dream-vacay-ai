@@ -163,12 +163,6 @@ export function SearchEngine({ size = "md" }: { size?: "md" | "lg" }) {
 
         <div className={`mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2`}>
           <button
-            onClick={runSearch}
-            className={`flex items-center justify-center gap-2 rounded-2xl border border-border bg-card px-4 font-black text-foreground transition active:scale-95 ${btnPad}`}
-          >
-            <Search className="h-4 w-4" /> חפש חופשה
-          </button>
-          <button
             onClick={runAi}
             className={`group relative flex items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-sunset px-4 font-black text-white shadow-glow transition active:scale-95 ${btnPad}`}
           >
@@ -177,6 +171,12 @@ export function SearchEngine({ size = "md" }: { size?: "md" | "lg" }) {
               aria-hidden
               className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-1000 group-hover:translate-x-full"
             />
+          </button>
+          <button
+            onClick={runSearch}
+            className={`flex items-center justify-center gap-2 rounded-2xl border border-border bg-card px-4 font-black text-foreground transition active:scale-95 ${btnPad}`}
+          >
+            <Search className="h-4 w-4" /> חפש חופשה
           </button>
         </div>
       </div>

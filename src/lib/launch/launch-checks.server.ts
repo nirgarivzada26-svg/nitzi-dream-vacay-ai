@@ -323,8 +323,7 @@ async function checkoutChecks(fx: Fixture): Promise<LaunchCheck[]> {
     }),
     await run("checkout.coupon", "ולידציית קופונים", () => {
       const list = (coupons.data?.value ?? null) as
-        | { code: string; percent?: number; amount?: number }[]
-        | null;
+        { code: string; percent?: number; amount?: number }[] | null;
       if (!list || list.length === 0) {
         return ok("לא הוגדרו קופונים — אין מסלול הנחה שניתן לנצל לרעה");
       }
@@ -559,6 +558,10 @@ async function aiChecks(): Promise<LaunchCheck[]> {
       directOnly: null,
       musts: null,
       exclude: null,
+      requestedDates: null,
+      dateFlexibility: null,
+      childrenAges: null,
+      baggagePreference: null,
     },
     5,
   );

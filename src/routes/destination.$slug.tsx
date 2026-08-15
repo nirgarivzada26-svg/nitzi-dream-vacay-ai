@@ -22,6 +22,7 @@ import { DealCard } from "@/components/DealCard";
 import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
 import { findDestination } from "@/lib/catalog";
 import { getDeal } from "@/lib/deals";
+import { DestinationPageSkeleton } from "@/components/DestinationPageSkeleton";
 
 export const Route = createFileRoute("/destination/$slug")({
   loader: async ({ context, params }) => {
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/destination/$slug")({
     // thrown error during render.
     return { known: !!findDestination(catalog, decodeURIComponent(params.slug)) };
   },
+  pendingComponent: DestinationPageSkeleton,
   head: ({ params }) => {
     const name = decodeURIComponent(params.slug);
     return {
@@ -49,17 +51,28 @@ export const Route = createFileRoute("/destination/$slug")({
       ],
     };
   },
-  errorComponent: ({ error }) => (
+  errorComponent: ({ reset }) => (
     <div dir="rtl" className="grid min-h-screen place-items-center px-6 text-center">
       <div>
         <h1 className="text-2xl font-black">לא הצלחנו לטעון את היעד</h1>
-        <p className="mt-2 text-sm font-semibold text-muted-foreground">{error.message}</p>
-        <Link
-          to="/"
-          className="mt-4 inline-block rounded-2xl bg-gradient-sunset px-4 py-2 text-sm font-black text-white"
-        >
-          חזרה לבית
-        </Link>
+        <p className="mt-2 text-sm font-semibold text-muted-foreground">
+          ייתכן שהייתה בעיית תקשורת. אפשר לנסות שוב.
+        </p>
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          <button
+            type="button"
+            onClick={() => reset()}
+            className="rounded-2xl border border-border bg-card px-4 py-2 text-sm font-black text-foreground"
+          >
+            נסה שוב
+          </button>
+          <Link
+            to="/"
+            className="inline-block rounded-2xl bg-gradient-sunset px-4 py-2 text-sm font-black text-white"
+          >
+            חזרה לבית
+          </Link>
+        </div>
       </div>
     </div>
   ),

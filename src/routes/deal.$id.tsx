@@ -54,6 +54,7 @@ import {
 } from "@/lib/deal-alternatives";
 import { nitziScore } from "@/lib/deal-score";
 import { dealVariantsFor } from "@/lib/deals";
+import { cancellationDetail } from "@/lib/cancellation-policy";
 import { SIMILAR_LABEL, similarDeals } from "@/lib/similar-deals";
 import { ConciergeItinerary } from "@/components/deal/ConciergeItinerary";
 import { ConciergeCost } from "@/components/deal/ConciergeCost";
@@ -74,6 +75,10 @@ import { TravelTips } from "@/components/deal/TravelTips";
 import { scoreBreakdown } from "@/lib/deal-scores";
 import { buildComparisons } from "@/lib/deal-comparison";
 import { bookTiming } from "@/lib/book-timing";
+import { DealPageSkeleton } from "@/components/deal/DealPageSkeleton";
+import { decodeCanonicalId } from "@/lib/offers/canonical-id";
+import { LiveOfferView } from "@/components/deal/LiveOfferView";
+import { dealResolutionQueryOptions } from "@/lib/deal-resolution.functions";
 
 export const Route = createFileRoute("/deal/$id")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -95,13 +100,25 @@ export const Route = createFileRoute("/deal/$id")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
+  loader: ({ context, params }) => {
+    const decoded = decodeCanonicalId(params.id);
+    if (decoded.isLegacyDemoId) {
+      return context.queryClient.ensureQueryData(destinationsQueryOptions);
+    }
+    return context.queryClient.ensureQueryData(dealResolutionQueryOptions(params.id));
+  },
+  pendingComponent: DealPageSkeleton,
   component: DealPage,
 });
 
 const fmtILS = (n: number) => `₪${Math.round(n).toLocaleString("he-IL")}`;
 const fmtDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("he-IL", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" });
+  new Date(iso).toLocaleDateString("he-IL", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 
 function agoLabel(iso: string | null, now: number | null) {
   if (!iso || now === null) return "עכשיו";
@@ -112,7 +129,19 @@ function agoLabel(iso: string | null, now: number | null) {
   return `לפני ${Math.floor(m / 60)} ש׳`;
 }
 
+/** Thin router: legacy DEMO ids render the existing, unmodified deal page;
+ *  canonical SANDBOX/LIVE ids render LiveOfferView, sourced from
+ *  resolveOffer() — never getDeal(), never a demo fallback. */
 function DealPage() {
+  const { id } = Route.useParams();
+  const decoded = decodeCanonicalId(id);
+  if (decoded.isLegacyDemoId) {
+    return <DemoDealPage />;
+  }
+  return <LiveOfferView canonicalId={id} />;
+}
+
+function DemoDealPage() {
   const { id } = Route.useParams();
   const { flight } = Route.useSearch();
   const navigate = useNavigate();
@@ -147,7 +176,10 @@ function DealPage() {
 
   if (!canonical || !configured) {
     return (
-      <div dir="rtl" className="grid min-h-screen place-items-center bg-background px-6 text-center">
+      <div
+        dir="rtl"
+        className="grid min-h-screen place-items-center bg-background px-6 text-center"
+      >
         <div>
           <h1 className="text-2xl font-black">הדיל לא נמצא</h1>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -173,10 +205,7 @@ function DealPage() {
   const peers = dealVariantsFor(dest.slug, catalog, 3).filter((d) => d.id !== canonical.id);
   const related = similarDeals(canonical, catalog);
   const scores = scoreBreakdown(deal, peers, selectedFlightId);
-  const comparisons = buildComparisons(
-    deal,
-    [...peers, ...related.map((r) => r.deal)],
-  );
+  const comparisons = buildComparisons(deal, [...peers, ...related.map((r) => r.deal)]);
   const timing = bookTiming(deal, peers);
 
   const refresh = async () => {
@@ -284,7 +313,11 @@ function DealPage() {
             </section>
 
             <section className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              <Fact icon={<MapPin className="h-3.5 w-3.5" />} label="מלון" value={deal.hotel.name} />
+              <Fact
+                icon={<MapPin className="h-3.5 w-3.5" />}
+                label="מלון"
+                value={deal.hotel.name}
+              />
               <Fact
                 icon={<Star className="h-3.5 w-3.5" />}
                 label="דירוג"
@@ -336,20 +369,32 @@ function DealPage() {
               title="למה זו הבחירה של NITZI?"
             />
 
-            <Section title="ניקוד NITZI — פירוט מלא" icon={<Sparkles className="h-4 w-4" />}>
+            <SectionNav
+              items={[
+                { href: "#score", label: "ניקוד NITZI" },
+                { href: "#compare", label: "השוואה" },
+                { href: "#flight", label: "טיסה" },
+                { href: "#hotel", label: "מלון" },
+                { href: "#map", label: "מפה" },
+                { href: "#price", label: "מחיר" },
+                { href: "#policy", label: "ביטול ומדיניות" },
+                { href: "#faq", label: "שאלות נפוצות" },
+              ]}
+            />
+
+            <Section
+              id="score"
+              title="ניקוד NITZI — פירוט מלא"
+              icon={<Sparkles className="h-4 w-4" />}
+            >
               <ScoreBreakdownPanel breakdown={scores} />
             </Section>
 
-            <Section title="השוואה לחלופות" icon={<Scale className="h-4 w-4" />}>
+            <Section id="compare" title="השוואה לחלופות" icon={<Scale className="h-4 w-4" />}>
               <DealComparison comparisons={comparisons} />
             </Section>
 
-            <Section title="האם זה זמן טוב להזמין?" icon={<Clock className="h-4 w-4" />}>
-              <BookTimingCard timing={timing} />
-            </Section>
-
-
-            <Section title="פרטי הטיסה" icon={<Plane className="h-4 w-4" />}>
+            <Section id="flight" title="פרטי הטיסה" icon={<Plane className="h-4 w-4" />}>
               <DealFlightSection
                 deal={deal}
                 alt={alt}
@@ -370,8 +415,28 @@ function DealPage() {
               </p>
             </Section>
 
-            <Section title="המלון" icon={<MapPin className="h-4 w-4" />}>
-              <h3 className="text-lg font-black">{deal.hotel.name}</h3>
+            <Section id="price" title="פירוט מחיר" icon={<Wallet className="h-4 w-4" />}>
+              <DealPriceBreakdown b={breakdown} />
+              <div className="mt-3">
+                <SmartPriceBadge deal={deal} full />
+              </div>
+            </Section>
+
+            <Section title="מה כלול ומה לא" icon={<ListChecks className="h-4 w-4" />}>
+              <DealInclusions items={inclusionsFor(deal, alt)} />
+            </Section>
+
+            {/* Supporting detail — same information as above, quieter visual
+                weight so the page doesn't read as 20 equally-important cards. */}
+            <div className="flex items-center gap-3 pt-2">
+              <h2 className="shrink-0 text-[11px] font-black uppercase tracking-widest text-muted-foreground">
+                עוד פרטים על החבילה
+              </h2>
+              <div className="h-px flex-1 bg-border" aria-hidden />
+            </div>
+
+            <Section id="hotel" title="המלון" icon={<MapPin className="h-4 w-4" />} variant="quiet">
+              <h3 className="text-base font-black">{deal.hotel.name}</h3>
               <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span aria-label={`${deal.hotel.stars} כוכבים`} className="inline-flex">
                   {Array.from({ length: deal.hotel.stars }).map((_, i) => (
@@ -389,28 +454,27 @@ function DealPage() {
               </p>
             </Section>
 
-            <Section title="האזור בקצרה" icon={<MapPin className="h-4 w-4" />}>
+            <Section
+              id="map"
+              title="האזור בקצרה"
+              icon={<MapPin className="h-4 w-4" />}
+              variant="quiet"
+            >
               <DealMap dest={dest} hotelName={deal.hotel.name} />
             </Section>
 
-            <Section title="טיפים ליעד" icon={<MapPin className="h-4 w-4" />}>
+            <Section title="טיפים ליעד" icon={<MapPin className="h-4 w-4" />} variant="quiet">
               <TravelTips dest={dest} />
             </Section>
 
-            <Section title="מה כלול ומה לא" icon={<ListChecks className="h-4 w-4" />}>
-              <DealInclusions items={inclusionsFor(deal, alt)} />
-            </Section>
-
-            <Section title="פירוט מחיר" icon={<Wallet className="h-4 w-4" />}>
-              <DealPriceBreakdown b={breakdown} />
-              <div className="mt-3">
-                <SmartPriceBadge deal={deal} full />
-              </div>
-            </Section>
-
-            <Section title="מדיניות וביטול" icon={<Shield className="h-4 w-4" />}>
+            <Section
+              id="policy"
+              title="מדיניות וביטול"
+              icon={<Shield className="h-4 w-4" />}
+              variant="quiet"
+            >
               <ul className="space-y-2 text-sm">
-                <li>ביטול: {deal.cancellation}</li>
+                <li>ביטול: {cancellationDetail(deal.cancellationPolicy, deal.dates.start)}</li>
                 <li>
                   החזר כספי: החזרים מבוצעים לאמצעי התשלום המקורי לאחר אישור הספק. בהזמנת הדגמה לא
                   מתבצע חיוב ולכן אין החזר.
@@ -422,36 +486,60 @@ function DealPage() {
               </ul>
             </Section>
 
-            <Section title="המסלול היומי שלכם" icon={<Calendar className="h-4 w-4" />}>
+            <Section
+              title="האם זה זמן טוב להזמין?"
+              icon={<Clock className="h-4 w-4" />}
+              variant="quiet"
+            >
+              <BookTimingCard timing={timing} />
+            </Section>
+
+            <Section
+              title="המסלול היומי שלכם"
+              icon={<Calendar className="h-4 w-4" />}
+              variant="quiet"
+            >
               <ConciergeItinerary deal={deal} />
             </Section>
 
-            <Section title="הערכת עלות החופשה כולה" icon={<Wallet className="h-4 w-4" />}>
+            <Section
+              title="הערכת עלות החופשה כולה"
+              icon={<Wallet className="h-4 w-4" />}
+              variant="quiet"
+            >
               <ConciergeCost deal={deal} />
             </Section>
 
-            <Section title="למי החופשה הזו מתאימה?" icon={<Users className="h-4 w-4" />}>
+            <Section
+              title="למי החופשה הזו מתאימה?"
+              icon={<Users className="h-4 w-4" />}
+              variant="quiet"
+            >
               <ConciergeAudience deal={deal} />
             </Section>
 
-            <Section title="מזג אוויר ועונתיות" icon={<ThermometerSun className="h-4 w-4" />}>
+            <Section
+              title="מזג אוויר ועונתיות"
+              icon={<ThermometerSun className="h-4 w-4" />}
+              variant="quiet"
+            >
               <ConciergeWeather deal={deal} />
             </Section>
 
-            <Section title="פרופיל החוויה" icon={<Sparkles className="h-4 w-4" />}>
+            <Section title="פרופיל החוויה" icon={<Sparkles className="h-4 w-4" />} variant="quiet">
               <ConciergeExperience deal={deal} />
             </Section>
 
-            <Section title="איך אפשר לחסוך" icon={<PiggyBank className="h-4 w-4" />}>
+            <Section
+              title="איך אפשר לחסוך"
+              icon={<PiggyBank className="h-4 w-4" />}
+              variant="quiet"
+            >
               <ConciergeSavings deal={deal} peers={peers} />
             </Section>
 
-            <Section title="יעדים דומים" icon={<MapPin className="h-4 w-4" />}>
+            <Section title="יעדים דומים" icon={<MapPin className="h-4 w-4" />} variant="quiet">
               <ConciergeAlternatives deal={deal} catalog={catalog} />
-            </Section>
-
-            <Section title="שאלות נפוצות" icon={<ListChecks className="h-4 w-4" />}>
-              <FAQ deal={deal} verificationLabel={v.label} />
             </Section>
 
             <section>
@@ -478,6 +566,15 @@ function DealPage() {
                 ))}
               </ul>
             </section>
+
+            <Section
+              id="faq"
+              title="שאלות נפוצות"
+              icon={<ListChecks className="h-4 w-4" />}
+              variant="quiet"
+            >
+              <FAQ deal={deal} verificationLabel={v.label} />
+            </Section>
 
             <ConciergeClosing deal={deal} peers={peers} />
           </main>
@@ -587,17 +684,62 @@ function RevalidationNote({ res }: { res: RevalidationResult }) {
   );
 }
 
+/** Lightweight in-page jump nav — real anchor links, no JS required to work,
+ *  nothing hidden behind it (every section is still reachable by scrolling). */
+function SectionNav({ items }: { items: { href: string; label: string }[] }) {
+  return (
+    <nav aria-label="ניווט מהיר בעמוד" className="-mx-1 overflow-x-auto px-1">
+      <ul className="flex w-max items-center gap-1.5 py-0.5">
+        {items.map((it) => (
+          <li key={it.href}>
+            <a
+              href={it.href}
+              className="block whitespace-nowrap rounded-full border border-border bg-card px-3 py-1.5 text-[11px] font-bold text-muted-foreground transition hover:border-primary/50 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+            >
+              {it.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
 function Section({
+  id,
   title,
   icon,
+  variant = "default",
   children,
 }: {
+  id?: string;
   title: string;
   icon: React.ReactNode;
+  /** "quiet" is used for supporting/reference content — same information, lighter visual weight. */
+  variant?: "default" | "quiet";
   children: React.ReactNode;
 }) {
+  if (variant === "quiet") {
+    return (
+      <section
+        id={id}
+        className="scroll-mt-24 rounded-2xl border border-border/40 bg-muted/20 p-4 sm:p-5"
+      >
+        <div className="flex items-center gap-2">
+          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
+            {icon}
+          </span>
+          <h3 className="text-[13px] font-black text-foreground/90">{title}</h3>
+        </div>
+        <div className="mt-2.5">{children}</div>
+      </section>
+    );
+  }
   return (
-    <section className="rounded-3xl border border-border/70 bg-card/85 p-5 shadow-soft backdrop-blur">
+    <section
+      id={id}
+      className="scroll-mt-24 rounded-3xl border border-border/70 bg-card/85 p-5 shadow-soft backdrop-blur"
+    >
       <div className="flex items-center gap-2">
         <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-gradient-sunset text-white">
           {icon}
@@ -609,15 +751,7 @@ function Section({
   );
 }
 
-function Fact({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-}) {
+function Fact({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="min-w-0 rounded-2xl border border-border bg-muted/40 p-3">
       <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
@@ -641,11 +775,11 @@ function FAQ({ deal, verificationLabel }: { deal: Deal; verificationLabel: strin
     },
     {
       q: "מה כלול במחיר?",
-      a: "פירוט מלא מופיע בסעיף \"מה כלול ומה לא\", כולל פריטים אופציונליים ופריטים הטעונים אישור.",
+      a: 'פירוט מלא מופיע בסעיף "מה כלול ומה לא", כולל פריטים אופציונליים ופריטים הטעונים אישור.',
     },
     {
       q: "מה מדיניות הביטול?",
-      a: deal.cancellation,
+      a: cancellationDetail(deal.cancellationPolicy, deal.dates.start),
     },
     {
       q: "האם נדרש דרכון בתוקף?",

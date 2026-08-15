@@ -22,7 +22,7 @@ const tripTypeEnum = z.enum([
 const styleEnum = z.enum(["chill", "luxury", "young", "smart"]);
 const boardEnum = z.enum(["room-only", "breakfast", "half-board", "all-inclusive"]);
 
-const filtersSchema = z.object({
+export const filtersSchema = z.object({
   destinations: z.array(z.string()).nullable(),
   countries: z.array(z.string()).nullable(),
   tripType: tripTypeEnum.nullable(),
@@ -35,6 +35,12 @@ const filtersSchema = z.object({
   directOnly: z.boolean().nullable(),
   musts: z.array(z.enum(["pool", "beach", "all-inclusive", "free-cancellation"])).nullable(),
   exclude: z.array(z.string()).nullable(),
+  // Context-only — never used to filter search results (the catalog can't
+  // genuinely support these yet). See agent-search.server.ts.
+  requestedDates: z.string().nullable(),
+  dateFlexibility: z.enum(["fixed", "flexible", "very-flexible"]).nullable(),
+  childrenAges: z.array(z.number()).nullable(),
+  baggagePreference: z.enum(["checked", "carry-on-only"]).nullable(),
 });
 
 const SYSTEM = `אתה NITZI — סוכן נסיעות אישי חכם, לא צ'אטבוט כללי. אתה מדבר עברית טבעית, חמה וקצרה (RTL).
@@ -42,13 +48,21 @@ const SYSTEM = `אתה NITZI — סוכן נסיעות אישי חכם, לא צ'
 
 חוקי ברזל:
 1. אסור להמציא יעדים, מלונות, טיסות, מחירים או זמינות. כל המלצה חייבת להגיע מהכלים searchTrips / buildTrip בלבד.
-2. אם אין תוצאה — תגיד את זה במפורש, תסביר למה (emptyReason) ותציע לשנות תנאי (תקציב, כוכבים, ישירה בלבד, יעד אחר מהקטלוג).
+2. אם אין תוצאה — תגיד את זה במפורש, תסביר למה (emptyReason/blockingConstraint) ותציע לשנות תנאי (תקציב, כוכבים, ישירה בלבד, יעד אחר מהקטלוג).
 3. אל תכתוב מחירים בטקסט שלא הוחזרו מכלי. אל תבטיח זמינות.
 4. אל תחזור על פרטי הכרטיסים בטקסט — הממשק מציג אותם. תוסיף רק את השורה האישית: למה זה מתאים דווקא למשתמש.
 
-איך לעבוד:
-- הבן את הבקשה, זכור מה כבר נאמר בשיחה (תקציב, תאריכים/לילות, נוסעים, שדה תעופה, מדינות מועדפות, דירוג מלון, בסיס אירוח, ים/בריכה, יעדים שנפסלו).
-- כשחסר מידע קריטי (תקציב או מספר נוסעים) — שאל שאלה אחת קצרה, ואם המשתמש אומר "לא משנה לי" פשוט חפש.
+איך לעבוד — משמעת שיחה:
+- בכל הודעה, חלץ כמה שיותר פרטים אמיתיים מהטקסט החופשי של המשתמש בבת אחת (יעד, תאריכים/גמישות, נוסעים, גילאי ילדים, תקציב, רמת מלון, בסיס אירוח, טיסה ישירה, כבודה, ים, חיי לילה, משפחה, יוקרה/תקציבי/רגוע).
+- זכור כל מה שכבר נאמר בשיחה — אל תשאל שוב על פרט שכבר נמסר, גם אם המשתמש לא חזר עליו בהודעה האחרונה.
+- כשמידע קריטי לחיפוש חסר (בעיקר תקציב או מספר נוסעים) — שאל שאלה אחת קצרה וממוקדת, לא רשימה. אם המשתמש אומר "לא משנה לי" פשוט חפש.
+- ברגע שיש מספיק מידע לחיפוש סביר — חפש מיד, אל תמשיך לשאול. אל תכריח את המשתמש לענות על כל שאלה אפשרית.
+- בכל פעם שאתה לומד או משנה העדפה כלשהי (גם אם עוד לא חיפשת) — קרא ל-updateKnownPreferences עם כל מה שידוע עד כה, כדי שהממשק יציג למשתמש "מה NITZI כבר יודע".
+
+שדות הקשר בלבד (אינם מסננים תוצאות היום):
+- requestedDates / dateFlexibility: לקטלוג של NITZI אין היום מלאי אמיתי לפי חודש/תאריך ספציפי — כל התאריכים המוצגים הם התאריכים שבפועל זמינים בקטלוג. שמור את הבקשה לשיחה, אך אם המשתמש שואל אם התאריך שלו נענה — תגיד את זה בכנות, אל תעמיד פנים שסיננת לפי תאריך.
+- childrenAges: הקטלוג היום לא מבחין בין חבילה למבוגרים לחבילה עם ילדים ברמת המלאי/המחיר — שמור את הגילאים לשיחה (זה עוזר לך לנסח למה יעד מתאים למשפחה), אך אל תטען שסיננת תוצאות לפי גיל ילד.
+- baggagePreference: כל חבילה כוללת כבודה 20 ק״ג לאדם כברירת מחדל (זו עובדה אמיתית מהקטלוג), ואפשר להוסיף מזוודה נוספת בתשלום בשלב ההזמנה — זה מידע אמיתי שאפשר לשתף, אבל זה לא משנה אילו חבילות מוצגות.
 - קרא ל-searchTrips עם המסננים שהצלחת לחלץ. אם המשתמש ביקש יעד ספציפי שאין לו חבילה, נסה buildTrip לאותו יעד.
 - אם המשתמש רוצה להשוות — קרא ל-compareTrips עם עד 3 מזהי דילים מהתוצאות שכבר הצגת.
 - כשלא בטוח אילו יעדים קיימים — קרא ל-listCatalog.
@@ -138,8 +152,7 @@ export const Route = createFileRoute("/api/chat")({
         const lovable = createNitziAiProvider(apiKey, runIdFetch);
 
         const profile = body.profile as
-          | { favorites?: string[]; booked?: string[]; avgBudget?: number | null }
-          | undefined;
+          { favorites?: string[]; booked?: string[]; avgBudget?: number | null } | undefined;
         const personalization =
           profile && (profile.favorites?.length || profile.booked?.length || profile.avgBudget)
             ? `\n\nמידע אישי על המשתמש (לשימוש בהתאמה, לא להמצאה): מועדפים: ${profile.favorites?.join(", ") || "אין"}. הזמנות קודמות: ${profile.booked?.join(", ") || "אין"}. תקציב ממוצע קודם לאדם: ${profile.avgBudget ? `₪${profile.avgBudget}` : "לא ידוע"}.`
@@ -183,6 +196,12 @@ export const Route = createFileRoute("/api/chat")({
               description: "רשימת כל היעדים הקיימים בקטלוג NITZI, כולל אילו מהם ניתנים להזמנה.",
               inputSchema: z.object({}),
               execute: async () => listCatalog(),
+            }),
+            updateKnownPreferences: tool({
+              description:
+                "מעדכן את פאנל 'מה NITZI כבר יודע' בממשק עם כל ההעדפות שחולצו עד כה מהשיחה — כולל שדות הקשר בלבד (תאריכים, גמישות, גילאי ילדים, כבודה) שאינם משפיעים על תוצאות חיפוש. קרא לזה בכל פעם שנודע לך משהו חדש, גם אם עוד לא הגיע הזמן לחפש.",
+              inputSchema: z.object({ known: filtersSchema }),
+              execute: async ({ known }) => known,
             }),
           },
         });

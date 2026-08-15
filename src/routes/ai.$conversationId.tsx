@@ -7,9 +7,11 @@ import { TopNav } from "@/components/TopNav";
 import { loadMessages } from "@/lib/ai-conversations";
 import { useAuth } from "@/lib/auth";
 import { destinationsQueryOptions } from "@/lib/use-catalog";
+import { AiPageSkeleton } from "@/components/ai/AiPageSkeleton";
 
 export const Route = createFileRoute("/ai/$conversationId")({
   loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
+  pendingComponent: AiPageSkeleton,
   validateSearch: (search: Record<string, unknown>) => ({
     q: typeof search.q === "string" ? search.q : undefined,
   }),

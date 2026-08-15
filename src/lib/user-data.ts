@@ -35,6 +35,8 @@ export interface BookingRow {
   start_date: string;
   end_date: string;
   status: string;
+  /** 'paid' | 'demo' | 'failed' — see the payment_status migration (Slice 1). */
+  payment_status: string;
   snapshot: Deal;
   created_at: string;
 }

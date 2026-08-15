@@ -7,9 +7,11 @@ import { TopNav } from "@/components/TopNav";
 import { createConversation } from "@/lib/ai-conversations";
 import { useAuth } from "@/lib/auth";
 import { destinationsQueryOptions } from "@/lib/use-catalog";
+import { AiPageSkeleton } from "@/components/ai/AiPageSkeleton";
 
 export const Route = createFileRoute("/ai/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
+  pendingComponent: AiPageSkeleton,
   head: () => ({
     meta: [
       { title: "NITZI AI — סוכן החופשות האישי שלך" },

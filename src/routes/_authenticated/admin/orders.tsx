@@ -153,14 +153,26 @@ function OrdersPage() {
             {
               key: "payment",
               header: "סטטוס תשלום",
-              render: (r) =>
-                r.paymentMethod ? (
-                  <span className="text-xs font-bold text-emerald-700">
-                    שולם · {r.paymentMethod}
+              render: (r) => {
+                if (r.paymentStatus === "paid") {
+                  return (
+                    <span className="text-xs font-bold text-emerald-700">
+                      שולם{r.paymentMethod ? ` · ${r.paymentMethod}` : ""}
+                    </span>
+                  );
+                }
+                if (r.paymentStatus === "failed") {
+                  return <span className="text-xs font-bold text-rose-700">חיוב נכשל</span>;
+                }
+                // "demo" (or any other non-paid state) — never styled like a
+                // real paid order, regardless of whether a payment method
+                // was recorded.
+                return (
+                  <span className="text-xs font-bold text-amber-800">
+                    הדגמה — לא בוצע חיוב{r.paymentMethod ? ` (${r.paymentMethod})` : ""}
                   </span>
-                ) : (
-                  <span className="text-xs text-muted-foreground">לא תועד</span>
-                ),
+                );
+              },
             },
             {
               key: "total",

@@ -3,7 +3,9 @@ import { useState } from "react";
 import heroImg from "@/assets/hero-main.jpg";
 import { TopNav } from "@/components/TopNav";
 import { SearchEngine } from "@/components/SearchEngine";
-import { DealRails } from "@/components/DealRails";
+import { DealRails, homeRailsQueryOptions } from "@/components/DealRails";
+import { MustNotMissCard } from "@/components/MustNotMissCard";
+import { mustNotMissQueryOptions } from "@/lib/must-not-miss.functions";
 import { SecretDealCard } from "@/components/SecretDealCard";
 import { SignInModal } from "@/components/SignInModal";
 import { Footer } from "@/components/Footer";
@@ -11,6 +13,7 @@ import { DemoDataNotice } from "@/components/DemoDataNotice";
 import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
 import { DestinationImage } from "@/components/DestinationImage";
 import { Sparkles } from "lucide-react";
+import { HomePageSkeleton } from "@/components/HomePageSkeleton";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -38,7 +41,13 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
+  loader: ({ context }) =>
+    Promise.all([
+      context.queryClient.ensureQueryData(destinationsQueryOptions),
+      context.queryClient.ensureQueryData(homeRailsQueryOptions),
+      context.queryClient.ensureQueryData(mustNotMissQueryOptions),
+    ]),
+  pendingComponent: HomePageSkeleton,
   component: Home,
 });
 
@@ -98,6 +107,10 @@ function Home() {
       </div>
 
       <div className="mx-auto mt-6 w-full max-w-[1600px]">
+        <MustNotMissCard />
+      </div>
+
+      <div className="mx-auto mt-6 w-full max-w-[1600px]">
         <SecretDealCard />
       </div>
 
@@ -128,7 +141,6 @@ function Home() {
       <WhyNitzi />
 
       <PopularDestinations />
-
 
       <Footer />
 

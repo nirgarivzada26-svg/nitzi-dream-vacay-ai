@@ -9,6 +9,7 @@ import { TopNav } from "@/components/TopNav";
 import { Footer } from "@/components/Footer";
 import { getCompanyProfile } from "@/lib/company.functions";
 import { LEGAL_SLUGS, LEGAL_TITLES, getLegalDocument, type LegalSlug } from "@/lib/legal";
+import { TextPageSkeleton } from "@/components/TextPageSkeleton";
 
 const companyQuery = queryOptions({
   queryKey: ["company-profile"],
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/legal/$doc")({
     if (!LEGAL_SLUGS.includes(params.doc as LegalSlug)) throw notFound();
   },
   loader: ({ context }) => context.queryClient.ensureQueryData(companyQuery),
+  pendingComponent: TextPageSkeleton,
   head: ({ params }) => {
     const title = LEGAL_TITLES[params.doc as LegalSlug] ?? "מידע משפטי";
     const description = `${title} של NITZI — פלטפורמת חופשות מבוססת AI. מסמך רשמי ומעודכן.`;

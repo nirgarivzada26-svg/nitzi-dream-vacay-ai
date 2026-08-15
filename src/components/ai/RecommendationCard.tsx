@@ -1,8 +1,20 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { BadgeCheck, GitCompare, Heart, Moon, Plane, Star, Users } from "lucide-react";
+import {
+  ArrowLeftCircle,
+  BadgeCheck,
+  GitCompare,
+  Heart,
+  MessageCircleQuestion,
+  Moon,
+  Plane,
+  Sparkles,
+  Star,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 import { boardLabels } from "@/lib/deals";
+import { cancellationSummary } from "@/lib/cancellation-policy";
 import type { AgentComparison, AgentRecommendation } from "@/lib/agent/agent-types";
 import { isCompared, toggleCompare } from "@/lib/compare-store";
 import { addFavorite } from "@/lib/user-data";
@@ -22,12 +34,34 @@ const SMART_CLS: Record<string, string> = {
   unknown: "bg-muted text-muted-foreground",
 };
 
-export function RecommendationCard({ rec }: { rec: AgentRecommendation }) {
+export function RecommendationCard({
+  rec,
+  allRecommendations,
+  onAskFollowUp,
+}: {
+  rec: AgentRecommendation;
+  /** The full recommendations array from the SAME tool call — alternative
+   *  lookups below only ever resolve within this array, never elsewhere. */
+  allRecommendations?: AgentRecommendation[];
+  onAskFollowUp?: (prefillText: string) => void;
+}) {
   const catalog = useDestinations();
   const [compared, setCompared] = useState(rec.dealId ? isCompared(rec.dealId, "package") : false);
   const [saving, setSaving] = useState(false);
 
   const dest = catalog.find((d) => d.slug === rec.destinationSlug);
+
+  // Resolve alternative dealIds strictly within allRecommendations — if the
+  // referenced dealId isn't actually present in this same result set (it
+  // always should be, per agent-search.server.ts, but this guards against
+  // ever silently trusting an id that isn't visibly on screen), we don't
+  // render the alternative rather than risk pointing at an unseen deal.
+  const cheaperAlt = allRecommendations?.find(
+    (r) => r.dealId && r.dealId === rec.cheaperAlternativeDealId,
+  );
+  const betterAlt = allRecommendations?.find(
+    (r) => r.dealId && r.dealId === rec.betterAlternativeDealId,
+  );
 
   const onSave = async () => {
     if (!rec.dealId) return;
@@ -89,10 +123,27 @@ export function RecommendationCard({ rec }: { rec: AgentRecommendation }) {
           <span className="flex items-center gap-1 rounded-full bg-muted px-2 py-1">
             <Users className="h-3 w-3" /> {rec.people}
           </span>
-          <span className="rounded-full bg-muted px-2 py-1">{boardLabels[rec.board]}</span>
+          {rec.board === "unknown" ? (
+            <span className="rounded-full border border-dashed border-border px-2 py-1 text-muted-foreground">
+              בסיס אירוח לא ידוע
+            </span>
+          ) : (
+            <span className="rounded-full bg-muted px-2 py-1">{boardLabels[rec.board]}</span>
+          )}
           <span className="flex items-center gap-1 rounded-full bg-muted px-2 py-1">
             <Plane className="h-3 w-3" /> {rec.outbound.airline} ·{" "}
             {rec.outbound.stops === 0 ? "ישירה" : `${rec.outbound.stops} עצירות`}
+          </span>
+          <span
+            className={`rounded-full px-2 py-1 ${
+              rec.cancellationPolicy.kind === "free" || rec.cancellationPolicy.kind === "free_until"
+                ? "bg-emerald-50 text-emerald-800"
+                : rec.cancellationPolicy.kind === "unknown"
+                  ? "bg-muted text-muted-foreground"
+                  : "bg-amber-50 text-amber-900"
+            }`}
+          >
+            {cancellationSummary(rec.cancellationPolicy, rec.startDate)}
           </span>
         </div>
 
@@ -113,6 +164,54 @@ export function RecommendationCard({ rec }: { rec: AgentRecommendation }) {
           ))}
         </ul>
 
+        {(rec.advantage || rec.compromise) && (
+          <div className="space-y-1 text-[12px] font-semibold">
+            {rec.advantage && (
+              <p className="flex items-start gap-1.5 text-emerald-800">
+                <span aria-hidden>✓</span>
+                <span>
+                  <b className="font-black">יתרון עיקרי:</b> {rec.advantage}
+                </span>
+              </p>
+            )}
+            {rec.compromise && (
+              <p className="flex items-start gap-1.5 text-amber-800">
+                <span aria-hidden>⚠</span>
+                <span>
+                  <b className="font-black">שווה לדעת:</b> {rec.compromise}
+                </span>
+              </p>
+            )}
+          </div>
+        )}
+
+        {(cheaperAlt || betterAlt) && (
+          <div className="flex flex-wrap gap-1.5">
+            {cheaperAlt && (
+              <Link
+                to="/deal/$id"
+                params={{ id: cheaperAlt.dealId! }}
+                search={{ flight: undefined }}
+                className="inline-flex items-center gap-1 rounded-full border border-dashed border-border px-2.5 py-1 text-[11px] font-bold text-muted-foreground hover:border-primary hover:text-primary"
+              >
+                <ArrowLeftCircle className="h-3 w-3" aria-hidden /> יש זול יותר:{" "}
+                {fmt(cheaperAlt.pricePerPerson)} ב{cheaperAlt.destination}
+              </Link>
+            )}
+            {betterAlt && (
+              <Link
+                to="/deal/$id"
+                params={{ id: betterAlt.dealId! }}
+                search={{ flight: undefined }}
+                className="inline-flex items-center gap-1 rounded-full border border-dashed border-border px-2.5 py-1 text-[11px] font-bold text-muted-foreground hover:border-primary hover:text-primary"
+              >
+                <Sparkles className="h-3 w-3" aria-hidden /> יש מלון טוב יותר ב
+                {betterAlt.destination}
+              </Link>
+            )}
+          </div>
+        )}
+
         {rec.note && (
           <p className="rounded-2xl border border-dashed border-border p-2.5 text-[11px] font-bold text-muted-foreground">
             {rec.note}
@@ -129,6 +228,17 @@ export function RecommendationCard({ rec }: { rec: AgentRecommendation }) {
           </div>
 
           <div className="flex flex-wrap items-center justify-end gap-2">
+            {onAskFollowUp && (
+              <button
+                type="button"
+                onClick={() => onAskFollowUp(`לגבי ${rec.destination}: `)}
+                className="grid h-10 w-10 place-items-center rounded-2xl border border-border bg-background"
+                aria-label="שאלת המשך ל-NITZI"
+                title="שאלת המשך ל-NITZI"
+              >
+                <MessageCircleQuestion className="h-4 w-4" />
+              </button>
+            )}
             {rec.dealId && (
               <>
                 <button
@@ -156,9 +266,17 @@ export function RecommendationCard({ rec }: { rec: AgentRecommendation }) {
                   to="/deal/$id"
                   params={{ id: rec.dealId }}
                   search={{ flight: undefined }}
-                  className="rounded-2xl bg-gradient-sunset px-4 py-2.5 text-sm font-black text-white shadow-glow"
+                  className="rounded-2xl border border-border bg-background px-4 py-2.5 text-sm font-black text-foreground"
                 >
                   לצפייה בדיל
+                </Link>
+                <Link
+                  to="/booking-request/$dealId"
+                  params={{ dealId: rec.dealId }}
+                  search={{ flight: undefined }}
+                  className="rounded-2xl bg-gradient-sunset px-4 py-2.5 text-sm font-black text-white shadow-glow"
+                >
+                  המשך להזמנה
                 </Link>
               </>
             )}

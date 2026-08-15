@@ -8,6 +8,7 @@
 // functions — the return shape and Price-Revalidation contract are stable.
 
 import type { Destination } from "./catalog";
+import { derivePolicy, isFreeCancellation, type CancellationPolicy } from "./cancellation-policy";
 
 export type Availability = "available" | "limited" | "sold-out";
 
@@ -49,6 +50,8 @@ export interface Deal {
   listPricePerPerson: number; // pre-discount reference price
   discountPct: number; // 0-100
   freeCancellation: boolean;
+  /** Single source of truth — see src/lib/cancellation-policy.ts. `freeCancellation` above is derived from this. */
+  cancellationPolicy: CancellationPolicy;
   hotel: {
     name: string;
     note: string;
@@ -63,7 +66,6 @@ export interface Deal {
   price: DealPrice;
   includes: string[];
   excludes: string[];
-  cancellation: string;
   gallery: { src: string; alt: string }[];
   attractions: string[];
   restaurants: string[];
@@ -147,7 +149,8 @@ function buildDeal(dest: Destination, opts?: { secret?: boolean; seed?: string }
   ] as BoardBasis[]);
   const listPricePerPerson = Math.round((perPerson * (1.12 + r() * 0.26)) / 10) * 10;
   const discountPct = Math.max(0, Math.round((1 - perPerson / listPricePerPerson) * 100));
-  const freeCancellation = r() > 0.3;
+  const cancellationPolicy = derivePolicy(r);
+  const freeCancellation = isFreeCancellation(cancellationPolicy);
 
   return {
     id: dealIdFor(dest),
@@ -157,6 +160,7 @@ function buildDeal(dest: Destination, opts?: { secret?: boolean; seed?: string }
     listPricePerPerson,
     discountPct,
     freeCancellation,
+    cancellationPolicy,
     hotel: {
       name: hotel.name,
       note: hotel.note,
@@ -205,7 +209,6 @@ function buildDeal(dest: Destination, opts?: { secret?: boolean; seed?: string }
       "אטרקציות וסיורים מודרכים",
       "פיקדון וחיובים אישיים במלון",
     ],
-    cancellation: "ביטול חינם עד 21 ימים לפני היציאה. לאחר מכן חיוב לפי מדיניות הספק.",
     gallery: dest.image ? [{ src: dest.image, alt: `${dest.name} — נוף ראשי` }] : [],
     attractions: dest.attractions,
     restaurants: dest.restaurants,

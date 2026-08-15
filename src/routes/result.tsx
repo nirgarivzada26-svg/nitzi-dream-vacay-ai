@@ -31,6 +31,7 @@ import { setResultsCache } from "@/lib/results-cache";
 import { isCompared, toggleCompare, useCompare } from "@/lib/compare-store";
 import { CompareBar } from "@/components/CompareBar";
 import { WhyNitziButton } from "@/components/WhyNitziButton";
+import { CardGridSkeleton } from "@/components/CardGridSkeleton";
 
 export const Route = createFileRoute("/result")({
   head: () => ({
@@ -45,6 +46,7 @@ export const Route = createFileRoute("/result")({
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
+  pendingComponent: CardGridSkeleton,
   component: Result,
 });
 

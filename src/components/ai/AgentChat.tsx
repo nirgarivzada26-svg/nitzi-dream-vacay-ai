@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
-import { toast } from "sonner";
-import { AlertTriangle, Compass, Search, Wand2 } from "lucide-react";
+import { AlertTriangle, Compass, RefreshCw, Search, Wand2 } from "lucide-react";
 import {
   Conversation,
   ConversationContent,
@@ -18,7 +17,9 @@ import {
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import { Tool, ToolContent, ToolHeader, ToolInput } from "@/components/ai-elements/tool";
 import { ComparisonTable, RecommendationCard } from "@/components/ai/RecommendationCard";
-import type { AgentComparison, AgentSearchResult } from "@/lib/agent/agent-types";
+import { KnowledgePanel } from "@/components/ai/KnowledgePanel";
+import { QuickReplyChips } from "@/components/ai/QuickReplyChips";
+import type { AgentComparison, AgentSearchResult, KnownPreferences } from "@/lib/agent/agent-types";
 import { saveMessage } from "@/lib/ai-conversations";
 import { useAuth } from "@/lib/auth";
 import { listBookings, listFavorites } from "@/lib/user-data";
@@ -53,6 +54,7 @@ const TOOL_LABEL: Record<string, string> = {
   "tool-buildTrip": "הרכבת טיסה + מלון",
   "tool-compareTrips": "השוואת דילים",
   "tool-listCatalog": "בדיקת יעדים זמינים",
+  "tool-updateKnownPreferences": "עדכון מה שידוע עד כה",
 };
 
 export function AgentChat({
@@ -109,11 +111,13 @@ export function AgentChat({
     [profile],
   );
 
-  const { messages, sendMessage, status, error } = useChat({
+  const { messages, sendMessage, status, error, regenerate, clearError } = useChat({
     id: chatId,
     messages: initialMessages,
     transport,
-    onError: (e) => toast.error(e.message || "שגיאה בתקשורת עם NITZI AI"),
+    // Only one visible error surface (the inline card below) — no toast, to
+    // avoid showing the same failure twice. The raw error is never rendered
+    // to the user anywhere; see the inline card's fixed, safe copy.
   });
 
   // Persist new messages for signed-in conversations.
@@ -145,6 +149,29 @@ export function AgentChat({
 
   const busy = status === "submitted" || status === "streaming";
 
+  // Derived, never client-invented: the latest structured preferences the
+  // model itself emitted via updateKnownPreferences, or (as a fallback)
+  // the filters it actually used for its most recent search — whichever
+  // is more recent in the transcript.
+  const known = useMemo<KnownPreferences | null>(() => {
+    let latest: KnownPreferences | null = null;
+    for (const message of messages) {
+      for (const part of message.parts) {
+        if (!part.type.startsWith("tool-")) continue;
+        const p = part as unknown as { type: string; output?: unknown };
+        if (p.type === "tool-updateKnownPreferences" && p.output) {
+          latest = p.output as KnownPreferences;
+        } else if (
+          (p.type === "tool-searchTrips" || p.type === "tool-buildTrip") &&
+          isSearchResult(p.output)
+        ) {
+          latest = p.output.filtersUsed;
+        }
+      }
+    }
+    return latest;
+  }, [messages]);
+
   const submit = (text: string) => {
     const value = text.trim();
     if (!value || busy) return;
@@ -154,6 +181,23 @@ export function AgentChat({
     void sendMessage({ text: value });
     focusInput();
   };
+
+  const askFollowUp = useCallback((prefill: string) => {
+    const el = textareaRef.current;
+    if (!el) return;
+    // PromptInputTextarea is a controlled component (internal React state) —
+    // setting el.value directly wouldn't update that state, so we go
+    // through the same native-setter + dispatched-event path React itself
+    // listens to for onChange.
+    const nativeSetter = Object.getOwnPropertyDescriptor(
+      window.HTMLTextAreaElement.prototype,
+      "value",
+    )?.set;
+    nativeSetter?.call(el, prefill);
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.focus();
+    el.setSelectionRange(prefill.length, prefill.length);
+  }, []);
 
   return (
     <div className="flex h-full min-h-0 flex-1 flex-col" dir="rtl">
@@ -225,15 +269,31 @@ export function AgentChat({
                               <RecommendationCard
                                 key={`${rec.dealId ?? rec.destinationSlug}-${idx}`}
                                 rec={rec}
+                                // Alternatives are only ever looked up within
+                                // this SAME tool call's own recommendations —
+                                // never a separate/fresh lookup.
+                                allRecommendations={output.recommendations}
+                                onAskFollowUp={askFollowUp}
                               />
                             ))}
                           </div>
                         )}
                         {isSearchResult(output) && output.recommendations.length === 0 && (
-                          <p className="flex items-center gap-2 rounded-2xl border border-dashed border-border p-3 text-[13px] font-bold text-muted-foreground">
-                            <AlertTriangle className="h-4 w-4" />
-                            {output.emptyReason ?? "לא נמצאו תוצאות בקטלוג"}
-                          </p>
+                          <div className="space-y-2 rounded-2xl border border-dashed border-border p-3">
+                            <p className="flex items-center gap-2 text-[13px] font-bold text-muted-foreground">
+                              <AlertTriangle className="h-4 w-4 shrink-0" />
+                              {output.emptyReason ?? "לא נמצאו תוצאות בקטלוג"}
+                            </p>
+                            {output.blockingConstraint && (
+                              <button
+                                type="button"
+                                onClick={() => submit(output.blockingConstraint!.suggestion)}
+                                className="rounded-full border border-primary/40 bg-primary/5 px-3 py-1.5 text-[12px] font-bold text-primary"
+                              >
+                                {output.blockingConstraint.suggestion}
+                              </button>
+                            )}
+                          </div>
                         )}
                         {isComparison(output) && <ComparisonTable data={output} />}
                         {p.state === "output-error" && (
@@ -254,18 +314,33 @@ export function AgentChat({
           {busy && (
             <div className="flex items-center gap-2 text-sm font-bold">
               <Search className="h-4 w-4 text-primary" />
-              <Shimmer>NITZI מחפש בקטלוג...</Shimmer>
+              <Shimmer>אני בודק עבורך את האפשרויות המתאימות ביותר…</Shimmer>
             </div>
           )}
 
           {error && (
-            <p className="rounded-2xl bg-destructive/10 p-3 text-[13px] font-bold text-destructive">
-              {error.message}
-            </p>
+            <div className="flex items-center justify-between gap-3 rounded-2xl bg-destructive/10 p-3 text-[13px] font-bold text-destructive">
+              <span>אירעה שגיאה בתקשורת עם NITZI AI. נסה שוב בעוד רגע.</span>
+              <button
+                type="button"
+                onClick={() => {
+                  clearError();
+                  void regenerate();
+                }}
+                className="flex shrink-0 items-center gap-1 rounded-full border border-destructive/30 bg-background px-3 py-1.5 text-[12px] font-black text-destructive"
+              >
+                <RefreshCw className="h-3 w-3" aria-hidden /> נסה שוב
+              </button>
+            </div>
           )}
         </ConversationContent>
         <ConversationScrollButton />
       </Conversation>
+
+      <div className="space-y-2 pt-2">
+        <KnowledgePanel known={known} onRemove={(label) => submit(`בטל את ההעדפה: ${label}`)} />
+        <QuickReplyChips known={known} onPick={submit} />
+      </div>
 
       <div className="border-t border-border/60 bg-background/90 px-4 py-3 backdrop-blur sm:px-6">
         <div className="mx-auto w-full max-w-3xl">

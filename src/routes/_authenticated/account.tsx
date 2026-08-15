@@ -8,6 +8,7 @@ import { z } from "zod";
 import {
   ArrowLeft,
   Bell,
+  BellRing,
   BookmarkCheck,
   Calendar,
   Heart,
@@ -22,6 +23,9 @@ import {
 import { NitziLogo } from "@/components/NitziLogo";
 import { DestinationImage } from "@/components/DestinationImage";
 import { displayNameOf, signOut, useAuth } from "@/lib/auth";
+import { getDeal } from "@/lib/deals";
+import { useDestinations } from "@/lib/use-catalog";
+import { deletePriceAlert, listPriceAlerts } from "@/lib/price-alerts";
 import {
   clearSearchHistory,
   deleteSavedTrip,
@@ -37,7 +41,15 @@ import {
   type NotificationPreferences,
 } from "@/lib/user-data";
 
-const TABS = ["bookings", "trips", "favorites", "history", "notifications", "profile"] as const;
+const TABS = [
+  "bookings",
+  "trips",
+  "favorites",
+  "alerts",
+  "history",
+  "notifications",
+  "profile",
+] as const;
 type TabId = (typeof TABS)[number];
 
 const searchSchema = z.object({ tab: z.enum(TABS).optional() });
@@ -130,6 +142,12 @@ function AccountPage() {
           icon={<Heart className="h-3.5 w-3.5" />}
         />
         <TabLink
+          id="alerts"
+          active={active}
+          label="התראות מחיר"
+          icon={<BellRing className="h-3.5 w-3.5" />}
+        />
+        <TabLink
           id="history"
           active={active}
           label="היסטוריה"
@@ -153,6 +171,7 @@ function AccountPage() {
         {active === "bookings" && <BookingsTab />}
         {active === "trips" && <TripsTab />}
         {active === "favorites" && <FavoritesTab />}
+        {active === "alerts" && <PriceAlertsTab />}
         {active === "history" && <HistoryTab />}
         {active === "notifications" && <NotificationsTab />}
         {active === "profile" && <ProfileTab />}
@@ -376,6 +395,132 @@ function FavoritesTab() {
                 </Link>
               </div>
             </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * Honest, deterministic state for one price alert card — never a fabricated
+ * "live" price movement, just a comparison against the real current catalog
+ * price (same source every other page uses via getDeal()).
+ */
+export type PriceAlertState = "reached" | "pending" | "unavailable";
+
+export function priceAlertState(currentPrice: number | null, targetPrice: number): PriceAlertState {
+  if (currentPrice === null) return "unavailable";
+  return currentPrice <= targetPrice ? "reached" : "pending";
+}
+
+function PriceAlertsTab() {
+  const qc = useQueryClient();
+  const catalog = useDestinations();
+  const q = useQuery({ queryKey: ["price_alerts"], queryFn: listPriceAlerts });
+
+  if (q.isLoading) return <SkeletonList />;
+
+  if (!q.data?.length) {
+    return (
+      <EmptyState
+        title="אין לך עדיין התראות מחיר"
+        hint="בכל דיל אפשר להפעיל התראה שתתריע כשהמחיר יורד ליעד שתבחר."
+        cta={
+          <Link
+            to="/"
+            className="rounded-2xl bg-gradient-sunset px-4 py-2 text-sm font-black text-white shadow-glow"
+          >
+            גלה דילים
+          </Link>
+        }
+      />
+    );
+  }
+
+  const onDelete = async (dealId: string) => {
+    await deletePriceAlert(dealId);
+    qc.invalidateQueries({ queryKey: ["price_alerts"] });
+  };
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      {q.data.map((alert) => {
+        // The real, current catalog price — same source every other page
+        // uses (getDeal). Never a fabricated "live" tick; if the deal is no
+        // longer in the catalog we say so honestly instead of guessing.
+        const currentDeal = getDeal(alert.deal_id, catalog);
+        const currentPrice = currentDeal?.price.perPerson ?? null;
+        const state = priceAlertState(currentPrice, alert.target_price);
+
+        return (
+          <div key={alert.id} className="rounded-3xl border border-border bg-card p-4 shadow-soft">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <h3 className="truncate text-sm font-black text-foreground">
+                  {alert.destination_name}
+                </h3>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  נוצרה ב-{new Date(alert.created_at).toLocaleDateString("he-IL")}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => onDelete(alert.deal_id)}
+                aria-label={`הסר התראת מחיר ל${alert.destination_name}`}
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border text-muted-foreground hover:border-destructive/40 hover:text-destructive"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+
+            <div className="mt-3 space-y-1.5 text-[12px]">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">מחיר יעד</span>
+                <span className="font-black text-foreground">
+                  ₪{alert.target_price.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">מחיר בעת יצירת ההתראה</span>
+                <span className="font-bold text-foreground">
+                  ₪{alert.baseline_price.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">מחיר נוכחי בקטלוג</span>
+                <span className="font-bold text-foreground">
+                  {currentPrice !== null ? `₪${currentPrice.toLocaleString()}` : "לא זמין"}
+                </span>
+              </div>
+            </div>
+
+            <div
+              className={`mt-3 rounded-2xl px-3 py-2 text-[11px] font-black ${
+                state === "unavailable"
+                  ? "bg-muted text-muted-foreground"
+                  : state === "reached"
+                    ? "bg-emerald-100 text-emerald-800"
+                    : "bg-amber-100 text-amber-900"
+              }`}
+            >
+              {state === "unavailable"
+                ? "החבילה כבר לא זמינה בקטלוג"
+                : state === "reached"
+                  ? "המחיר הגיע ליעד שהגדרת! 🎉"
+                  : `עדיין מעל היעד ב-₪${(currentPrice! - alert.target_price).toLocaleString()}`}
+            </div>
+
+            {alert.deal_id && currentDeal && (
+              <Link
+                to="/deal/$id"
+                params={{ id: alert.deal_id }}
+                search={{ flight: undefined }}
+                className="mt-3 block rounded-2xl border border-border bg-background px-3 py-2 text-center text-[12px] font-black text-foreground"
+              >
+                לצפייה בדיל
+              </Link>
+            )}
           </div>
         );
       })}
