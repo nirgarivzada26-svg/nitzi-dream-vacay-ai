@@ -20,6 +20,7 @@ import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
 import { findDestination } from "@/lib/catalog";
 import { searchFlights, type ScoredFlight } from "@/lib/flight-search";
 import { CardGridSkeleton } from "@/components/CardGridSkeleton";
+import { canonicalLink } from "@/lib/seo";
 
 export const Route = createFileRoute("/flights")({
   head: () => ({
@@ -38,6 +39,7 @@ export const Route = createFileRoute("/flights")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [canonicalLink("/flights")],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
   pendingComponent: CardGridSkeleton,

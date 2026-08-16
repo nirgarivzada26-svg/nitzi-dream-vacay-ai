@@ -18,6 +18,7 @@ import { Footer } from "@/components/Footer";
 import { SignInModal } from "@/components/SignInModal";
 import { useAuth } from "@/lib/auth";
 import {
+import { canonicalLink } from "@/lib/seo";
   SUPPORT_FAQ,
   SUPPORT_TOPICS,
   createSupportRequest,
@@ -44,6 +45,7 @@ export const Route = createFileRoute("/support")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [canonicalLink("/support")],
   }),
   component: SupportPage,
 });

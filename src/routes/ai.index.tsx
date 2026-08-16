@@ -8,6 +8,7 @@ import { createConversation } from "@/lib/ai-conversations";
 import { useAuth } from "@/lib/auth";
 import { destinationsQueryOptions } from "@/lib/use-catalog";
 import { AiPageSkeleton } from "@/components/ai/AiPageSkeleton";
+import { canonicalLink } from "@/lib/seo";
 
 export const Route = createFileRoute("/ai/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(destinationsQueryOptions),
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/ai/")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [canonicalLink("/ai")],
   }),
   component: AiIndexPage,
 });

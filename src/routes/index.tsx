@@ -14,6 +14,7 @@ import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
 import { DestinationImage } from "@/components/DestinationImage";
 import { Sparkles } from "lucide-react";
 import { HomePageSkeleton } from "@/components/HomePageSkeleton";
+import { canonicalLink } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -33,6 +34,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
+      canonicalLink("/"),
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
