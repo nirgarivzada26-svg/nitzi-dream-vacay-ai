@@ -9,78 +9,49 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as CompareRouteImport } from './routes/compare'
-import { Route as FlightsRouteImport } from './routes/flights'
-import { Route as PackagesRouteImport } from './routes/packages'
-import { Route as QuizRouteImport } from './routes/quiz'
-import { Route as ResultRouteImport } from './routes/result'
 import { Route as SupportRouteImport } from './routes/support'
+import { Route as ResultRouteImport } from './routes/result'
+import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as PackagesRouteImport } from './routes/packages'
+import { Route as FlightsRouteImport } from './routes/flights'
+import { Route as CompareRouteImport } from './routes/compare'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AiIndexRouteImport } from './routes/ai.index'
+import { Route as PackageIdRouteImport } from './routes/package.$id'
+import { Route as LegalDocRouteImport } from './routes/legal.$doc'
+import { Route as HotelIdRouteImport } from './routes/hotel.$id'
+import { Route as FlightIdRouteImport } from './routes/flight.$id'
+import { Route as DestinationSlugRouteImport } from './routes/destination.$slug'
+import { Route as DealIdRouteImport } from './routes/deal.$id'
+import { Route as BookingRequestDealIdRouteImport } from './routes/booking-request.$dealId'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AiConversationIdRouteImport } from './routes/ai.$conversationId'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
-import { Route as AiIndexRouteImport } from './routes/ai.index'
-import { Route as AiConversationIdRouteImport } from './routes/ai.$conversationId'
-import { Route as ApiChatRouteImport } from './routes/api/chat'
-import { Route as BookingRequestDealIdRouteImport } from './routes/booking-request.$dealId'
-import { Route as DealIdRouteImport } from './routes/deal.$id'
-import { Route as DestinationSlugRouteImport } from './routes/destination.$slug'
-import { Route as FlightIdRouteImport } from './routes/flight.$id'
-import { Route as HotelIdRouteImport } from './routes/hotel.$id'
-import { Route as LegalDocRouteImport } from './routes/legal.$doc'
-import { Route as PackageIdRouteImport } from './routes/package.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
-import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
-import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
-import { Route as AuthenticatedAdminCommercialRouteImport } from './routes/_authenticated/admin/commercial'
-import { Route as AuthenticatedAdminFlightsRouteImport } from './routes/_authenticated/admin/flights'
-import { Route as AuthenticatedAdminLaunchRouteImport } from './routes/_authenticated/admin/launch'
-import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin/notifications'
-import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin/orders'
-import { Route as AuthenticatedAdminPackagesRouteImport } from './routes/_authenticated/admin/packages'
-import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin/permissions'
-import { Route as AuthenticatedAdminProvidersRouteImport } from './routes/_authenticated/admin/providers'
-import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin/reports'
-import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
-import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
-import { Route as AuthenticatedBookingIdRouteImport } from './routes/_authenticated/booking.$id'
 import { Route as AuthenticatedCheckoutIdRouteImport } from './routes/_authenticated/checkout.$id'
-import { Route as ApiPublicMonitoringPulseRouteImport } from './routes/api/public/monitoring/pulse'
+import { Route as AuthenticatedBookingIdRouteImport } from './routes/_authenticated/booking.$id'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
+import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin/reports'
+import { Route as AuthenticatedAdminProvidersRouteImport } from './routes/_authenticated/admin/providers'
+import { Route as AuthenticatedAdminPermissionsRouteImport } from './routes/_authenticated/admin/permissions'
+import { Route as AuthenticatedAdminPackagesRouteImport } from './routes/_authenticated/admin/packages'
+import { Route as AuthenticatedAdminOrdersRouteImport } from './routes/_authenticated/admin/orders'
+import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin/notifications'
+import { Route as AuthenticatedAdminLaunchRouteImport } from './routes/_authenticated/admin/launch'
+import { Route as AuthenticatedAdminFlightsRouteImport } from './routes/_authenticated/admin/flights'
+import { Route as AuthenticatedAdminCommercialRouteImport } from './routes/_authenticated/admin/commercial'
+import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
+import { Route as AuthenticatedAdminAnalyticsRouteImport } from './routes/_authenticated/admin/analytics'
 import { Route as ApiPublicWebhooksProviderRouteImport } from './routes/api/public/webhooks/$provider'
+import { Route as ApiPublicMonitoringPulseRouteImport } from './routes/api/public/monitoring/pulse'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CompareRoute = CompareRouteImport.update({
-  id: '/compare',
-  path: '/compare',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FlightsRoute = FlightsRouteImport.update({
-  id: '/flights',
-  path: '/flights',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PackagesRoute = PackagesRouteImport.update({
-  id: '/packages',
-  path: '/packages',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const QuizRoute = QuizRouteImport.update({
-  id: '/quiz',
-  path: '/quiz',
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResultRoute = ResultRouteImport.update({
@@ -88,9 +59,88 @@ const ResultRoute = ResultRouteImport.update({
   path: '/result',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SupportRoute = SupportRouteImport.update({
-  id: '/support',
-  path: '/support',
+const QuizRoute = QuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PackagesRoute = PackagesRouteImport.update({
+  id: '/packages',
+  path: '/packages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FlightsRoute = FlightsRouteImport.update({
+  id: '/flights',
+  path: '/flights',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiIndexRoute = AiIndexRouteImport.update({
+  id: '/ai/',
+  path: '/ai/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PackageIdRoute = PackageIdRouteImport.update({
+  id: '/package/$id',
+  path: '/package/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalDocRoute = LegalDocRouteImport.update({
+  id: '/legal/$doc',
+  path: '/legal/$doc',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HotelIdRoute = HotelIdRouteImport.update({
+  id: '/hotel/$id',
+  path: '/hotel/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FlightIdRoute = FlightIdRouteImport.update({
+  id: '/flight/$id',
+  path: '/flight/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DestinationSlugRoute = DestinationSlugRouteImport.update({
+  id: '/destination/$slug',
+  path: '/destination/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DealIdRoute = DealIdRouteImport.update({
+  id: '/deal/$id',
+  path: '/deal/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookingRequestDealIdRoute = BookingRequestDealIdRouteImport.update({
+  id: '/booking-request/$dealId',
+  path: '/booking-request/$dealId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AiConversationIdRoute = AiConversationIdRouteImport.update({
+  id: '/ai/$conversationId',
+  path: '/ai/$conversationId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
@@ -103,118 +153,30 @@ const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AiIndexRoute = AiIndexRouteImport.update({
-  id: '/ai/',
-  path: '/ai/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AiConversationIdRoute = AiConversationIdRouteImport.update({
-  id: '/ai/$conversationId',
-  path: '/ai/$conversationId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiChatRoute = ApiChatRouteImport.update({
-  id: '/api/chat',
-  path: '/api/chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BookingRequestDealIdRoute = BookingRequestDealIdRouteImport.update({
-  id: '/booking-request/$dealId',
-  path: '/booking-request/$dealId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DealIdRoute = DealIdRouteImport.update({
-  id: '/deal/$id',
-  path: '/deal/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DestinationSlugRoute = DestinationSlugRouteImport.update({
-  id: '/destination/$slug',
-  path: '/destination/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FlightIdRoute = FlightIdRouteImport.update({
-  id: '/flight/$id',
-  path: '/flight/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HotelIdRoute = HotelIdRouteImport.update({
-  id: '/hotel/$id',
-  path: '/hotel/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LegalDocRoute = LegalDocRouteImport.update({
-  id: '/legal/$doc',
-  path: '/legal/$doc',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PackageIdRoute = PackageIdRouteImport.update({
-  id: '/package/$id',
-  path: '/package/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
-const AuthenticatedAdminAnalyticsRoute =
-  AuthenticatedAdminAnalyticsRouteImport.update({
-    id: '/analytics',
-    path: '/analytics',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
-  } as any)
-const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
-  id: '/audit',
-  path: '/audit',
+const AuthenticatedCheckoutIdRoute = AuthenticatedCheckoutIdRouteImport.update({
+  id: '/checkout/$id',
+  path: '/checkout/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBookingIdRoute = AuthenticatedBookingIdRouteImport.update({
+  id: '/booking/$id',
+  path: '/booking/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
-const AuthenticatedAdminCommercialRoute =
-  AuthenticatedAdminCommercialRouteImport.update({
-    id: '/commercial',
-    path: '/commercial',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
-  } as any)
-const AuthenticatedAdminFlightsRoute =
-  AuthenticatedAdminFlightsRouteImport.update({
-    id: '/flights',
-    path: '/flights',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
-  } as any)
-const AuthenticatedAdminLaunchRoute =
-  AuthenticatedAdminLaunchRouteImport.update({
-    id: '/launch',
-    path: '/launch',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
-  } as any)
-const AuthenticatedAdminNotificationsRoute =
-  AuthenticatedAdminNotificationsRouteImport.update({
-    id: '/notifications',
-    path: '/notifications',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
-  } as any)
-const AuthenticatedAdminOrdersRoute =
-  AuthenticatedAdminOrdersRouteImport.update({
-    id: '/orders',
-    path: '/orders',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
-  } as any)
-const AuthenticatedAdminPackagesRoute =
-  AuthenticatedAdminPackagesRouteImport.update({
-    id: '/packages',
-    path: '/packages',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
-  } as any)
-const AuthenticatedAdminPermissionsRoute =
-  AuthenticatedAdminPermissionsRouteImport.update({
-    id: '/permissions',
-    path: '/permissions',
-    getParentRoute: () => AuthenticatedAdminRouteRoute,
-  } as any)
-const AuthenticatedAdminProvidersRoute =
-  AuthenticatedAdminProvidersRouteImport.update({
-    id: '/providers',
-    path: '/providers',
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminReportsRoute =
@@ -223,37 +185,75 @@ const AuthenticatedAdminReportsRoute =
     path: '/reports',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
-const AuthenticatedAdminSettingsRoute =
-  AuthenticatedAdminSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
+const AuthenticatedAdminProvidersRoute =
+  AuthenticatedAdminProvidersRouteImport.update({
+    id: '/providers',
+    path: '/providers',
     getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
-const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
+const AuthenticatedAdminPermissionsRoute =
+  AuthenticatedAdminPermissionsRouteImport.update({
+    id: '/permissions',
+    path: '/permissions',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminPackagesRoute =
+  AuthenticatedAdminPackagesRouteImport.update({
+    id: '/packages',
+    path: '/packages',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminOrdersRoute =
+  AuthenticatedAdminOrdersRouteImport.update({
+    id: '/orders',
+    path: '/orders',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminNotificationsRoute =
+  AuthenticatedAdminNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminLaunchRoute =
+  AuthenticatedAdminLaunchRouteImport.update({
+    id: '/launch',
+    path: '/launch',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminFlightsRoute =
+  AuthenticatedAdminFlightsRouteImport.update({
+    id: '/flights',
+    path: '/flights',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminCommercialRoute =
+  AuthenticatedAdminCommercialRouteImport.update({
+    id: '/commercial',
+    path: '/commercial',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
+const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
   getParentRoute: () => AuthenticatedAdminRouteRoute,
 } as any)
-const AuthenticatedBookingIdRoute = AuthenticatedBookingIdRouteImport.update({
-  id: '/booking/$id',
-  path: '/booking/$id',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedCheckoutIdRoute = AuthenticatedCheckoutIdRouteImport.update({
-  id: '/checkout/$id',
-  path: '/checkout/$id',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const ApiPublicMonitoringPulseRoute =
-  ApiPublicMonitoringPulseRouteImport.update({
-    id: '/api/public/monitoring/pulse',
-    path: '/api/public/monitoring/pulse',
-    getParentRoute: () => rootRouteImport,
+const AuthenticatedAdminAnalyticsRoute =
+  AuthenticatedAdminAnalyticsRouteImport.update({
+    id: '/analytics',
+    path: '/analytics',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const ApiPublicWebhooksProviderRoute =
   ApiPublicWebhooksProviderRouteImport.update({
     id: '/api/public/webhooks/$provider',
     path: '/api/public/webhooks/$provider',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicMonitoringPulseRoute =
+  ApiPublicMonitoringPulseRouteImport.update({
+    id: '/api/public/monitoring/pulse',
+    path: '/api/public/monitoring/pulse',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -527,53 +527,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/compare': {
-      id: '/compare'
-      path: '/compare'
-      fullPath: '/compare'
-      preLoaderRoute: typeof CompareRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/flights': {
-      id: '/flights'
-      path: '/flights'
-      fullPath: '/flights'
-      preLoaderRoute: typeof FlightsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/packages': {
-      id: '/packages'
-      path: '/packages'
-      fullPath: '/packages'
-      preLoaderRoute: typeof PackagesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/quiz': {
-      id: '/quiz'
-      path: '/quiz'
-      fullPath: '/quiz'
-      preLoaderRoute: typeof QuizRouteImport
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/result': {
@@ -583,11 +541,123 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResultRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/support': {
-      id: '/support'
-      path: '/support'
-      fullPath: '/support'
-      preLoaderRoute: typeof SupportRouteImport
+    '/quiz': {
+      id: '/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/packages': {
+      id: '/packages'
+      path: '/packages'
+      fullPath: '/packages'
+      preLoaderRoute: typeof PackagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/flights': {
+      id: '/flights'
+      path: '/flights'
+      fullPath: '/flights'
+      preLoaderRoute: typeof FlightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai/': {
+      id: '/ai/'
+      path: '/ai'
+      fullPath: '/ai/'
+      preLoaderRoute: typeof AiIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/package/$id': {
+      id: '/package/$id'
+      path: '/package/$id'
+      fullPath: '/package/$id'
+      preLoaderRoute: typeof PackageIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/$doc': {
+      id: '/legal/$doc'
+      path: '/legal/$doc'
+      fullPath: '/legal/$doc'
+      preLoaderRoute: typeof LegalDocRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hotel/$id': {
+      id: '/hotel/$id'
+      path: '/hotel/$id'
+      fullPath: '/hotel/$id'
+      preLoaderRoute: typeof HotelIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/flight/$id': {
+      id: '/flight/$id'
+      path: '/flight/$id'
+      fullPath: '/flight/$id'
+      preLoaderRoute: typeof FlightIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/destination/$slug': {
+      id: '/destination/$slug'
+      path: '/destination/$slug'
+      fullPath: '/destination/$slug'
+      preLoaderRoute: typeof DestinationSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/deal/$id': {
+      id: '/deal/$id'
+      path: '/deal/$id'
+      fullPath: '/deal/$id'
+      preLoaderRoute: typeof DealIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/booking-request/$dealId': {
+      id: '/booking-request/$dealId'
+      path: '/booking-request/$dealId'
+      fullPath: '/booking-request/$dealId'
+      preLoaderRoute: typeof BookingRequestDealIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ai/$conversationId': {
+      id: '/ai/$conversationId'
+      path: '/ai/$conversationId'
+      fullPath: '/ai/$conversationId'
+      preLoaderRoute: typeof AiConversationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/account': {
@@ -604,76 +674,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/ai/': {
-      id: '/ai/'
-      path: '/ai'
-      fullPath: '/ai/'
-      preLoaderRoute: typeof AiIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ai/$conversationId': {
-      id: '/ai/$conversationId'
-      path: '/ai/$conversationId'
-      fullPath: '/ai/$conversationId'
-      preLoaderRoute: typeof AiConversationIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/chat': {
-      id: '/api/chat'
-      path: '/api/chat'
-      fullPath: '/api/chat'
-      preLoaderRoute: typeof ApiChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/booking-request/$dealId': {
-      id: '/booking-request/$dealId'
-      path: '/booking-request/$dealId'
-      fullPath: '/booking-request/$dealId'
-      preLoaderRoute: typeof BookingRequestDealIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/deal/$id': {
-      id: '/deal/$id'
-      path: '/deal/$id'
-      fullPath: '/deal/$id'
-      preLoaderRoute: typeof DealIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/destination/$slug': {
-      id: '/destination/$slug'
-      path: '/destination/$slug'
-      fullPath: '/destination/$slug'
-      preLoaderRoute: typeof DestinationSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/flight/$id': {
-      id: '/flight/$id'
-      path: '/flight/$id'
-      fullPath: '/flight/$id'
-      preLoaderRoute: typeof FlightIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/hotel/$id': {
-      id: '/hotel/$id'
-      path: '/hotel/$id'
-      fullPath: '/hotel/$id'
-      preLoaderRoute: typeof HotelIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/legal/$doc': {
-      id: '/legal/$doc'
-      path: '/legal/$doc'
-      fullPath: '/legal/$doc'
-      preLoaderRoute: typeof LegalDocRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/package/$id': {
-      id: '/package/$id'
-      path: '/package/$id'
-      fullPath: '/package/$id'
-      preLoaderRoute: typeof PackageIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
@@ -681,81 +681,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
-    '/_authenticated/admin/analytics': {
-      id: '/_authenticated/admin/analytics'
-      path: '/analytics'
-      fullPath: '/admin/analytics'
-      preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
+    '/_authenticated/checkout/$id': {
+      id: '/_authenticated/checkout/$id'
+      path: '/checkout/$id'
+      fullPath: '/checkout/$id'
+      preLoaderRoute: typeof AuthenticatedCheckoutIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/admin/audit': {
-      id: '/_authenticated/admin/audit'
-      path: '/audit'
-      fullPath: '/admin/audit'
-      preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
+    '/_authenticated/booking/$id': {
+      id: '/_authenticated/booking/$id'
+      path: '/booking/$id'
+      fullPath: '/booking/$id'
+      preLoaderRoute: typeof AuthenticatedBookingIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/admin/commercial': {
-      id: '/_authenticated/admin/commercial'
-      path: '/commercial'
-      fullPath: '/admin/commercial'
-      preLoaderRoute: typeof AuthenticatedAdminCommercialRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
-    }
-    '/_authenticated/admin/flights': {
-      id: '/_authenticated/admin/flights'
-      path: '/flights'
-      fullPath: '/admin/flights'
-      preLoaderRoute: typeof AuthenticatedAdminFlightsRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
-    }
-    '/_authenticated/admin/launch': {
-      id: '/_authenticated/admin/launch'
-      path: '/launch'
-      fullPath: '/admin/launch'
-      preLoaderRoute: typeof AuthenticatedAdminLaunchRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
-    }
-    '/_authenticated/admin/notifications': {
-      id: '/_authenticated/admin/notifications'
-      path: '/notifications'
-      fullPath: '/admin/notifications'
-      preLoaderRoute: typeof AuthenticatedAdminNotificationsRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
-    }
-    '/_authenticated/admin/orders': {
-      id: '/_authenticated/admin/orders'
-      path: '/orders'
-      fullPath: '/admin/orders'
-      preLoaderRoute: typeof AuthenticatedAdminOrdersRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
-    }
-    '/_authenticated/admin/packages': {
-      id: '/_authenticated/admin/packages'
-      path: '/packages'
-      fullPath: '/admin/packages'
-      preLoaderRoute: typeof AuthenticatedAdminPackagesRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
-    }
-    '/_authenticated/admin/permissions': {
-      id: '/_authenticated/admin/permissions'
-      path: '/permissions'
-      fullPath: '/admin/permissions'
-      preLoaderRoute: typeof AuthenticatedAdminPermissionsRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
-    }
-    '/_authenticated/admin/providers': {
-      id: '/_authenticated/admin/providers'
-      path: '/providers'
-      fullPath: '/admin/providers'
-      preLoaderRoute: typeof AuthenticatedAdminProvidersRouteImport
-      parentRoute: typeof AuthenticatedAdminRouteRoute
-    }
-    '/_authenticated/admin/reports': {
-      id: '/_authenticated/admin/reports'
-      path: '/reports'
-      fullPath: '/admin/reports'
-      preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/settings': {
@@ -765,39 +709,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
-    '/_authenticated/admin/users': {
-      id: '/_authenticated/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+    '/_authenticated/admin/reports': {
+      id: '/_authenticated/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AuthenticatedAdminReportsRouteImport
       parentRoute: typeof AuthenticatedAdminRouteRoute
     }
-    '/_authenticated/booking/$id': {
-      id: '/_authenticated/booking/$id'
-      path: '/booking/$id'
-      fullPath: '/booking/$id'
-      preLoaderRoute: typeof AuthenticatedBookingIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/_authenticated/admin/providers': {
+      id: '/_authenticated/admin/providers'
+      path: '/providers'
+      fullPath: '/admin/providers'
+      preLoaderRoute: typeof AuthenticatedAdminProvidersRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
-    '/_authenticated/checkout/$id': {
-      id: '/_authenticated/checkout/$id'
-      path: '/checkout/$id'
-      fullPath: '/checkout/$id'
-      preLoaderRoute: typeof AuthenticatedCheckoutIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/_authenticated/admin/permissions': {
+      id: '/_authenticated/admin/permissions'
+      path: '/permissions'
+      fullPath: '/admin/permissions'
+      preLoaderRoute: typeof AuthenticatedAdminPermissionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
-    '/api/public/monitoring/pulse': {
-      id: '/api/public/monitoring/pulse'
-      path: '/api/public/monitoring/pulse'
-      fullPath: '/api/public/monitoring/pulse'
-      preLoaderRoute: typeof ApiPublicMonitoringPulseRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/admin/packages': {
+      id: '/_authenticated/admin/packages'
+      path: '/packages'
+      fullPath: '/admin/packages'
+      preLoaderRoute: typeof AuthenticatedAdminPackagesRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/orders': {
+      id: '/_authenticated/admin/orders'
+      path: '/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AuthenticatedAdminOrdersRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/notifications': {
+      id: '/_authenticated/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AuthenticatedAdminNotificationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/launch': {
+      id: '/_authenticated/admin/launch'
+      path: '/launch'
+      fullPath: '/admin/launch'
+      preLoaderRoute: typeof AuthenticatedAdminLaunchRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/flights': {
+      id: '/_authenticated/admin/flights'
+      path: '/flights'
+      fullPath: '/admin/flights'
+      preLoaderRoute: typeof AuthenticatedAdminFlightsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/commercial': {
+      id: '/_authenticated/admin/commercial'
+      path: '/commercial'
+      fullPath: '/admin/commercial'
+      preLoaderRoute: typeof AuthenticatedAdminCommercialRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/audit': {
+      id: '/_authenticated/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/_authenticated/admin/analytics': {
+      id: '/_authenticated/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AuthenticatedAdminAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/api/public/webhooks/$provider': {
       id: '/api/public/webhooks/$provider'
       path: '/api/public/webhooks/$provider'
       fullPath: '/api/public/webhooks/$provider'
       preLoaderRoute: typeof ApiPublicWebhooksProviderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/monitoring/pulse': {
+      id: '/api/public/monitoring/pulse'
+      path: '/api/public/monitoring/pulse'
+      fullPath: '/api/public/monitoring/pulse'
+      preLoaderRoute: typeof ApiPublicMonitoringPulseRouteImport
       parentRoute: typeof rootRouteImport
     }
   }

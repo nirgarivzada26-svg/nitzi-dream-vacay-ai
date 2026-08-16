@@ -166,42 +166,6 @@ export type Database = {
         }
         Relationships: []
       }
-      provider_offer_cache: {
-        Row: {
-          canonical_id: string
-          source_mode: string
-          provider_id: string
-          provider_offer_id: string
-          offer: Json
-          search_context: Json
-          created_at: string
-          verified_at: string | null
-          expires_at: string
-        }
-        Insert: {
-          canonical_id: string
-          source_mode: string
-          provider_id: string
-          provider_offer_id: string
-          offer: Json
-          search_context?: Json
-          created_at?: string
-          verified_at?: string | null
-          expires_at: string
-        }
-        Update: {
-          canonical_id?: string
-          source_mode?: string
-          provider_id?: string
-          provider_offer_id?: string
-          offer?: Json
-          search_context?: Json
-          created_at?: string
-          verified_at?: string | null
-          expires_at?: string
-        }
-        Relationships: []
-      }
       app_error_log: {
         Row: {
           context: Json
@@ -696,6 +660,42 @@ export type Database = {
           operation?: string
           provider_id?: string
           provider_kind?: string
+        }
+        Relationships: []
+      }
+      provider_offer_cache: {
+        Row: {
+          canonical_id: string
+          created_at: string
+          expires_at: string
+          offer: Json
+          provider_id: string
+          provider_offer_id: string
+          search_context: Json
+          source_mode: string
+          verified_at: string | null
+        }
+        Insert: {
+          canonical_id: string
+          created_at?: string
+          expires_at: string
+          offer: Json
+          provider_id: string
+          provider_offer_id: string
+          search_context: Json
+          source_mode: string
+          verified_at?: string | null
+        }
+        Update: {
+          canonical_id?: string
+          created_at?: string
+          expires_at?: string
+          offer?: Json
+          provider_id?: string
+          provider_offer_id?: string
+          search_context?: Json
+          source_mode?: string
+          verified_at?: string | null
         }
         Relationships: []
       }
