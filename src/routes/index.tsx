@@ -18,7 +18,7 @@ import { HomePageSkeleton } from "@/components/HomePageSkeleton";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "NITZI — עוזר ה-AI שמתכנן לך את החופשה המושלמת" },
+      { title: "NITZI" },
       {
         name: "description",
         content:
