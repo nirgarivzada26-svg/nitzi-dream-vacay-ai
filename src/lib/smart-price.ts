@@ -34,7 +34,10 @@ export interface SmartPriceVerdict {
 
 const UNKNOWN_LABEL = "אין מספיק מידע";
 
-export function smartPrice(deal: Deal, peerPricesPerPerson: number[] = []): SmartPriceVerdict | null {
+export function smartPrice(
+  deal: Deal,
+  peerPricesPerPerson: number[] = [],
+): SmartPriceVerdict | null {
   const peers = peerPricesPerPerson.filter((n) => Number.isFinite(n) && n > 0);
   const catalogAvg = deal.destination.avgBudgetPerPerson;
   const peerAvg = peers.length > 0 ? peers.reduce((a, b) => a + b, 0) / peers.length : null;

@@ -88,15 +88,18 @@ describe("Slice 3.6 — concierge itinerary", () => {
     const allowed = new Set([...rich.restaurants, ...rich.attractions, ...rich.itinerary]);
     for (const day of buildItinerary(richDeals[0]))
       for (const s of day.slots)
-        if (s.source.includes("restaurants") || s.source.includes("attractions") || s.source.includes("itinerary"))
+        if (
+          s.source.includes("restaurants") ||
+          s.source.includes("attractions") ||
+          s.source.includes("itinerary")
+        )
           expect(allowed.has(s.title)).toBe(true);
   });
 
   it("still produces a valid plan for a destination with no content", () => {
     const days = buildItinerary(bareDeals[0]);
     expect(days.length).toBeGreaterThan(1);
-    for (const day of days)
-      for (const s of day.slots) expect(s.source.length).toBeGreaterThan(0);
+    for (const day of days) for (const s of day.slots) expect(s.source.length).toBeGreaterThan(0);
   });
 });
 

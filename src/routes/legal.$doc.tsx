@@ -10,6 +10,7 @@ import { Footer } from "@/components/Footer";
 import { getCompanyProfile } from "@/lib/company.functions";
 import { LEGAL_SLUGS, LEGAL_TITLES, getLegalDocument, type LegalSlug } from "@/lib/legal";
 import { TextPageSkeleton } from "@/components/TextPageSkeleton";
+import { canonicalLink } from "@/lib/seo";
 
 const companyQuery = queryOptions({
   queryKey: ["company-profile"],
@@ -35,6 +36,7 @@ export const Route = createFileRoute("/legal/$doc")({
         { property: "og:type", content: "article" },
         { name: "twitter:card", content: "summary" },
       ],
+      links: [canonicalLink(`/legal/${params.doc}`)],
     };
   },
   component: LegalPage,

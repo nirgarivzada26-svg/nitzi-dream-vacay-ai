@@ -51,8 +51,7 @@ export function similarDeals(deal: Deal, catalog: Destination[], limit = 6): Sim
     push(d, "better-hotel");
   for (const d of all.filter((d) => d.outbound.stops === 0 && deal.outbound.stops > 0))
     push(d, "direct-flight");
-  for (const d of all.filter((d) => d.price.perPerson < budget * 0.92))
-    push(d, "cheaper-flight");
+  for (const d of all.filter((d) => d.price.perPerson < budget * 0.92)) push(d, "cheaper-flight");
   for (const d of all.filter((d) => d.destination.region === deal.destination.region))
     push(d, "nearby-destination");
   for (const d of all.filter(

@@ -152,7 +152,8 @@ export const Route = createFileRoute("/api/chat")({
         const lovable = createNitziAiProvider(apiKey, runIdFetch);
 
         const profile = body.profile as
-          { favorites?: string[]; booked?: string[]; avgBudget?: number | null } | undefined;
+          | { favorites?: string[]; booked?: string[]; avgBudget?: number | null }
+          | undefined;
         const personalization =
           profile && (profile.favorites?.length || profile.booked?.length || profile.avgBudget)
             ? `\n\nמידע אישי על המשתמש (לשימוש בהתאמה, לא להמצאה): מועדפים: ${profile.favorites?.join(", ") || "אין"}. הזמנות קודמות: ${profile.booked?.join(", ") || "אין"}. תקציב ממוצע קודם לאדם: ${profile.avgBudget ? `₪${profile.avgBudget}` : "לא ידוע"}.`

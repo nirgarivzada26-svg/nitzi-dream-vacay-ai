@@ -18,19 +18,22 @@ import { GlobalDemoBanner } from "../components/GlobalDemoBanner";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+    <div
+      dir="rtl"
+      className="flex min-h-screen items-center justify-center bg-background px-4 text-center"
+    >
+      <div className="max-w-md">
+        <h1 className="text-7xl font-black text-foreground">404</h1>
+        <h2 className="mt-4 text-xl font-black text-foreground">הדף לא נמצא</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          הדף שחיפשת לא קיים או שהוסר. אפשר לחזור לעמוד הבית ולהמשיך לתכנן את החופשה.
         </p>
         <div className="mt-6">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-2xl bg-primary px-5 py-3 text-sm font-black text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Go home
+            חזרה לעמוד הבית
           </Link>
         </div>
       </div>
@@ -46,13 +49,14 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
+    <div
+      dir="rtl"
+      className="flex min-h-screen items-center justify-center bg-background px-4 text-center"
+    >
+      <div className="max-w-md">
+        <h1 className="text-xl font-black tracking-tight text-foreground">הדף לא נטען</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          משהו השתבש אצלנו. אפשר לנסות שוב או לחזור לעמוד הבית.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -60,15 +64,15 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-2xl bg-primary px-5 py-3 text-sm font-black text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Try again
+            נסה שוב
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex items-center justify-center rounded-2xl border border-input bg-background px-5 py-3 text-sm font-black text-foreground transition-colors hover:bg-accent"
           >
-            Go home
+            לעמוד הבית
           </a>
         </div>
       </div>
@@ -116,7 +120,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="he" dir="rtl">
       <head>
         <HeadContent />
       </head>

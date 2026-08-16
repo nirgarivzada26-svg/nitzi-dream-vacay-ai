@@ -10,8 +10,7 @@
 import type { Destination } from "../catalog";
 import { boardLabels, type Deal } from "../deals";
 
-export const NO_ITINERARY_DATA =
-  "אין מספיק תוכן מובנה ביעד כדי להציע מסלול יומי מלא.";
+export const NO_ITINERARY_DATA = "אין מספיק תוכן מובנה ביעד כדי להציע מסלול יומי מלא.";
 
 export type SlotKind =
   | "arrival"
@@ -56,9 +55,7 @@ const addDays = (iso: string, n: number): string | null => {
 };
 
 const has = (dest: Destination, ...keys: string[]) =>
-  keys.some(
-    (k) => dest.travelCategories.includes(k) || (dest.matches as string[]).includes(k),
-  );
+  keys.some((k) => dest.travelCategories.includes(k) || (dest.matches as string[]).includes(k));
 
 function boardMeal(deal: Deal, meal: "breakfast" | "lunch" | "dinner"): ItinerarySlot | null {
   const b = deal.board;
@@ -68,7 +65,11 @@ function boardMeal(deal: Deal, meal: "breakfast" | "lunch" | "dinner"): Itinerar
     (meal === "lunch" && b === "all-inclusive");
   if (!included) return null;
   const label =
-    meal === "breakfast" ? "ארוחת בוקר במלון" : meal === "lunch" ? "ארוחת צהריים במלון" : "ארוחת ערב במלון";
+    meal === "breakfast"
+      ? "ארוחת בוקר במלון"
+      : meal === "lunch"
+        ? "ארוחת צהריים במלון"
+        : "ארוחת ערב במלון";
   return {
     kind: "meal",
     time: meal === "breakfast" ? "08:00" : meal === "lunch" ? "13:00" : "19:30",

@@ -210,7 +210,7 @@ export function sendBookingConfirmationSms(args: {
   return sendSms({
     to: args.to,
     template: "booking_confirmation",
-    body: `NITZI: ההזמנה ${args.reference} אושרה. הפרטים נשלחו למייל.`,
+    body: `NITZI: ההזמנה ${args.reference} אושרה. הפרטים המלאים זמינים באזור האישי באתר.`,
     channel: args.channel ?? "sms",
     userId: args.userId ?? null,
   });

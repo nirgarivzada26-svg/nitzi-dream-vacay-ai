@@ -52,22 +52,14 @@ export function travelTips(dest: Destination): TipCategory[] {
       "אזורים ושכונות",
       [
         dest.subregion ? `אזור: ${dest.subregion}` : null,
-        dest.itinerary.length > 0 ? `אזורים במסלול המומלץ: ${dest.itinerary.slice(0, 4).join(" · ")}` : null,
+        dest.itinerary.length > 0
+          ? `אזורים במסלול המומלץ: ${dest.itinerary.slice(0, 4).join(" · ")}`
+          : null,
       ],
       "עמודות subregion ו-itinerary בקטלוג היעדים",
     ),
-    cat(
-      "food",
-      "מסעדות ואוכל",
-      dest.restaurants.slice(0, 6),
-      "עמודת restaurants בקטלוג היעדים",
-    ),
-    cat(
-      "attractions",
-      "אטרקציות",
-      dest.attractions.slice(0, 6),
-      "עמודת attractions בקטלוג היעדים",
-    ),
+    cat("food", "מסעדות ואוכל", dest.restaurants.slice(0, 6), "עמודת restaurants בקטלוג היעדים"),
+    cat("attractions", "אטרקציות", dest.attractions.slice(0, 6), "עמודת attractions בקטלוג היעדים"),
     cat(
       "avoid",
       "מה כדאי להימנע ממנו",
@@ -118,7 +110,9 @@ export function travelTips(dest: Destination): TipCategory[] {
       "מידע מקומי",
       [
         dest.languages.length > 0 ? `שפות: ${dest.languages.join(", ")}` : null,
-        dest.travelCategories.length > 0 ? `סוגי חופשה ביעד: ${dest.travelCategories.join(", ")}` : null,
+        dest.travelCategories.length > 0
+          ? `סוגי חופשה ביעד: ${dest.travelCategories.join(", ")}`
+          : null,
         dest.averageTripDuration ? `משך טיול ממוצע: ${dest.averageTripDuration} לילות` : null,
       ],
       "עמודות languages, travel_categories, average_trip_duration",

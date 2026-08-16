@@ -4,6 +4,7 @@ import { NitziLogo } from "@/components/NitziLogo";
 import { clearCompare, toggleCompare, useCompare } from "@/lib/compare-store";
 import { findHotel, findPackage, getResultsCache } from "@/lib/results-cache";
 import { amenityLabel } from "@/lib/explain";
+import { canonicalLink } from "@/lib/seo";
 
 export const Route = createFileRoute("/compare")({
   head: () => ({
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/compare")({
       { property: "og:title", content: "השוואה — NITZI" },
       { property: "og:description", content: "טבלת השוואה שקופה של NITZI." },
     ],
+    links: [canonicalLink("/compare")],
   }),
   component: ComparePage,
 });

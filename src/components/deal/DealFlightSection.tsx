@@ -104,15 +104,7 @@ export function DealFlightSection({
   );
 }
 
-function Fact({
-  label,
-  value,
-  icon,
-}: {
-  label: string;
-  value: string;
-  icon?: React.ReactNode;
-}) {
+function Fact({ label, value, icon }: { label: string; value: string; icon?: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-border bg-muted/40 p-2.5">
       <dt className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">

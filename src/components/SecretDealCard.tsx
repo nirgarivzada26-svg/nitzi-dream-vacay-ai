@@ -31,7 +31,8 @@ export function SecretDealCard() {
   }, []);
 
   const openDeal = () =>
-    secret && navigate({ to: "/deal/$id", params: { id: secret.deal.id }, search: { flight: undefined } });
+    secret &&
+    navigate({ to: "/deal/$id", params: { id: secret.deal.id }, search: { flight: undefined } });
 
   const handleClick = () => {
     if (!secret) return;

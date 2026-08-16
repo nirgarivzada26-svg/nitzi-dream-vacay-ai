@@ -7,8 +7,18 @@ import type { Destination } from "../catalog";
 export const NO_WEATHER_DATA = "אין נתונים מאומתים.";
 
 const MONTHS_HE = [
-  "ינואר","פברואר","מרץ","אפריל","מאי","יוני",
-  "יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר",
+  "ינואר",
+  "פברואר",
+  "מרץ",
+  "אפריל",
+  "מאי",
+  "יוני",
+  "יולי",
+  "אוגוסט",
+  "ספטמבר",
+  "אוקטובר",
+  "נובמבר",
+  "דצמבר",
 ];
 
 export interface WeatherFact {
@@ -20,9 +30,7 @@ export interface WeatherFact {
 
 export function weatherSummary(dest: Destination): WeatherFact[] {
   const air = dest.weather?.trim() ? dest.weather.trim() : null;
-  const months = dest.bestTravelMonths
-    .map((m) => MONTHS_HE[m - 1])
-    .filter(Boolean);
+  const months = dest.bestTravelMonths.map((m) => MONTHS_HE[m - 1]).filter(Boolean);
 
   return [
     {

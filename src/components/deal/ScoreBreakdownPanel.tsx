@@ -24,8 +24,8 @@ export function ScoreBreakdownPanel({ breakdown }: { breakdown: ScoreBreakdown }
         <div className="min-w-0">
           <p className="text-sm font-black">ניקוד NITZI כולל</p>
           <p className="text-[11px] text-muted-foreground">
-            משוקלל ממלון (30%), מחיר (30%), טיסה (25%) ומיקום (15%). {breakdown.coverage.scored} מתוך{" "}
-            {breakdown.coverage.total} מדדים מגובים בנתונים.
+            משוקלל ממלון (30%), מחיר (30%), טיסה (25%) ומיקום (15%). {breakdown.coverage.scored}{" "}
+            מתוך {breakdown.coverage.total} מדדים מגובים בנתונים.
           </p>
         </div>
       </div>

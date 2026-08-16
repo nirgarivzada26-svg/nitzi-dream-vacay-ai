@@ -97,7 +97,7 @@ function AuthPage() {
   return (
     <div
       dir="rtl"
-      className="relative min-h-screen bg-gradient-to-b from-sand/60 via-background to-background pb-16"
+      className="relative min-h-screen overflow-x-hidden bg-gradient-to-b from-sand/60 via-background to-background pb-16"
     >
       <div
         aria-hidden

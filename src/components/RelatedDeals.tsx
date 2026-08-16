@@ -87,9 +87,7 @@ export function RelatedDeals({ deal, catalog }: { deal: Deal; catalog: Destinati
         id: "bestsellers",
         title: "רבי מכר",
         emoji: "🏆",
-        deals: [...others]
-          .sort((a, b) => b.hotel.reviewsCount - a.hotel.reviewsCount)
-          .slice(0, 10),
+        deals: [...others].sort((a, b) => b.hotel.reviewsCount - a.hotel.reviewsCount).slice(0, 10),
       },
     ].filter((r) => r.deals.length > 0);
   }, [all, deal, recent]);

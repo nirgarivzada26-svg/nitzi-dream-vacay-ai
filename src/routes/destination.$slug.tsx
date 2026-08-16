@@ -23,6 +23,7 @@ import { destinationsQueryOptions, useDestinations } from "@/lib/use-catalog";
 import { findDestination } from "@/lib/catalog";
 import { getDeal } from "@/lib/deals";
 import { DestinationPageSkeleton } from "@/components/DestinationPageSkeleton";
+import { canonicalLink } from "@/lib/seo";
 
 export const Route = createFileRoute("/destination/$slug")({
   loader: async ({ context, params }) => {
@@ -49,6 +50,7 @@ export const Route = createFileRoute("/destination/$slug")({
         { property: "og:type", content: "article" },
         { name: "twitter:card", content: "summary_large_image" },
       ],
+      links: [canonicalLink(`/destination/${encodeURIComponent(params.slug)}`)],
     };
   },
   errorComponent: ({ reset }) => (

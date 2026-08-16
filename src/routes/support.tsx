@@ -26,6 +26,7 @@ import {
   type SupportRequestRow,
   type SupportTopic,
 } from "@/lib/support";
+import { canonicalLink } from "@/lib/seo";
 
 export const Route = createFileRoute("/support")({
   head: () => ({
@@ -44,6 +45,7 @@ export const Route = createFileRoute("/support")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [canonicalLink("/support")],
   }),
   component: SupportPage,
 });

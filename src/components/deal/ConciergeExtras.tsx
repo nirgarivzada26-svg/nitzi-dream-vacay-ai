@@ -43,13 +43,7 @@ export function ConciergeSavings({ deal, peers }: { deal: Deal; peers: Deal[] })
   );
 }
 
-export function ConciergeAlternatives({
-  deal,
-  catalog,
-}: {
-  deal: Deal;
-  catalog: Destination[];
-}) {
+export function ConciergeAlternatives({ deal, catalog }: { deal: Deal; catalog: Destination[] }) {
   const alts = alternativeDestinations(deal.destination, catalog);
   if (alts.length === 0)
     return (

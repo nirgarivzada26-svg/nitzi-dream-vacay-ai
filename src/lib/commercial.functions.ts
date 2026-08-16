@@ -3,7 +3,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { CommercialGateRecord, CommercialReport, MonitorPulse } from "./launch/commercial-types";
+import type {
+  CommercialGateRecord,
+  CommercialReport,
+  MonitorPulse,
+} from "./launch/commercial-types";
 
 export interface CommercialState {
   report: CommercialReport | null;

@@ -57,8 +57,7 @@ export function DealFlightAlternatives({
                 </div>
                 <div className="mt-2 flex items-center gap-2 text-[12px] font-bold text-foreground">
                   <Plane className="h-3.5 w-3.5 text-primary" aria-hidden />
-                  {a.outbound.airline} · {time(a.outbound.departAt)} →{" "}
-                  {time(a.outbound.arriveAt)}
+                  {a.outbound.airline} · {time(a.outbound.departAt)} → {time(a.outbound.arriveAt)}
                   <span className="text-muted-foreground">
                     {a.outbound.stops === 0 ? "ישירה" : `${a.outbound.stops} עצירות`}
                   </span>

@@ -7,12 +7,7 @@ import { experienceProfile, NO_EXPERIENCE_DATA } from "@/lib/concierge/experienc
 export function ConciergeAudience({ deal }: { deal: Deal }) {
   const { fits, avoid } = audienceFor(deal);
 
-  const col = (
-    title: string,
-    items: typeof fits,
-    tone: "good" | "bad",
-    empty: string,
-  ) => (
+  const col = (title: string, items: typeof fits, tone: "good" | "bad", empty: string) => (
     <div className="rounded-2xl border border-border bg-card p-4">
       <p className="mb-2 text-sm font-black text-foreground">{title}</p>
       {items.length === 0 ? (

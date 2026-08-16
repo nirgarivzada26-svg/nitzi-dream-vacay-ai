@@ -22,18 +22,19 @@ export function audienceFor(deal: Deal): AudienceVerdict {
   const fits: AudienceFlag[] = [];
   const avoid: AudienceFlag[] = [];
 
-  const add = (
-    to: AudienceFlag[],
-    key: string,
-    label: string,
-    reason: string,
-    source: string,
-  ) => to.push({ key, label, reason, source });
+  const add = (to: AudienceFlag[], key: string, label: string, reason: string, source: string) =>
+    to.push({ key, label, reason, source });
 
   if (tags.has("romantic"))
     add(fits, "couples", "זוגות", "היעד מסווג בקטלוג כיעד רומנטי", "travel_categories / matches");
   if (tags.has("romantic") && deal.hotel.stars >= 4)
-    add(fits, "honeymoon", "ירח דבש", `יעד רומנטי עם מלון ${deal.hotel.stars}★`, "travel_categories + דירוג המלון");
+    add(
+      fits,
+      "honeymoon",
+      "ירח דבש",
+      `יעד רומנטי עם מלון ${deal.hotel.stars}★`,
+      "travel_categories + דירוג המלון",
+    );
   if (tags.has("family"))
     add(fits, "families", "משפחות", "היעד מסווג בקטלוג כיעד משפחתי", "travel_categories / matches");
   if (tags.has("friends") || tags.has("nightlife"))
@@ -79,15 +80,15 @@ export function audienceFor(deal: Deal): AudienceVerdict {
       "פרטי הטיסה בהצעה",
     );
   if (tags.has("nightlife") && tags.has("family") === false && !tags.has("nature"))
+    add(avoid, "quiet", "מחפשי שקט", "היעד מסווג כיעד חיי לילה בלבד", "travel_categories");
+  if (!tags.has("nightlife"))
     add(
       avoid,
-      "quiet",
-      "מחפשי שקט",
-      "היעד מסווג כיעד חיי לילה בלבד",
+      "party",
+      "מחפשי חיי לילה",
+      "היעד אינו מסווג בקטלוג כיעד חיי לילה",
       "travel_categories",
     );
-  if (!tags.has("nightlife"))
-    add(avoid, "party", "מחפשי חיי לילה", "היעד אינו מסווג בקטלוג כיעד חיי לילה", "travel_categories");
   if (!tags.has("family") && deal.hotel.stars <= 3)
     add(
       avoid,

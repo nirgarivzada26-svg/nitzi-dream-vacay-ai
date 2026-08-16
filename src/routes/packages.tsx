@@ -8,6 +8,7 @@ import { CardGridSkeleton } from "@/components/CardGridSkeleton";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { groupDeals, type Deal } from "@/lib/deals";
 import { getPackagesOffers } from "@/lib/packages-offers.functions";
+import { canonicalLink } from "@/lib/seo";
 
 type SortKey = "value" | "price" | "discount" | "soon";
 
@@ -46,6 +47,7 @@ export const Route = createFileRoute("/packages")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [canonicalLink("/packages")],
   }),
   validateSearch: (raw: Record<string, unknown>): PackagesSearch => ({
     country: typeof raw.country === "string" ? raw.country : undefined,

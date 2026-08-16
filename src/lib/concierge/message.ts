@@ -10,8 +10,7 @@ import { topExperiences } from "./experience";
 import { audienceFor } from "./audience";
 import { inBestSeason } from "./weather";
 
-export const NO_MESSAGE =
-  "אין מספיק נתונים מאומתים כדי לנסח המלצה אישית על הדיל הזה.";
+export const NO_MESSAGE = "אין מספיק נתונים מאומתים כדי לנסח המלצה אישית על הדיל הזה.";
 
 export interface ConciergeMessage {
   headline: string;
@@ -41,12 +40,9 @@ export function conciergeMessage(deal: Deal, peers: Deal[]): ConciergeMessage | 
       source: "שדה board בהצעה",
     });
 
-  const samePeers = peers.filter(
-    (p) => p.id !== deal.id && p.destination.slug === dest.slug,
-  );
+  const samePeers = peers.filter((p) => p.id !== deal.id && p.destination.slug === dest.slug);
   if (samePeers.length >= 2) {
-    const avg =
-      samePeers.reduce((s, p) => s + p.price.perPerson, 0) / samePeers.length;
+    const avg = samePeers.reduce((s, p) => s + p.price.perPerson, 0) / samePeers.length;
     if (deal.price.perPerson < avg * 0.95)
       reasons.push({
         text: `המחיר נמוך בכ-${Math.round(((avg - deal.price.perPerson) / avg) * 100)}% מהממוצע של ${samePeers.length} הצעות מאומתות אחרות לאותו יעד`,
@@ -80,7 +76,13 @@ export function conciergeMessage(deal: Deal, peers: Deal[]): ConciergeMessage | 
   const caveat =
     avoid.length > 0 ? `שווה לשים לב: פחות מתאים ל${avoid[0].label} — ${avoid[0].reason}.` : null;
 
-  const who = fits.length > 0 ? ` אם אתם ${fits.slice(0, 2).map((f) => f.label).join(" או ")},` : "";
+  const who =
+    fits.length > 0
+      ? ` אם אתם ${fits
+          .slice(0, 2)
+          .map((f) => f.label)
+          .join(" או ")},`
+      : "";
 
   return {
     headline: `אם זו הייתה החופשה שלי,${who} הייתי בוחר בדיל הזה בגלל:`,
