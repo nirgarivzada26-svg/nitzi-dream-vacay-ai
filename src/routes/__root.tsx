@@ -87,10 +87,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "NITZI מתכננת עבורך את החופשה הבאה: יעדים, דילים, מלונות וטיסות עם AI.",
       },
       { property: "og:site_name", content: "NITZI" },
+      { property: "og:title", content: "NITZI" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "NITZI" },
+      { name: "application-name", content: "NITZI" },
+      { name: "apple-mobile-web-app-title", content: "NITZI" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
     ],
     links: [
+      { rel: "manifest", href: "/site.webmanifest" },
       {
         rel: "stylesheet",
         href: appCss,
