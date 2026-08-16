@@ -49,7 +49,9 @@ export function ConciergeItinerary({ deal }: { deal: Deal }) {
                       {s.detail && (
                         <span className="block text-xs text-muted-foreground">{s.detail}</span>
                       )}
-                      <span className="block text-[10px] text-muted-foreground/70">מקור: {s.source}</span>
+                      <span className="block text-[10px] text-muted-foreground/70">
+                        מקור: {s.source}
+                      </span>
                     </span>
                   </li>
                 ))}

@@ -133,7 +133,9 @@ function verdictFor(base: Deal, other: Deal): string {
   if (other.hotel.stars > base.hotel.stars)
     gains.push(`מלון ${other.hotel.stars}★ במקום ${base.hotel.stars}★`);
   if (other.hotel.guestRating > base.hotel.guestRating + 0.2)
-    gains.push(`דירוג אורחים ${other.hotel.guestRating.toFixed(1)} במקום ${base.hotel.guestRating.toFixed(1)}`);
+    gains.push(
+      `דירוג אורחים ${other.hotel.guestRating.toFixed(1)} במקום ${base.hotel.guestRating.toFixed(1)}`,
+    );
   if (other.outbound.stops < base.outbound.stops) gains.push("טיסה ישירה");
   if (other.board !== base.board) gains.push(boardLabels[other.board]);
   if (!base.freeCancellation && other.freeCancellation) gains.push("ביטול חינם");
@@ -167,7 +169,11 @@ function pick(cands: Deal[], angle: CompareAngle, base: Deal): Deal | null {
     case "better-hotel":
       return (
         s
-          .filter((d) => d.hotel.stars > base.hotel.stars || d.hotel.guestRating > base.hotel.guestRating + 0.3)
+          .filter(
+            (d) =>
+              d.hotel.stars > base.hotel.stars ||
+              d.hotel.guestRating > base.hotel.guestRating + 0.3,
+          )
           .sort((a, b) => b.hotel.guestRating - a.hotel.guestRating)[0] ?? null
       );
     case "cheaper":

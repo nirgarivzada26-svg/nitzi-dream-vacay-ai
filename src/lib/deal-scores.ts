@@ -50,8 +50,7 @@ export function hotelMetrics(deal: Deal): Metric[] {
   const perNight = deal.price.perPerson / Math.max(1, deal.dates.nights);
   const baseline = dest.avgBudgetPerPerson / Math.max(1, deal.dates.nights);
 
-  const familySignal =
-    dest.matches.includes("family") || dest.travelCategories.includes("family");
+  const familySignal = dest.matches.includes("family") || dest.travelCategories.includes("family");
   const coupleSignal =
     dest.matches.includes("romantic") || dest.travelCategories.includes("romantic");
 
@@ -84,10 +83,7 @@ export function hotelMetrics(deal: Deal): Metric[] {
     {
       key: "value",
       label: "תמורה למחיר",
-      value:
-        baseline > 0
-          ? clamp(50 + ((baseline - perNight) / baseline) * 120)
-          : null,
+      value: baseline > 0 ? clamp(50 + ((baseline - perNight) / baseline) * 120) : null,
       basis:
         baseline > 0
           ? `₪${Math.round(perNight).toLocaleString("he-IL")} ללילה לאדם מול ממוצע ₪${Math.round(baseline).toLocaleString("he-IL")} ליעד`
@@ -105,9 +101,7 @@ export function hotelMetrics(deal: Deal): Metric[] {
       key: "couples",
       label: "התאמה לזוגות",
       value: coupleSignal ? clamp(60 + (h.guestRating - 8) * 15) : null,
-      basis: coupleSignal
-        ? "היעד מתויג בקטלוג כמתאים לזוגות"
-        : `${NO_DATA} — אין תיוג זוגות ליעד`,
+      basis: coupleSignal ? "היעד מתויג בקטלוג כמתאים לזוגות" : `${NO_DATA} — אין תיוג זוגות ליעד`,
     },
   ];
 }
@@ -136,13 +130,9 @@ export function flightMetrics(deal: Deal, alt: FlightAlternative | null): Metric
     ? {
         key: "baggage",
         label: "כבודה",
-        value: clamp(
-          (alt.carryOnIncluded ? 40 : 0) + (alt.checkedBagIncluded ? 60 : 0),
-        ),
+        value: clamp((alt.carryOnIncluded ? 40 : 0) + (alt.checkedBagIncluded ? 60 : 0)),
         basis: `${alt.carryOnIncluded ? "טרולי כלול" : "ללא טרולי"} · ${
-          alt.checkedBagIncluded
-            ? `מזוודה ${alt.checkedBagKg ?? "?"} ק״ג כלולה`
-            : "מזוודה בתשלום"
+          alt.checkedBagIncluded ? `מזוודה ${alt.checkedBagKg ?? "?"} ק״ג כלולה` : "מזוודה בתשלום"
         }`,
       }
     : { key: "baggage", label: "כבודה", value: null, basis: `${NO_DATA} — תנאי מזוודה לא נמסרו` };
@@ -183,7 +173,11 @@ const LOCATION_SIGNALS: { key: string; label: string; words: string[] }[] = [
   { key: "center", label: "מרכז עיר", words: ["מרכז", "כיכר", "עיר עתיקה", "רובע", "שדרות"] },
   { key: "nightlife", label: "חיי לילה", words: ["בר", "מועדון", "לילה", "פאב", "יין"] },
   { key: "family", label: "משפחות", words: ["פארק", "גן חיות", "אקווריום", "לונה", "מוזיאון"] },
-  { key: "transport", label: "תחבורה ציבורית", words: ["רכבת", "מטרו", "תחתית", "טראם", "אוטובוס"] },
+  {
+    key: "transport",
+    label: "תחבורה ציבורית",
+    words: ["רכבת", "מטרו", "תחתית", "טראם", "אוטובוס"],
+  },
   { key: "shopping", label: "קניות", words: ["שוק", "קניון", "שופינג", "חנויות", "מרקט"] },
   { key: "walk", label: "הליכתיות", words: ["טיילת", "רגל", "סמטה", "עיר עתיקה", "רחוב"] },
 ];
@@ -227,10 +221,7 @@ export function priceMetrics(deal: Deal, peers: Deal[]): Metric[] {
     {
       key: "vs-avg",
       label: "מול ממוצע היעד",
-      value:
-        baseline > 0
-          ? clamp(50 + ((baseline - deal.price.perPerson) / baseline) * 100)
-          : null,
+      value: baseline > 0 ? clamp(50 + ((baseline - deal.price.perPerson) / baseline) * 100) : null,
       basis:
         baseline > 0
           ? `₪${deal.price.perPerson.toLocaleString("he-IL")} מול ממוצע ₪${baseline.toLocaleString("he-IL")} לאדם`
@@ -262,7 +253,11 @@ export function priceMetrics(deal: Deal, peers: Deal[]): Metric[] {
   ];
 }
 
-export function scoreBreakdown(deal: Deal, peers: Deal[] = [], flightId?: string | null): ScoreBreakdown {
+export function scoreBreakdown(
+  deal: Deal,
+  peers: Deal[] = [],
+  flightId?: string | null,
+): ScoreBreakdown {
   const alt = findAlternative(deal, flightId ?? null);
   const hotel = hotelMetrics(deal);
   const flight = flightMetrics(deal, alt);

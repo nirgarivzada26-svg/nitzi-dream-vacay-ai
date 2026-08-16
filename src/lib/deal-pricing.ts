@@ -20,8 +20,7 @@ export interface PriceBreakdown {
 
 export const toCents = (ils: number) => Math.round(ils * 100);
 export const fromCents = (c: number) => c / 100;
-export const fmtCents = (c: number) =>
-  `₪${Math.round(c / 100).toLocaleString("he-IL")}`;
+export const fmtCents = (c: number) => `₪${Math.round(c / 100).toLocaleString("he-IL")}`;
 
 const SERVICE_FEE_CENTS_PER_TRAVELER = 4900; // ₪49 NITZI service fee
 

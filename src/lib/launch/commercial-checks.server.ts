@@ -259,10 +259,13 @@ async function paymentChecks(): Promise<LaunchCheck[]> {
 
 async function dnsTxt(name: string): Promise<string[]> {
   try {
-    const res = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(name)}&type=TXT`, {
-      headers: { accept: "application/json" },
-      signal: AbortSignal.timeout(8000),
-    });
+    const res = await fetch(
+      `https://dns.google/resolve?name=${encodeURIComponent(name)}&type=TXT`,
+      {
+        headers: { accept: "application/json" },
+        signal: AbortSignal.timeout(8000),
+      },
+    );
     const body = (await res.json()) as { Answer?: { data: string }[] };
     return (body.Answer ?? []).map((a) => a.data.replace(/^"|"$/g, ""));
   } catch {
@@ -285,9 +288,7 @@ async function emailChecks(): Promise<LaunchCheck[]> {
     : [[], []];
   const dkimSelectors = ["default", "resend", "lovable", "s1", "google"];
   const dkim = domain
-    ? (
-        await Promise.all(dkimSelectors.map((s) => dnsTxt(`${s}._domainkey.${domain}`)))
-      ).flat()
+    ? (await Promise.all(dkimSelectors.map((s) => dnsTxt(`${s}._domainkey.${domain}`)))).flat()
     : [];
 
   const emailMessages = MESSAGE_CATALOG.filter((m) => m.channel === "email");
@@ -390,9 +391,8 @@ async function supplierChecks(): Promise<LaunchCheck[]> {
   const { FLIGHT_ADAPTERS } = await import("@/lib/providers/flight-adapters.server");
   const { HOTEL_ADAPTERS } = await import("@/lib/providers/hotel-adapters.server");
   const { PAYMENT_ADAPTERS } = await import("@/lib/providers/payment-adapters.server");
-  const { EMAIL_ADAPTERS, SMS_ADAPTERS } = await import(
-    "@/lib/providers/messaging-adapters.server"
-  );
+  const { EMAIL_ADAPTERS, SMS_ADAPTERS } =
+    await import("@/lib/providers/messaging-adapters.server");
   const { providerOrder } = await import("@/lib/providers/credentials.server");
 
   const cancelRoute = routeExists("_authenticated/booking.$id");
@@ -592,10 +592,7 @@ async function observabilityChecks(): Promise<LaunchCheck[]> {
     ),
     await run("obs.alerting", "התראות", () => {
       if (!thresholds || typeof thresholds.provider_failure_rate !== "number")
-        return fail(
-          "לא הוגדרו ספי התראה (alert_thresholds)",
-          "הגדר ספי התראה בהגדרות המערכת",
-        );
+        return fail("לא הוגדרו ספי התראה (alert_thresholds)", "הגדר ספי התראה בהגדרות המערכת");
       return routeExists("api/public/monitoring/pulse")
         ? ok(
             `ניטור אוטומטי פעיל: שיעור כשל ספקים ${Math.round(
@@ -700,11 +697,14 @@ async function securityChecks(): Promise<LaunchCheck[]> {
   // Real probe: the AI rate limiter must exist and answer.
   let rateLimit: { ok: boolean; message: string };
   try {
-    const { error } = await supabaseAdmin.rpc("ai_rate_limit_hit" as never, {
-      _user_id: "00000000-0000-0000-0000-000000000000",
-      _limit: 1,
-      _window_seconds: 1,
-    } as never);
+    const { error } = await supabaseAdmin.rpc(
+      "ai_rate_limit_hit" as never,
+      {
+        _user_id: "00000000-0000-0000-0000-000000000000",
+        _limit: 1,
+        _window_seconds: 1,
+      } as never,
+    );
     rateLimit = { ok: !error, message: error?.message ?? "פונקציית ההגבלה עונה" };
   } catch (e) {
     rateLimit = { ok: false, message: e instanceof Error ? e.message : "שגיאה" };
@@ -733,10 +733,7 @@ async function securityChecks(): Promise<LaunchCheck[]> {
     await run("security.2fa", "מוכנות ל-2FA", () =>
       review.two_factor_ready
         ? ok("אימות דו-שלבי סומן כמוכן להפעלה בשכבת האימות")
-        : fail(
-            "2FA לא סומן כמוכן",
-            "הפעל MFA בשכבת האימות וסמן security_review.two_factor_ready",
-          ),
+        : fail("2FA לא סומן כמוכן", "הפעל MFA בשכבת האימות וסמן security_review.two_factor_ready"),
     ),
     await run("security.secrets", "אחסון סודות", () => {
       // A secret is only safe while it stays server-side: anything exposed to
@@ -748,10 +745,11 @@ async function securityChecks(): Promise<LaunchCheck[]> {
         (k) => Boolean(env(k)),
       );
       return exposed.length === 0
-        ? ok(
-            `אין סודות חשופים ללקוח; ${serverSide.length} מפתחות ספק נקראים מסביבת השרת בזמן ריצה`,
-          )
-        : fail(`סודות חשופים ללקוח: ${exposed.join(", ")}`, "העבר אותם לסודות שרת ללא קידומת VITE_");
+        ? ok(`אין סודות חשופים ללקוח; ${serverSide.length} מפתחות ספק נקראים מסביבת השרת בזמן ריצה`)
+        : fail(
+            `סודות חשופים ללקוח: ${exposed.join(", ")}`,
+            "העבר אותם לסודות שרת ללא קידומת VITE_",
+          );
     }),
     await run("security.ratelimit", "הגבלת קצב", () =>
       rateLimit.ok
@@ -795,7 +793,9 @@ async function cxChecks(): Promise<LaunchCheck[]> {
   const checks = await Promise.all(
     pages.map((p) =>
       run(`cx.${p.id}`, p.label, () =>
-        routeExists(p.route) ? ok(`מסלול פעיל: ${p.route}`) : fail(`חסר מסלול ${p.route}`, "צור את העמוד"),
+        routeExists(p.route)
+          ? ok(`מסלול פעיל: ${p.route}`)
+          : fail(`חסר מסלול ${p.route}`, "צור את העמוד"),
       ),
     ),
   );

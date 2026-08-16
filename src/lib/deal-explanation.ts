@@ -9,8 +9,7 @@ import { smartPrice } from "./smart-price";
 import { nitziScore } from "./deal-score";
 import { flightAlternatives } from "./deal-alternatives";
 
-export const NOT_ENOUGH_DATA =
-  "אין מספיק מידע מאומת להצגת הסבר מלא.";
+export const NOT_ENOUGH_DATA = "אין מספיק מידע מאומת להצגת הסבר מלא.";
 
 export interface ExplanationSection {
   key: string;
@@ -117,7 +116,6 @@ export function explainDeal(deal: Deal, peers: Deal[] = []): DealExplanation {
   ]);
 
   add("pros", "יתרונות", [
-
     direct ? "טיסה ישירה" : null,
     deal.board !== "room-only" ? `${boardLabels[deal.board]} כלול` : null,
     deal.freeCancellation ? "ביטול חינם" : null,

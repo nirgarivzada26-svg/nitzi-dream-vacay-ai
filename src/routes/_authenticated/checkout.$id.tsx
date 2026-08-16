@@ -683,7 +683,6 @@ function CheckoutPage() {
                     ההזמנה זמינים תמיד באזור האישי. ({maskEmail(contact.email)})
                   </p>
                 )}
-
               </section>
             )}
           </main>

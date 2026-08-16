@@ -17,8 +17,8 @@ export function BookTimingCard({ timing }: { timing: BookTiming | null }) {
   if (!timing)
     return (
       <p className="rounded-2xl border border-border bg-muted/50 p-3 text-[12px] font-bold text-muted-foreground">
-        אין מספיק נתונים מאומתים כדי לקבוע אם זה זמן טוב להזמין. NITZI לא מציגה המלצת תזמון ללא
-        בסיס נתונים.
+        אין מספיק נתונים מאומתים כדי לקבוע אם זה זמן טוב להזמין. NITZI לא מציגה המלצת תזמון ללא בסיס
+        נתונים.
       </p>
     );
 

@@ -35,7 +35,6 @@ export function WhyNitziButton({
         </button>
       )}
 
-
       {open && (
         <div
           className="fixed inset-0 z-[110] grid place-items-end bg-black/60 p-0 backdrop-blur-sm sm:place-items-center sm:p-4"

@@ -83,14 +83,7 @@ export function experienceProfile(deal: Deal): ExperienceDimension[] {
       : fromTags(dest, "culture", "תרבות", ["city", "culture", "history"]),
     fromTags(dest, "shopping", "קניות", ["shopping", "city"]),
     fromTags(dest, "nature", "טבע", ["nature", "mountains", "ski"]),
-    fromTags(
-      dest,
-      "families",
-      "משפחות",
-      ["family"],
-      stars >= 4 ? 10 : 0,
-      `מלון ${stars}★`,
-    ),
+    fromTags(dest, "families", "משפחות", ["family"], stars >= 4 ? 10 : 0, `מלון ${stars}★`),
     fromTags(
       dest,
       "couples",

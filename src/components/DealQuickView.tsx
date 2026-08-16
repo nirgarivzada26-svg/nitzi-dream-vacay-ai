@@ -62,10 +62,7 @@ export function DealQuickView({
         className="relative max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-t-3xl bg-background shadow-2xl sm:rounded-3xl"
       >
         <div className="relative h-56 w-full overflow-hidden sm:h-72">
-          <DestinationImage
-            destination={deal.destination}
-            className="h-full w-full object-cover"
-          />
+          <DestinationImage destination={deal.destination} className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           <button
             onClick={onClose}
@@ -75,8 +72,7 @@ export function DealQuickView({
             <X className="h-4 w-4" />
           </button>
           <span className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-black text-foreground backdrop-blur">
-            <BadgeCheck className="h-3.5 w-3.5 text-emerald-600" /> מחיר אומת ·{" "}
-            {deal.price.source}
+            <BadgeCheck className="h-3.5 w-3.5 text-emerald-600" /> מחיר אומת · {deal.price.source}
           </span>
           <div className="absolute inset-x-0 bottom-0 p-5 text-white">
             <p className="text-xs font-bold text-white/85">
@@ -208,15 +204,7 @@ export function DealQuickView({
   );
 }
 
-function Fact({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-}) {
+function Fact({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="rounded-2xl border border-border/60 bg-muted/40 p-3">
       <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">

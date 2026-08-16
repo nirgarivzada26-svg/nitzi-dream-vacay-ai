@@ -16,7 +16,13 @@ import { DealQuickView } from "@/components/DealQuickView";
 import { WhyNitziButton } from "@/components/WhyNitziButton";
 import { PriceAlertButton } from "@/components/PriceAlertButton";
 
-export function DealCardActions({ deal, openQuickViewSignal }: { deal: Deal; openQuickViewSignal?: number }) {
+export function DealCardActions({
+  deal,
+  openQuickViewSignal,
+}: {
+  deal: Deal;
+  openQuickViewSignal?: number;
+}) {
   const { user } = useAuth();
   const compare = useCompare();
   const compared = isCompared(deal.id, "package");
@@ -138,10 +144,7 @@ export function DealCardActions({ deal, openQuickViewSignal }: { deal: Deal; ope
             setAlertOpen(false);
           }}
         >
-          <div
-            className="w-full max-w-sm rounded-3xl bg-background p-5 shadow-2xl"
-            onClick={stop}
-          >
+          <div className="w-full max-w-sm rounded-3xl bg-background p-5 shadow-2xl" onClick={stop}>
             <h4 className="text-sm font-black text-foreground">
               התראת מחיר · {deal.destination.name}
             </h4>

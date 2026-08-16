@@ -37,9 +37,9 @@ export function tripCost(deal: Deal, totalCentsOverride?: number): TripCost {
 
   // Package price already covers flights + hotel; the catalog average budget is
   // a full-trip per-person figure, so the on-ground allowance is what remains.
-  const avgTotalCents = dest.avgBudgetPerPerson > 0 ? dest.avgBudgetPerPerson * 100 * travelers : null;
-  const groundCents =
-    avgTotalCents !== null ? Math.max(0, avgTotalCents - b.totalCents) : null;
+  const avgTotalCents =
+    dest.avgBudgetPerPerson > 0 ? dest.avgBudgetPerPerson * 100 * travelers : null;
+  const groundCents = avgTotalCents !== null ? Math.max(0, avgTotalCents - b.totalCents) : null;
 
   const lines: CostLine[] = [
     {

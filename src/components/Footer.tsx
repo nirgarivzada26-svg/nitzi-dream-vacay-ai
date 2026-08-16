@@ -36,7 +36,6 @@ const columns: { title: string; links: FooterLink[] }[] = [
   },
 ];
 
-
 export function Footer() {
   return (
     <footer
@@ -112,7 +111,6 @@ export function Footer() {
                     )}
                   </li>
                 ))}
-
               </ul>
             </div>
           ))}
@@ -165,7 +163,6 @@ export function Footer() {
               </Link>
             ))}
           </div>
-
         </div>
       </div>
     </footer>

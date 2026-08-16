@@ -41,7 +41,8 @@ export function alternativeDestinations(
       reasons.push(`אותו אזור גיאוגרפי: ${c.region}`);
     }
     if (dest.avgBudgetPerPerson > 0 && c.avgBudgetPerPerson > 0) {
-      const gap = Math.abs(c.avgBudgetPerPerson - dest.avgBudgetPerPerson) / dest.avgBudgetPerPerson;
+      const gap =
+        Math.abs(c.avgBudgetPerPerson - dest.avgBudgetPerPerson) / dest.avgBudgetPerPerson;
       if (gap <= 0.25) {
         score += 14;
         reasons.push("תקציב ממוצע דומה");
@@ -55,10 +56,7 @@ export function alternativeDestinations(
       score += 6;
       reasons.push("טיסה ישירה מתל אביב");
     }
-    const months = overlap(
-      dest.bestTravelMonths.map(String),
-      c.bestTravelMonths.map(String),
-    );
+    const months = overlap(dest.bestTravelMonths.map(String), c.bestTravelMonths.map(String));
     if (months >= 3) {
       score += 8;
       reasons.push("עונת נסיעה חופפת");

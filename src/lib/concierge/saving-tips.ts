@@ -78,10 +78,7 @@ export function savingTips(deal: Deal, peers: Deal[], limit = 5): SavingTip[] {
 
   const nights = same
     .filter((p) => p.dates.nights !== deal.dates.nights)
-    .sort(
-      (a, b) =>
-        a.price.perPerson / a.dates.nights - b.price.perPerson / b.dates.nights,
-    )[0];
+    .sort((a, b) => a.price.perPerson / a.dates.nights - b.price.perPerson / b.dates.nights)[0];
   if (nights) {
     const basePerNight = base / Math.max(1, deal.dates.nights);
     const altPerNight = nights.price.perPerson / Math.max(1, nights.dates.nights);

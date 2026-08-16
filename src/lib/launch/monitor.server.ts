@@ -22,7 +22,6 @@ interface Filterable {
   neq: (column: string, value: string | number | boolean) => unknown;
 }
 
-
 export const DEFAULT_THRESHOLDS: AlertThresholds = {
   provider_failure_rate: 0.1,
   failed_payments: 3,
@@ -86,7 +85,6 @@ export async function buildMonitorPulse(windowHours = 1): Promise<MonitorPulse> 
     count("app_error_log", since, (q) => (q as never as Filterable).eq("source", "ai")),
     count("app_error_log", since, (q) => (q as never as Filterable).neq("source", "ai")),
   ]);
-
 
   const providerFailureRate = providerCalls > 0 ? providerFailures / providerCalls : 0;
 

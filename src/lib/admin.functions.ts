@@ -45,11 +45,11 @@ function claimsOf(claims: unknown) {
  * permanently closed after the first success regardless of these env vars.
  */
 export function bootstrapEnabled(): boolean {
-  return (process.env['ADMIN_BOOTSTRAP_ENABLED'] ?? "").toLowerCase() === "true";
+  return (process.env["ADMIN_BOOTSTRAP_ENABLED"] ?? "").toLowerCase() === "true";
 }
 
 function bootstrapEmail(): string | null {
-  const raw = (process.env['ADMIN_BOOTSTRAP_EMAIL'] ?? "").trim().toLowerCase();
+  const raw = (process.env["ADMIN_BOOTSTRAP_EMAIL"] ?? "").trim().toLowerCase();
   return raw.length > 0 ? raw : null;
 }
 
@@ -127,7 +127,6 @@ export const claimSuperAdmin = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
-
 
 export const adminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

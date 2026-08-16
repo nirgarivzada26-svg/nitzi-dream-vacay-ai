@@ -96,7 +96,6 @@ function readableDealName(rawId: string, loaderData: unknown): string | null {
 }
 
 export const Route = createFileRoute("/deal/$id")({
-
   validateSearch: (s: Record<string, unknown>) => ({
     flight: typeof s.flight === "string" ? s.flight : undefined,
   }),
