@@ -16,6 +16,13 @@ export interface AlertThresholds {
   ai_errors: number;
 }
 
+/** Minimal structural view of the PostgREST filter builder used by the counters below. */
+interface Filterable {
+  eq: (column: string, value: string | number | boolean) => unknown;
+  neq: (column: string, value: string | number | boolean) => unknown;
+}
+
+
 export const DEFAULT_THRESHOLDS: AlertThresholds = {
   provider_failure_rate: 0.1,
   failed_payments: 3,
