@@ -663,6 +663,42 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_offer_cache: {
+        Row: {
+          canonical_id: string
+          created_at: string
+          expires_at: string
+          offer: Json
+          provider_id: string
+          provider_offer_id: string
+          search_context: Json
+          source_mode: string
+          verified_at: string | null
+        }
+        Insert: {
+          canonical_id: string
+          created_at?: string
+          expires_at: string
+          offer: Json
+          provider_id: string
+          provider_offer_id: string
+          search_context: Json
+          source_mode: string
+          verified_at?: string | null
+        }
+        Update: {
+          canonical_id?: string
+          created_at?: string
+          expires_at?: string
+          offer?: Json
+          provider_id?: string
+          provider_offer_id?: string
+          search_context?: Json
+          source_mode?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       provider_webhook_events: {
         Row: {
           created_at: string
