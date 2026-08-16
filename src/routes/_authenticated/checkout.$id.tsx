@@ -679,9 +679,11 @@ function CheckoutPage() {
                 </div>
                 {contact.email && (
                   <p className="mt-4 text-[12px] font-bold text-muted-foreground">
-                    אישור ההזמנה נשלח אוטומטית לכתובת האימייל שמסרת ({maskEmail(contact.email)}).
+                    שליחת אישור באימייל אינה פעילה בשלב זה — יש להוריד את אישור ההזמנה (PDF). פרטי
+                    ההזמנה זמינים תמיד באזור האישי. ({maskEmail(contact.email)})
                   </p>
                 )}
+
               </section>
             )}
           </main>

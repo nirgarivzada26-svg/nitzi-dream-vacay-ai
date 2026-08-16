@@ -84,22 +84,24 @@ export const Route = createFileRoute("/deal/$id")({
   validateSearch: (s: Record<string, unknown>) => ({
     flight: typeof s.flight === "string" ? s.flight : undefined,
   }),
-  head: ({ params }) => ({
-    meta: [
-      { title: `דיל ל${decodeURIComponent(params.id)} — NITZI` },
-      {
-        name: "description",
-        content: `חבילת נופש מלאה ל${decodeURIComponent(params.id)}: טיסות, מלון, מסלול, פירוט מחיר מלא ומצב אימות שקוף.`,
-      },
-      { property: "og:title", content: `דיל ל${decodeURIComponent(params.id)} — NITZI` },
-      {
-        property: "og:description",
-        content: "טיסה + מלון + מסלול, עם פירוט מחיר מלא ומצב אימות שקוף.",
-      },
-      { property: "og:type", content: "product" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: ({ params, loaderData }) => {
+    const name = readableDealName(params.id, loaderData);
+    const title = name ? `חבילת נופש ל${name} — NITZI` : "חבילת נופש — NITZI";
+    const description = name
+      ? `חבילת נופש מלאה ל${name}: טיסות, מלון, מסלול, פירוט מחיר מלא ומצב אימות שקוף.`
+      : "חבילת נופש מלאה: טיסות, מלון, מסלול, פירוט מחיר מלא ומצב אימות שקוף.";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "product" },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+    };
+  },
+
   loader: ({ context, params }) => {
     const decoded = decodeCanonicalId(params.id);
     if (decoded.isLegacyDemoId) {
