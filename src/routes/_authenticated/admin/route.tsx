@@ -103,7 +103,7 @@ function AdminLayout() {
         <div className="w-full max-w-md rounded-3xl border border-border bg-card p-8 text-center shadow-sm">
           <ShieldCheck className="mx-auto h-8 w-8 text-primary" />
           <h1 className="mt-3 text-xl font-black">אזור ניהול</h1>
-          {me.needsBootstrap ? (
+          {me.needsBootstrap && me.bootstrapEligible ? (
             <>
               <p className="mt-2 text-sm text-muted-foreground">
                 עדיין אין מנהל מוגדר במערכת. אפשר להגדיר את החשבון הזה כסופר אדמין.
