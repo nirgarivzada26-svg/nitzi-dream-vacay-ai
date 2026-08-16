@@ -484,7 +484,7 @@ function CheckoutPage() {
                       type="email"
                       value={contact.email}
                       onChange={(v) => setContact((c) => ({ ...c, email: v }))}
-                      hint="אישור ההזמנה יישלח לכתובת הזו"
+                      hint="לשימוש הצוות בלבד — שליחת אישור באימייל עדיין לא פעילה"
                       validate={(v) =>
                         /\S+@\S+\.\S+/.test(v) ? undefined : "כתובת אימייל לא תקינה"
                       }

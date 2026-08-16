@@ -332,7 +332,7 @@ function ManageBookingPage() {
                           message: `בקשה לשליחה חוזרת של מסמכי ההזמנה ${bookingRef(b.id)} לכתובת ${contactEmail}.`,
                           bookingId: b.id,
                         }),
-                      "הבקשה נרשמה — הצוות ישלח את המסמכים לאימייל שבהזמנה.",
+                      "הבקשה נרשמה. שליחת מסמכים באימייל אינה פעילה בשלב זה — אפשר להוריד את אישור ההזמנה מהעמוד.",
                     )
                   }
                   className="flex items-center justify-center gap-2 rounded-2xl border border-border px-4 py-3 text-sm font-black hover:border-primary/50 disabled:opacity-50"

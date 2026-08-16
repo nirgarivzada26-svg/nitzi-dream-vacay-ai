@@ -56,7 +56,12 @@ function OrdersPage() {
       toast.error(e.message);
     },
     onSuccess: (_r, v) =>
-      toast.success(v.action === "resend_email" ? "אישור ההזמנה נשלח מחדש" : "ההזמנה עודכנה"),
+      toast.success(
+        v.action === "resend_email"
+          ? "הבקשה נרשמה ביומן — שליחת אימייל אינה פעילה עד לחיבור ספק דיוור"
+          : "ההזמנה עודכנה",
+      ),
+
     onSettled: () => {
       qc.invalidateQueries({ queryKey: ["admin", "orders"] });
       qc.invalidateQueries({ queryKey: ["admin", "overview"] });
