@@ -18,7 +18,6 @@ import { Footer } from "@/components/Footer";
 import { SignInModal } from "@/components/SignInModal";
 import { useAuth } from "@/lib/auth";
 import {
-import { canonicalLink } from "@/lib/seo";
   SUPPORT_FAQ,
   SUPPORT_TOPICS,
   createSupportRequest,
@@ -27,6 +26,7 @@ import { canonicalLink } from "@/lib/seo";
   type SupportRequestRow,
   type SupportTopic,
 } from "@/lib/support";
+import { canonicalLink } from "@/lib/seo";
 
 export const Route = createFileRoute("/support")({
   head: () => ({
