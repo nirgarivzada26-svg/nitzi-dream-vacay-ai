@@ -26,6 +26,52 @@ const roleEnum = z.enum([
   "finance",
 ]);
 
+function claimsOf(claims: unknown) {
+  const c = (claims ?? {}) as { email?: string; email_verified?: boolean };
+  return { email: c.email ?? null, emailVerified: c.email_verified === true };
+}
+
+/**
+ * Bootstrap is gated by BOTH an operator flag and an explicit account identity:
+ *
+ *   ADMIN_BOOTSTRAP_ENABLED=true      — operator opts in for the claim window
+ *   ADMIN_BOOTSTRAP_EMAIL=<address>   — the ONLY account allowed to claim
+ *
+ * Without the email allow-list, whoever reaches /admin first during the claim
+ * window becomes permanent super admin. The email is read from the
+ * server-validated JWT claims (never from request data), so it cannot be
+ * spoofed by a client. Once any staff row exists the advisory-locked
+ * claim_super_admin RPC refuses every further claim, so bootstrap is
+ * permanently closed after the first success regardless of these env vars.
+ */
+export function bootstrapEnabled(): boolean {
+  return (process.env['ADMIN_BOOTSTRAP_ENABLED'] ?? "").toLowerCase() === "true";
+}
+
+function bootstrapEmail(): string | null {
+  const raw = (process.env['ADMIN_BOOTSTRAP_EMAIL'] ?? "").trim().toLowerCase();
+  return raw.length > 0 ? raw : null;
+}
+
+/** Server-side truth for "may this caller claim super admin right now?". */
+function bootstrapDenialReason(claims: unknown): string | null {
+  if (!bootstrapEnabled()) {
+    return "בוטסטראפ מנהל כבוי.";
+  }
+  const allowed = bootstrapEmail();
+  if (!allowed) {
+    return "בוטסטראפ מנהל אינו מוגדר לחשבון מורשה.";
+  }
+  const { email, emailVerified } = claimsOf(claims);
+  if (!email || email.toLowerCase() !== allowed) {
+    return "החשבון הזה אינו מורשה לקבל הרשאת סופר אדמין.";
+  }
+  if (!emailVerified) {
+    return "יש לאמת את כתובת האימייל של החשבון לפני קבלת הרשאת סופר אדמין.";
+  }
+  return null;
+}
+
 export const adminMe = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<AdminMe> => {
@@ -35,37 +81,32 @@ export const adminMe = createServerFn({ method: "GET" })
     const count = await m.staffCount();
     return {
       userId: context.userId,
-      email: (context.claims as { email?: string } | null)?.email ?? null,
+      email: claimsOf(context.claims).email,
       roles,
       permissions,
       needsBootstrap: count === 0,
+      bootstrapEligible: count === 0 && bootstrapDenialReason(context.claims) === null,
     };
   });
-
-/**
- * First signed-in user may claim super admin while no staff exists —
- * but ONLY when an operator has explicitly opted in via
- * ADMIN_BOOTSTRAP_ENABLED=true. Without that flag, an unrelated visitor who
- * finds /admin before the intended owner does could otherwise silently
- * become super_admin on a fresh deployment. Set the flag for the first
- * deploy/claim, then unset it (or leave it unset going forward — the DB-side
- * advisory-locked claim_super_admin RPC already refuses a second claim once
- * any staff row exists, so this flag only matters for that narrow window).
- */
-export function bootstrapEnabled(): boolean {
-  return (process.env.ADMIN_BOOTSTRAP_ENABLED ?? "").toLowerCase() === "true";
-}
 
 export const claimSuperAdmin = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ ok: true }> => {
     const m = await import("./admin.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const email = claimsOf(context.claims).email;
 
-    if (!bootstrapEnabled()) {
-      throw new m.AdminError(
-        "בוטסטראפ מנהל כבוי. יש להגדיר את משתנה הסביבה ADMIN_BOOTSTRAP_ENABLED=true זמנית כדי לתפוס הרשאת סופר אדמין ראשונה, ולאחר מכן לכבות אותו.",
-      );
+    const denied = bootstrapDenialReason(context.claims);
+    if (denied) {
+      await m.logAudit({
+        actorId: context.userId,
+        actorEmail: email,
+        action: "claim_super_admin_denied",
+        resource: "user_roles",
+        resourceId: context.userId,
+        newValue: { reason: denied },
+      });
+      throw new m.AdminError(denied);
     }
 
     // Atomic bootstrap: the DB takes an advisory lock and refuses a second claim,
@@ -78,7 +119,7 @@ export const claimSuperAdmin = createServerFn({ method: "POST" })
 
     await m.logAudit({
       actorId: context.userId,
-      actorEmail: (context.claims as { email?: string } | null)?.email ?? null,
+      actorEmail: email,
       action: "claim_super_admin",
       resource: "user_roles",
       resourceId: context.userId,
@@ -86,6 +127,7 @@ export const claimSuperAdmin = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
 
 export const adminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

@@ -58,6 +58,8 @@ export interface AdminMe {
   permissions: AdminPermission[];
   /** True when no staff member exists yet — the first signed-in user may claim. */
   needsBootstrap: boolean;
+  /** True only for the explicitly authorized bootstrap account (server-computed). */
+  bootstrapEligible: boolean;
 }
 
 export interface DayPoint {
