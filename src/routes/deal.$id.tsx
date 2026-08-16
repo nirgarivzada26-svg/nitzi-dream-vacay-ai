@@ -80,7 +80,23 @@ import { decodeCanonicalId } from "@/lib/offers/canonical-id";
 import { LiveOfferView } from "@/components/deal/LiveOfferView";
 import { dealResolutionQueryOptions } from "@/lib/deal-resolution.functions";
 
+/**
+ * Human-readable destination name for the browser title / OG tags.
+ * Never falls back to the raw canonical id — customers must not see internal ids.
+ */
+function readableDealName(rawId: string, loaderData: unknown): string | null {
+  const slug = decodeCanonicalId(decodeURIComponent(rawId)).providerOfferId.split("~")[0];
+  if (Array.isArray(loaderData)) {
+    const hit = (loaderData as { slug?: string; name?: string }[]).find((d) => d?.slug === slug);
+    if (hit?.name) return hit.name;
+  }
+  const city = (loaderData as { refreshedOffer?: { destination?: { city?: string } } } | null)
+    ?.refreshedOffer?.destination?.city;
+  return city ?? null;
+}
+
 export const Route = createFileRoute("/deal/$id")({
+
   validateSearch: (s: Record<string, unknown>) => ({
     flight: typeof s.flight === "string" ? s.flight : undefined,
   }),
