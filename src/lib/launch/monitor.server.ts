@@ -65,22 +65,21 @@ export async function buildMonitorPulse(windowHours = 1): Promise<MonitorPulse> 
     appErrors,
   ] = await Promise.all([
     count("bookings", since),
-    count("bookings", since, (q) => (q as never as { eq: Function }).eq("status", "failed")),
+    count("bookings", since, (q) => (q as never as Filterable).eq("status", "failed")),
     count("payment_transactions", since),
+    count("payment_transactions", since, (q) => (q as never as Filterable).eq("status", "failed")),
     count("payment_transactions", since, (q) =>
-      (q as never as { eq: Function }).eq("status", "failed"),
-    ),
-    count("payment_transactions", since, (q) =>
-      (q as never as { eq: Function }).eq("operation", "refund"),
+      (q as never as Filterable).eq("operation", "refund"),
     ),
     count("provider_events", since),
-    count("provider_events", since, (q) => (q as never as { eq: Function }).eq("success", false)),
+    count("provider_events", since, (q) => (q as never as Filterable).eq("success", false)),
     count("provider_webhook_events", since, (q) =>
-      (q as never as { eq: Function }).eq("verified", false),
+      (q as never as Filterable).eq("verified", false),
     ),
-    count("app_error_log", since, (q) => (q as never as { eq: Function }).eq("source", "ai")),
-    count("app_error_log", since, (q) => (q as never as { neq: Function }).neq("source", "ai")),
+    count("app_error_log", since, (q) => (q as never as Filterable).eq("source", "ai")),
+    count("app_error_log", since, (q) => (q as never as Filterable).neq("source", "ai")),
   ]);
+
 
   const providerFailureRate = providerCalls > 0 ? providerFailures / providerCalls : 0;
 
